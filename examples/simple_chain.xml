@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<simulation xmlns="http://github.com/hmatuschek/stochbb">
+ <!-- Stimulus at t=0 -->
+ <delta id="stimulus">
+  <param name="delay">0</param>
+ </delta>
+ <!-- A fixed processing delay of 100ms -->
+ <delta id="fixed_delay">
+  <param name="delay">100</param>
+ </delta>
+ <!-- Processes the stimulus -->
+ <normal id="process">
+  <param name="mu">250</param>
+  <param name="sigma">100</param>
+ </normal>
+ <!-- Some additional noise -->
+ <normal id="noise">
+  <param name="mu">0</param>
+  <param name="sigma">50</param>
+ </normal>
+
+ <!-- Assemble the processing chain, result is "response" RV -->
+ <chain id="response">
+  <var>stimulus</var>     <!-- stimulus tiggers delay//-->
+  <var>fixed_delay</var>  <!-- delay triggers process //-->
+  <var>process</var>      <!-- process tiggers noise //-->
+  <var>noise</var>
+ </chain>
+
+ <!-- Evaluate the PDF of the response as the output -->
+ <eval-pdf from="0" to="500" steps="1000">
+  <var>response</var>
+ </eval-pdf>
+</Simulation>
