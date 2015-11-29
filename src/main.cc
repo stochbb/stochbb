@@ -1,8 +1,4 @@
-#include "lib/randomvariable.hh"
-#include "lib/operators.hh"
-#include "lib/minmax.hh"
-#include "lib/xmlparser.hh"
-#include "lib/exception.hh"
+#include "lib/api.hh"
 
 #include <iostream>
 #include <QFile>
@@ -31,17 +27,15 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  XmlParser parser;
   Simulation sim;
-  QDomElement root = doc.documentElement();
-  try { sim = parser.parse(root); }
+  try { sim = Simulation::fromXml(argv[1]); }
   catch (Error &err) {
     std::cerr << err.what() << std::endl;
     return -1;
   }
 
   size_t N = sim.steps(), M = sim.numOutputVars();
-  Eigen::MatrixXd out; sim.run(out);
+  Eigen::MatrixXd out(N, M+1); sim.run(out);
   for (size_t i=0; i<N; i++) {
     std::cout << out(i,0);
     for (size_t j=0; j<M; j++) {

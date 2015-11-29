@@ -79,54 +79,6 @@ protected:
   bool _marked;
 };
 
-
-/** Base class of all container classes.
- * @ingroup api */
-class Container
-{
-public:
-  /** The object type of the container. */
-  typedef Object ObjectType;
-
-protected:
-  /** Hidden constructor. */
-  Container();
-  /** Packs the given objects. */
-  explicit Container(Object *obj);
-  /** Copy constructor. */
-  Container(const Container &other);
-
-public:
-  /** Destructor. */
-  virtual ~Container();
-
-  /** Assignment operator. */
-  const Container &operator=(const Container &other);
-
-  /** Returns @c true if the container is empty. */
-  bool isNull() const;
-
-  /** Returns @c true if the object can be casted to the given container. */
-  template <class T>
-  bool is() const {
-    return 0 != dynamic_cast<typename T::ObjectType *>(this->_object);
-  }
-
-  /** Casts the object to the given container. */
-  template <class T>
-  T as() const {
-    return T(dynamic_cast<typename T::ObjectType *>(this->_object));
-  }
-
-protected:
-  /** Boxes the given object. */
-  void box(Object *obj);
-
-protected:
-  /** Holds the object. */
-  Object *_object;
-};
-
 }
 
 #endif

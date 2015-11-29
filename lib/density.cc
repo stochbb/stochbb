@@ -200,26 +200,3 @@ GammaDensityObj::sample(Eigen::VectorXd &out) const {
   }
 }
 
-
-/* ********************************************************************************************* *
- * Implementation of Density container
- * ********************************************************************************************* */
-Density::Density(DensityObj *obj)
-  : Container(obj), _density(obj)
-{
-  // pass...
-}
-
-Density::Density(const Density &other)
-  : Container(other), _density(other._density)
-{
-  // pass...
-}
-
-Density &
-Density::operator =(const Density &other) {
-  Container::operator =(other);
-  _density = other._density;
-  return *this;
-}
-

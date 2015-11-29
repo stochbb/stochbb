@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<simulation xmlns="http://github.com/hmatuschek/stochbb">
+<simulation xmlns="http://github.com/hmatuschek/stochbb/version-0">
  <!-- Stimulus at t=0 -->
  <var id="stimulus" type="delta">
   <param name="delay">0</param>
@@ -14,7 +14,13 @@
  <!-- Processes the stimulus -->
  <var id="process" type="gamma">
   <param name="k">10</param>
-  <param name="theta">50</param>
+  <param name="theta">100</param>
+ </var>
+
+ <!-- Some additional noise -->
+ <var id="noise" type="gamma">
+  <param name="k">3</param>
+  <param name="theta">10</param>
  </var>
 
  <!-- Assemble the processing chain, result is "response" RV -->
@@ -22,11 +28,7 @@
   <ref>stimulus</ref>     <!-- stimulus tiggers delay//-->
   <ref>fixed_delay</ref>  <!-- delay triggers process //-->
   <ref>process</ref>      <!-- process tiggers noise //-->
-  <!-- Some additional noise -->
-  <var id="noise" type="gamma">
-   <param name="k">3</param>
-   <param name="theta">10</param>
-  </var>
+  <ref>noise</ref>
  </var>
 
  <!-- Evaluate the PDF of the response as the output -->

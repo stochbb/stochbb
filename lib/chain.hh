@@ -43,29 +43,6 @@ protected:
   ConvolutionDensityObj *_density;
 };
 
-
-/** Implements the random variable
- * \f[
- *  Y = \sum_i X_i\,,
- * \f]
- * where \f$X_i\f$ are independent random variables. */
-class Chain: public Var
-{
-public:
-  typedef ChainObj ObjectType;
-
-public:
-  Chain(const Var &a, const Var &b);
-
-  Chain &operator =(const Chain &other);
-
-  inline size_t numVariables() const { return _chain->variables().size(); }
-  inline Var variable(size_t idx) const { return _chain->variables()[idx]; }
-
-protected:
-  ChainObj *_chain;
-};
-
 }
 
 #endif // CHAIN_HH

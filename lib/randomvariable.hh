@@ -62,60 +62,6 @@ protected:
 };
 
 
-class Var: public Container
-{
-public:
-  typedef VarObj ObjectType;
-
-public:
-  Var(VarObj *obj);
-  Var(const Var &other);
-
-  Var &operator =(const Var &other);
-  inline VarObj *operator *() const { return _randomVariable; }
-
-  inline Density density() const {
-    return _randomVariable->density();
-  }
-
-protected:
-  VarObj *_randomVariable;
-};
-
-
-class GenericVar: public Var
-{
-public:
-  typedef GenericVarObj ObjectType;
-
-public:
-  GenericVar(GenericVarObj *obj);
-  GenericVar(const Density &density);
-  GenericVar(const GenericVar &other);
-
-  GenericVar &operator=(const GenericVar &other);
-
-public:
-  inline static GenericVar delta(double delay) {
-    return GenericVarObj::delta(delay);
-  }
-
-  inline static GenericVar unif(double a, double b) {
-    return GenericVarObj::unif(a,b);
-  }
-
-  inline static GenericVar norm(double mu, double sigma) {
-    return GenericVarObj::norm(mu, sigma);
-  }
-
-  inline static GenericVar gamma(double k, double theta) {
-    return GenericVarObj::gamma(k, theta);
-  }
-
-protected:
-  GenericVarObj *_genericRV;
-};
-
 }
 
 #endif // __SBB_RANDOMVARIABLE_HH__

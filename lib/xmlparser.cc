@@ -3,7 +3,7 @@
 #include "minmax.hh"
 #include "exception.hh"
 #include <iostream>
-
+#include <QFile>
 
 using namespace sbb;
 
@@ -14,6 +14,30 @@ XmlParser::XmlParser() {
   _factories["gamma"] = &XmlParser::parseGamma;
   _factories["chain"] = &XmlParser::parseChain;
   _factories["maximum"] = &XmlParser::parseMaximum;
+  _factories["minimum"] = &XmlParser::parseMinimum;
+}
+
+Simulation
+XmlParser::parse(const QString &filename) {
+  QFile file(filename);
+  if (! file.open(QIODevice::ReadOnly)) {
+    ParserError err;
+    err << "Cannot open file " << filename.toStdString() << std::endl;
+    throw err;
+  }
+
+  QDomDocument doc;
+  QString msg; int row;
+  if (! doc.setContent(&file, &msg, &row)) {
+    file.close();
+    ParserError err;
+    err << "Cannot parse file " << filename.toStdString() << ": " << msg.toStdString()
+        << " @" << row << std::endl;
+    throw err;
+  }
+
+  QDomElement root = doc.documentElement();
+  return parse(root);
 }
 
 Simulation
@@ -125,6 +149,18 @@ XmlParser::parseMaximum(QDomElement &node, SimulationObj *sim, XmlParser *parser
     throw err;
   }
   return new MaximumObj(vars.toStdVector());
+}
+
+VarObj *
+XmlParser::parseMinimum(QDomElement &node, SimulationObj *sim, XmlParser *parser) {
+  QVector<VarObj *> vars = parser->parseVars(node, sim);
+  if (0 == vars.size()) {
+    ParserError err;
+    err << "ParserError @" << node.lineNumber()
+        << ": " << node.tagName().toStdString() << " has no variables.";
+    throw err;
+  }
+  return new MinimumObj(vars.toStdVector());
 }
 
 VarObj *

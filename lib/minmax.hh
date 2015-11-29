@@ -23,6 +23,23 @@ protected:
   std::vector<DensityObj *> _densities;
 };
 
+class MinimumDensityObj: public DensityObj
+{
+public:
+  MinimumDensityObj(const std::vector<VarObj *> &variables);
+  virtual ~MinimumDensityObj();
+  virtual void mark();
+
+  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void sample(Eigen::VectorXd &out) const;
+
+  inline const std::vector<DensityObj *> &densities() const { return _densities; }
+
+protected:
+  std::vector<DensityObj *> _densities;
+};
+
 
 class MaximumObj: public VarObj
 {
@@ -45,22 +62,24 @@ protected:
 };
 
 
-class Maximum: public Var
+class MinimumObj: public VarObj
 {
 public:
-  typedef MaximumObj ObjectType;
+  MinimumObj(VarObj *a, VarObj *b);
+  MinimumObj(const std::vector<VarObj *> &variables);
+  virtual ~MinimumObj();
 
-public:
-  Maximum(MaximumObj *obj);
-  Maximum(const Var &a, const Var &b);
-  Maximum(const Maximum &other);
-  Maximum &operator=(const Maximum &other);
+  virtual void mark();
 
-  inline size_t numVariables() const { return _maximum->variables().size(); }
-  inline Var variable(size_t idx) { return _maximum->variables()[idx]; }
+  virtual DensityObj *density();
+
+  const std::vector<VarObj *> variables() const {
+    return _variables;
+  }
 
 protected:
-  MaximumObj *_maximum;
+  std::vector<VarObj *> _variables;
+  MinimumDensityObj *_density;
 };
 
 }

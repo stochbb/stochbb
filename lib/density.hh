@@ -88,34 +88,6 @@ protected:
   double _theta;
 };
 
-
-class Density: public Container
-{
-public:
-  typedef DensityObj ObjectType;
-
-public:
-  Density(DensityObj *obj);
-  Density(const Density &other);
-
-  Density &operator=(const Density &other);
-
-  inline void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-    _density->eval(Tmin, Tmax, out);
-  }
-  inline void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-    _density->evalCDF(Tmin, Tmax, out);
-  }
-  inline void sample(Eigen::VectorXd &out) const {
-    _density->sample(out);
-  }
-
-  inline DensityObj *operator *() const { return _density; }
-
-protected:
-  DensityObj *_density;
-};
-
 }
 
 #endif // __SBB_DENSITY_HH__

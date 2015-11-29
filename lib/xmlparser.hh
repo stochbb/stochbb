@@ -1,7 +1,8 @@
 #ifndef __SBB_XMLPARSER_HH__
 #define __SBB_XMLPARSER_HH__
 
-#include "simulation.hh"
+#include "api.hh"
+
 #include <QDomElement>
 #include <QVector>
 #include <QHash>
@@ -12,7 +13,7 @@ class XmlParser
 {
 public:
   XmlParser();
-
+  Simulation parse(const QString &filename);
   Simulation parse(QDomElement &doc);
 
 protected:
@@ -27,6 +28,7 @@ protected:
   static VarObj *parseGamma(QDomElement &node, SimulationObj *sim, XmlParser *parser);
   static VarObj *parseChain(QDomElement &node, SimulationObj *sim, XmlParser *parser);
   static VarObj *parseMaximum(QDomElement &node, SimulationObj *sim, XmlParser *parser);
+  static VarObj *parseMinimum(QDomElement &node, SimulationObj *sim, XmlParser *parser);
 
   QHash<QString, double> parseParams(QDomElement &node, SimulationObj *sim);
   QVector<VarObj *> parseVars(QDomElement &node, SimulationObj *sim);

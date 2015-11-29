@@ -1,5 +1,6 @@
 #include "simulation.hh"
 
+
 using namespace sbb;
 
 /* ********************************************************************************************* *
@@ -104,34 +105,4 @@ SimulationObj::run(Eigen::MatrixXd &out) const {
     out(i,0) = t;
   }
 }
-
-
-/* ********************************************************************************************* *
- * Implementation of Simulation container
- * ********************************************************************************************* */
-Simulation::Simulation()
-  : Container(new SimulationObj()), _simulation(static_cast<SimulationObj *>(_object))
-{
-  // pass...
-}
-
-Simulation::Simulation(SimulationObj *object)
-  : Container(object), _simulation(object)
-{
-  // pass...
-}
-
-Simulation::Simulation(const Simulation &other)
-  : Container(other), _simulation(other._simulation)
-{
-  // pass...
-}
-
-Simulation &
-Simulation::operator =(const Simulation &other) {
-  Container::operator=(other);
-  _simulation = other._simulation;
-  return *this;
-}
-
 

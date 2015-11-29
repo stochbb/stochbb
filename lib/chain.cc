@@ -145,21 +145,3 @@ ChainObj::density() {
   return _density;
 }
 
-
-/* ********************************************************************************************* *
- * Implementation of Chain container
- * ********************************************************************************************* */
-Chain::Chain(const Var &a, const Var &b)
-  : Var(new ChainObj(*a, *b)), _chain(static_cast<ChainObj *>(_randomVariable))
-{
-  // pass...
-}
-
-Chain &
-Chain::operator=(const Chain &other) {
-  Var::operator=(other);
-  _chain = other._chain;
-  return *this;
-}
-
-
