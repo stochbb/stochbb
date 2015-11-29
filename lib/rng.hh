@@ -15,6 +15,7 @@ public:
   static double unif(double a, double b);
   static double norm();
   static double norm(double mean, double stddev);
+  static double gamma(double k, double theta);
 
 protected:
   static RNG *get();

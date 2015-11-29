@@ -2,34 +2,37 @@
 
 <simulation xmlns="http://github.com/hmatuschek/stochbb">
  <!-- Stimulus at t=0 -->
- <delta id="stimulus">
+ <var id="stimulus" type="delta">
   <param name="delay">0</param>
- </delta>
+ </var>
+
  <!-- A fixed processing delay of 100ms -->
- <delta id="fixed_delay">
+ <var id="fixed_delay" type="delta">
   <param name="delay">100</param>
- </delta>
+ </var>
+
  <!-- Processes the stimulus -->
- <normal id="process">
-  <param name="mu">250</param>
-  <param name="sigma">100</param>
- </normal>
- <!-- Some additional noise -->
- <normal id="noise">
-  <param name="mu">0</param>
-  <param name="sigma">50</param>
- </normal>
+ <var id="process" type="gamma">
+  <param name="k">10</param>
+  <param name="theta">50</param>
+ </var>
 
  <!-- Assemble the processing chain, result is "response" RV -->
- <chain id="response">
-  <var>stimulus</var>     <!-- stimulus tiggers delay//-->
-  <var>fixed_delay</var>  <!-- delay triggers process //-->
-  <var>process</var>      <!-- process tiggers noise //-->
-  <var>noise</var>
- </chain>
+ <var id="response" type="chain">
+  <ref>stimulus</ref>     <!-- stimulus tiggers delay//-->
+  <ref>fixed_delay</ref>  <!-- delay triggers process //-->
+  <ref>process</ref>      <!-- process tiggers noise //-->
+  <!-- Some additional noise -->
+  <var id="noise" type="gamma">
+   <param name="k">3</param>
+   <param name="theta">10</param>
+  </var>
+ </var>
 
  <!-- Evaluate the PDF of the response as the output -->
- <eval-pdf from="0" to="500" steps="1000">
-  <var>response</var>
- </eval-pdf>
-</Simulation>
+ <output from="0" to="700" steps="1000">
+  <pdf><ref>response</ref></pdf>
+  <pdf><ref>process</ref></pdf>
+  <pdf><ref>noise</ref></pdf>
+ </output>
+</simulation>

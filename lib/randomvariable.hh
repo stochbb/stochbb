@@ -8,29 +8,29 @@
 namespace sbb {
 
 
-class RandomVariableObj: public Object
+class VarObj: public Object
 {
 protected:
-  RandomVariableObj();
+  VarObj();
 
 public:
-  virtual ~RandomVariableObj();
+  virtual ~VarObj();
 
   virtual void mark();
 
   virtual DensityObj *density() = 0;
 
-  inline const std::set<RandomVariableObj *> &dependencies() const {
+  inline const std::set<VarObj *> &dependencies() const {
     return _dependencies;
   }
 
-  inline bool dependsOn(RandomVariableObj *var) const {
+  inline bool dependsOn(VarObj *var) const {
     return 0 != _dependencies.count(var);
   }
 
-  inline bool mutuallyIndep(RandomVariableObj *var) const {
+  inline bool mutuallyIndep(VarObj *var) const {
     if (dependsOn(var)) { return false; }
-    std::set<RandomVariableObj *>::const_iterator item = var->dependencies().begin();
+    std::set<VarObj *>::const_iterator item = var->dependencies().begin();
     for (; item != var->dependencies().end(); item++) {
       if (dependsOn(*item)) { return false; }
     }
@@ -39,77 +39,81 @@ public:
 
 
 protected:
-  std::set<RandomVariableObj *> _dependencies;
+  std::set<VarObj *> _dependencies;
 };
 
 
-class GenericRandomVariableObj: public RandomVariableObj
+class GenericVarObj: public VarObj
 {
 public:
-  GenericRandomVariableObj(DensityObj *density);
-  virtual ~GenericRandomVariableObj();
+  GenericVarObj(DensityObj *density);
+  virtual ~GenericVarObj();
   virtual void mark();
 
   virtual DensityObj *density();
 
 public:
-  static GenericRandomVariableObj *delta(double delay);
-  static GenericRandomVariableObj *unif(double a, double b);
-  static GenericRandomVariableObj *norm(double mu, double sigma);
-
+  static GenericVarObj *delta(double delay);
+  static GenericVarObj *unif(double a, double b);
+  static GenericVarObj *norm(double mu, double sigma);
+  static GenericVarObj *gamma(double k, double theta);
 protected:
   DensityObj *_density;
 };
 
 
-class RandomVariable: public Container
+class Var: public Container
 {
 public:
-  typedef RandomVariableObj ObjectType;
+  typedef VarObj ObjectType;
 
 public:
-  RandomVariable(RandomVariableObj *obj);
-  RandomVariable(const RandomVariable &other);
+  Var(VarObj *obj);
+  Var(const Var &other);
 
-  RandomVariable &operator =(const RandomVariable &other);
-  inline RandomVariableObj *operator *() const { return _randomVariable; }
+  Var &operator =(const Var &other);
+  inline VarObj *operator *() const { return _randomVariable; }
 
   inline Density density() const {
     return _randomVariable->density();
   }
 
 protected:
-  RandomVariableObj *_randomVariable;
+  VarObj *_randomVariable;
 };
 
 
-class GenericRandomVariable: public RandomVariable
+class GenericVar: public Var
 {
 public:
-  typedef GenericRandomVariableObj ObjectType;
+  typedef GenericVarObj ObjectType;
 
 public:
-  GenericRandomVariable(GenericRandomVariableObj *obj);
-  GenericRandomVariable(const Density &density);
-  GenericRandomVariable(const GenericRandomVariable &other);
+  GenericVar(GenericVarObj *obj);
+  GenericVar(const Density &density);
+  GenericVar(const GenericVar &other);
 
-  GenericRandomVariable &operator=(const GenericRandomVariable &other);
+  GenericVar &operator=(const GenericVar &other);
 
 public:
-  inline static GenericRandomVariable delta(double delay) {
-    return GenericRandomVariableObj::delta(delay);
+  inline static GenericVar delta(double delay) {
+    return GenericVarObj::delta(delay);
   }
 
-  inline static GenericRandomVariable unif(double a, double b) {
-    return GenericRandomVariableObj::unif(a,b);
+  inline static GenericVar unif(double a, double b) {
+    return GenericVarObj::unif(a,b);
   }
 
-  inline static GenericRandomVariable norm(double mu, double sigma) {
-    return GenericRandomVariableObj::norm(mu, sigma);
+  inline static GenericVar norm(double mu, double sigma) {
+    return GenericVarObj::norm(mu, sigma);
+  }
+
+  inline static GenericVar gamma(double k, double theta) {
+    return GenericVarObj::gamma(k, theta);
   }
 
 protected:
-  GenericRandomVariableObj *_genericRV;
+  GenericVarObj *_genericRV;
 };
 
 }

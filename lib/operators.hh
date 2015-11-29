@@ -4,7 +4,7 @@
 #include "randomvariable.hh"
 #include "chain.hh"
 
-inline sbb::Chain operator+(const sbb::RandomVariable &a, const sbb::RandomVariable &b) {
+inline sbb::Chain operator+(const sbb::Var &a, const sbb::Var &b) {
   return sbb::Chain(a,b);
 }
 

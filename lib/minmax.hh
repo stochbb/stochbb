@@ -9,7 +9,7 @@ namespace sbb {
 class MaximumDensityObj: public DensityObj
 {
 public:
-  MaximumDensityObj(const std::vector<RandomVariableObj *> &variables);
+  MaximumDensityObj(const std::vector<VarObj *> &variables);
   virtual ~MaximumDensityObj();
   virtual void mark();
 
@@ -24,40 +24,40 @@ protected:
 };
 
 
-class MaximumObj: public RandomVariableObj
+class MaximumObj: public VarObj
 {
 public:
-  MaximumObj(RandomVariableObj *a, RandomVariableObj *b);
-  MaximumObj(const std::vector<RandomVariableObj *> &variables);
+  MaximumObj(VarObj *a, VarObj *b);
+  MaximumObj(const std::vector<VarObj *> &variables);
   virtual ~MaximumObj();
 
   virtual void mark();
 
   virtual DensityObj *density();
 
-  const std::vector<RandomVariableObj *> variables() const {
+  const std::vector<VarObj *> variables() const {
     return _variables;
   }
 
 protected:
-  std::vector<RandomVariableObj *> _variables;
+  std::vector<VarObj *> _variables;
   MaximumDensityObj *_density;
 };
 
 
-class Maximum: public RandomVariable
+class Maximum: public Var
 {
 public:
   typedef MaximumObj ObjectType;
 
 public:
   Maximum(MaximumObj *obj);
-  Maximum(const RandomVariable &a, const RandomVariable &b);
+  Maximum(const Var &a, const Var &b);
   Maximum(const Maximum &other);
   Maximum &operator=(const Maximum &other);
 
   inline size_t numVariables() const { return _maximum->variables().size(); }
-  inline RandomVariable variable(size_t idx) { return _maximum->variables()[idx]; }
+  inline Var variable(size_t idx) { return _maximum->variables()[idx]; }
 
 protected:
   MaximumObj *_maximum;

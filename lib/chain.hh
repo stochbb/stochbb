@@ -10,7 +10,7 @@ namespace sbb {
 class ConvolutionDensityObj: public DensityObj
 {
 public:
-  ConvolutionDensityObj(const std::vector<RandomVariableObj *> &variables);
+  ConvolutionDensityObj(const std::vector<VarObj *> &variables);
   virtual ~ConvolutionDensityObj();
 
   virtual void mark();
@@ -26,20 +26,20 @@ protected:
 };
 
 
-class ChainObj : public RandomVariableObj
+class ChainObj : public VarObj
 {
 public:
-  ChainObj(RandomVariableObj *a, RandomVariableObj *b);
-  ChainObj(const std::vector<RandomVariableObj *> &variables);
+  ChainObj(VarObj *a, VarObj *b);
+  ChainObj(const std::vector<VarObj *> &variables);
   virtual ~ChainObj();
   virtual void mark();
 
   virtual DensityObj *density();
 
-  inline const std::vector<RandomVariableObj *> &variables() const { return _variables; }
+  inline const std::vector<VarObj *> &variables() const { return _variables; }
 
 protected:
-  std::vector<RandomVariableObj *> _variables;
+  std::vector<VarObj *> _variables;
   ConvolutionDensityObj *_density;
 };
 
@@ -49,18 +49,18 @@ protected:
  *  Y = \sum_i X_i\,,
  * \f]
  * where \f$X_i\f$ are independent random variables. */
-class Chain: public RandomVariable
+class Chain: public Var
 {
 public:
   typedef ChainObj ObjectType;
 
 public:
-  Chain(const RandomVariable &a, const RandomVariable &b);
+  Chain(const Var &a, const Var &b);
 
   Chain &operator =(const Chain &other);
 
   inline size_t numVariables() const { return _chain->variables().size(); }
-  inline RandomVariable variable(size_t idx) const { return _chain->variables()[idx]; }
+  inline Var variable(size_t idx) const { return _chain->variables()[idx]; }
 
 protected:
   ChainObj *_chain;

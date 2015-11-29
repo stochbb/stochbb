@@ -1,11 +1,13 @@
 #include "minmax.hh"
+#include "exception.hh"
 
 using namespace sbb;
+
 
 /* ********************************************************************************************* *
  * Implementation of MaximumDensityObj
  * ********************************************************************************************* */
-MaximumDensityObj::MaximumDensityObj(const std::vector<RandomVariableObj *> &variables)
+MaximumDensityObj::MaximumDensityObj(const std::vector<VarObj *> &variables)
   : DensityObj(), _densities()
 {
   _densities.reserve(variables.size());
@@ -78,9 +80,14 @@ MaximumDensityObj::sample(Eigen::VectorXd &out) const {
 /* ********************************************************************************************* *
  * Implementation of MaximumObj
  * ********************************************************************************************* */
-MaximumObj::MaximumObj(RandomVariableObj *a, RandomVariableObj *b)
-  : RandomVariableObj(), _variables(), _density(0)
+MaximumObj::MaximumObj(VarObj *a, VarObj *b)
+  : VarObj(), _variables(), _density(0)
 {
+  if (! a->mutuallyIndep(b)) {
+    AssumptionError err;
+    err << "Cannot assemble maximum variable, arguments are not mutually independent.";
+    throw err;
+  }
   if (MaximumObj *max_a = dynamic_cast<MaximumObj *>(a)) {
     _variables = max_a->variables();
   } else {
@@ -106,11 +113,16 @@ MaximumObj::MaximumObj(RandomVariableObj *a, RandomVariableObj *b)
   _density = new MaximumDensityObj(_variables);
 }
 
-MaximumObj::MaximumObj(const std::vector<RandomVariableObj *> &variables)
-  : RandomVariableObj(), _variables(variables), _density(0)
+MaximumObj::MaximumObj(const std::vector<VarObj *> &variables)
+  : VarObj(), _variables(variables), _density(0)
 {
   // Collect dependencies
   for (size_t i=0; i<_variables.size(); i++) {
+    if (! this->mutuallyIndep(_variables[i])) {
+      AssumptionError err;
+      err << "Cannot assemble maximum variable, arguments are not mutually independent.";
+      throw err;
+    }
     // Add implicit dependencies
     _dependencies.insert(_variables[i]->dependencies().begin(),
                          _variables[i]->dependencies().end());
@@ -128,7 +140,7 @@ MaximumObj::~MaximumObj() {
 void
 MaximumObj::mark() {
   if (isMarked()) { return; }
-  RandomVariableObj::mark();
+  VarObj::mark();
   for (size_t i=0; i<_variables.size(); i++) {
     _variables[i]->mark();
   }
@@ -145,26 +157,26 @@ MaximumObj::density() {
  * Implementation of Maximum container
  * ********************************************************************************************* */
 Maximum::Maximum(MaximumObj *obj)
-  : RandomVariable(obj), _maximum(obj)
+  : Var(obj), _maximum(obj)
 {
   // pass...
 }
 
-Maximum::Maximum(const RandomVariable &a, const RandomVariable &b)
-  : RandomVariable(new MaximumObj(*a, *b)), _maximum(static_cast<MaximumObj *>(_randomVariable))
+Maximum::Maximum(const Var &a, const Var &b)
+  : Var(new MaximumObj(*a, *b)), _maximum(static_cast<MaximumObj *>(_randomVariable))
 {
   // pass...
 }
 
 Maximum::Maximum(const Maximum &other)
-  : RandomVariable(other), _maximum(other._maximum)
+  : Var(other), _maximum(other._maximum)
 {
   // pass...
 }
 
 Maximum &
 Maximum::operator =(const Maximum &other) {
-  RandomVariable::operator =(other);
+  Var::operator =(other);
   _maximum = other._maximum;
   return *this;
 }

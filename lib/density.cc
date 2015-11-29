@@ -1,5 +1,6 @@
 #include "density.hh"
 #include "rng.hh"
+#include "math.hh"
 
 using namespace sbb;
 
@@ -90,7 +91,7 @@ void
 UniformDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = ((t >= _a) && (t <= _b)) ? 1.0 : 0.0;
+    out[i] = ((t >= _a) && (t <= _b)) ? 1./(Tmax-Tmin) : 0.0;
   }
 }
 
@@ -151,6 +152,51 @@ void
 NormalDensityObj::sample(Eigen::VectorXd &out) const {
   for (int i=0; i<out.size(); i++) {
     out[i] = RNG::norm(_mean, _stddev);
+  }
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GammaDensityObj
+ * ********************************************************************************************* */
+GammaDensityObj::GammaDensityObj(double k, double theta)
+  : DensityObj(), _k(k), _theta(theta)
+{
+  // pass...
+}
+
+GammaDensityObj::~GammaDensityObj() {
+  // pass...
+}
+
+void
+GammaDensityObj::mark() {
+  if (isMarked()) { return; }
+  DensityObj::mark();
+}
+
+void
+GammaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  double t = Tmin, dt = (Tmax-Tmin)/out.size();
+  double c = std::tgamma(_k)*std::pow(_theta, _k);
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    out[i] = (std::pow(t,_k-1)*std::exp(-t/_theta))/c;
+  }
+}
+
+void
+GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  double t = Tmin, dt = (Tmax-Tmin)/out.size();
+  double c = std::tgamma(_k);
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    out[i] = sbb::gamma_li(_k,t/_theta)/c;
+  }
+}
+
+void
+GammaDensityObj::sample(Eigen::VectorXd &out) const {
+  for (size_t i=0; i<out.size(); i++) {
+    out[i] = RNG::gamma(_k, _theta);
   }
 }
 

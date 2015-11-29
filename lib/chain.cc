@@ -1,4 +1,5 @@
 #include "chain.hh"
+#include "exception.hh"
 #include <unsupported/Eigen/FFT>
 
 using namespace sbb;
@@ -7,7 +8,7 @@ using namespace sbb;
 /* ********************************************************************************************* *
  * Implementation of ConvolutionDensityObj
  * ********************************************************************************************* */
-ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<RandomVariableObj *> &variables)
+ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<VarObj *> &variables)
   : DensityObj(), _densities()
 {
   _densities.reserve(variables.size());
@@ -36,9 +37,10 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) cons
   Eigen::VectorXcd tmp2(2*out.size());
   Eigen::VectorXcd prod(2*out.size()); prod.setOnes();
   // Perform FFT convolution
+  double dt = (Tmax-Tmin)/out.size();
   for (size_t i=0; i<_densities.size(); i++) {
     _densities[i]->eval(Tmin, Tmax, out);
-    tmp1.head(out.size()) = out;
+    tmp1.head(out.size()) = out*dt;
     fft.fwd(tmp2, tmp1); prod.array() *= tmp2.array();
   }
   fft.inv(tmp1, prod);
@@ -66,9 +68,16 @@ ConvolutionDensityObj::sample(Eigen::VectorXd &out) const {
 /* ********************************************************************************************* *
  * Implementation of ChainObj
  * ********************************************************************************************* */
-ChainObj::ChainObj(RandomVariableObj *a, RandomVariableObj *b)
-  : RandomVariableObj(), _variables(), _density(0)
+ChainObj::ChainObj(VarObj *a, VarObj *b)
+  : VarObj(), _variables(), _density(0)
 {
+  // Check if these two RVs are mutually independent
+  if (! a->mutuallyIndep(b)) {
+    AssumptionError err;
+    err << "Cannot assemble chain variable, arguments are not mutually independent.";
+    throw err;
+  }
+
   if (ChainObj *a_chain = dynamic_cast<ChainObj *>(a)) {
     _variables = a_chain->variables();
   } else {
@@ -96,12 +105,17 @@ ChainObj::ChainObj(RandomVariableObj *a, RandomVariableObj *b)
   }
 }
 
-ChainObj::ChainObj(const std::vector<RandomVariableObj *> &variables)
-  : RandomVariableObj(), _variables(variables)
+ChainObj::ChainObj(const std::vector<VarObj *> &variables)
+  : VarObj(), _variables(variables)
 {
   _density = new ConvolutionDensityObj(_variables);
   // Collect dependencies
   for (size_t i=0; i<_variables.size(); i++) {
+    if (! this->mutuallyIndep(_variables[i])) {
+      AssumptionError err;
+      err << "Cannot assemble chain variable, arguments are not mutually independent.";
+      throw err;
+    }
     // Add implicit dependencies
     _dependencies.insert(_variables[i]->dependencies().begin(),
                          _variables[i]->dependencies().end());
@@ -117,7 +131,7 @@ ChainObj::~ChainObj() {
 void
 ChainObj::mark() {
   if (isMarked()) { return; }
-  RandomVariableObj::mark();
+  VarObj::mark();
   // mark all variables held
   for (size_t i=0; i<_variables.size(); i++) {
     _variables[i]->mark();
@@ -135,15 +149,15 @@ ChainObj::density() {
 /* ********************************************************************************************* *
  * Implementation of Chain container
  * ********************************************************************************************* */
-Chain::Chain(const RandomVariable &a, const RandomVariable &b)
-  : RandomVariable(new ChainObj(*a, *b)), _chain(static_cast<ChainObj *>(_randomVariable))
+Chain::Chain(const Var &a, const Var &b)
+  : Var(new ChainObj(*a, *b)), _chain(static_cast<ChainObj *>(_randomVariable))
 {
   // pass...
 }
 
 Chain &
 Chain::operator=(const Chain &other) {
-  RandomVariable::operator=(other);
+  Var::operator=(other);
   _chain = other._chain;
   return *this;
 }

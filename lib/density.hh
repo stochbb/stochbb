@@ -72,6 +72,23 @@ protected:
 };
 
 
+class GammaDensityObj: public DensityObj
+{
+public:
+  GammaDensityObj(double k, double theta);
+  virtual ~GammaDensityObj();
+  virtual void mark();
+
+  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void sample(Eigen::VectorXd &out) const;
+
+protected:
+  double _k;
+  double _theta;
+};
+
+
 class Density: public Container
 {
 public:
