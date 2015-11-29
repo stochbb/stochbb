@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<module xmlns="http://github.com/hmatuschek/stochbb/module-0.0"
+        xmlns:m="http://www.w3.org/1998/Math/MathML">
+
+ <load>exp</load>
+
+ <define name="exgauss">
+  <param id="mu"/>
+  <param id="sigma"/>
+  <param id="lambda"/>
+
+  <var type="normal" id="X1">
+   <param name="mu"> <m:ci>mu</m:ci> </param>
+   <param name="sigma"> <m:ci>sigma</m:ci> </param>
+  </var>
+
+  <var type="exp" id="X2">
+   <param name="lambda"> <m:ci>lambda</m:ci> </param>
+  </var>
+
+  <var type="chain" id="exgauss">
+   <ref>X1</ref> <ref>X2</ref>
+  </var>
+ </define>
+
+</module>

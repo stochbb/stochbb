@@ -1,26 +1,27 @@
 <?xml version="1.0"?>
 
-<simulation xmlns="http://github.com/hmatuschek/stochbb/version-0">
+<simulation xmlns="http://github.com/hmatuschek/stochbb/simulation-0.0"
+            xmlns:m="http://www.w3.org/1998/Math/MathML">
  <!-- Stimulus at t=0 -->
  <var id="stimulus" type="delta">
-  <param name="delay">0</param>
+  <param name="delay"><m:cn>0</m:cn></param>
  </var>
 
  <!-- A fixed processing delay of 100ms -->
  <var id="fixed_delay" type="delta">
-  <param name="delay">100</param>
+  <param name="delay"><m:cn>100</m:cn></param>
  </var>
 
  <!-- Processes the stimulus -->
  <var id="process" type="gamma">
-  <param name="k">10</param>
-  <param name="theta">100</param>
+  <param name="k"><m:cn>10</m:cn></param>
+  <param name="theta"><m:cn>100</m:cn></param>
  </var>
 
  <!-- Some additional noise -->
  <var id="noise" type="gamma">
-  <param name="k">3</param>
-  <param name="theta">10</param>
+  <param name="k"><m:cn>3</m:cn></param>
+  <param name="theta"><m:cn>10</m:cn></param>
  </var>
 
  <!-- Assemble the processing chain, result is "response" RV -->

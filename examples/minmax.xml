@@ -1,18 +1,19 @@
 <?xml version="1.0"?>
 
-<simulation xmlns="http://github.com/hmatuschek/stochbb/version-0">
+<simulation xmlns="http://github.com/hmatuschek/stochbb/simulation-0.0"
+            xmlns:m="http://www.w3.org/1998/Math/MathML">
  <!-- Get 3 iid. Gamma(3,10) distributed RV -->
  <var id="X1" type="gamma">
-  <param name="k">5</param>
-  <param name="theta">10</param>
+  <param name="k"><m:cn>5</m:cn></param>
+  <param name="theta"><m:cn>10</m:cn></param>
  </var>
  <var id="X2" type="gamma">
-  <param name="k">5</param>
-  <param name="theta">10</param>
+  <param name="k"><m:cn>5</m:cn></param>
+  <param name="theta"><m:cn>10</m:cn></param>
  </var>
  <var id="X3" type="gamma">
-  <param name="k">5</param>
-  <param name="theta">10</param>
+  <param name="k"><m:cn>5</m:cn></param>
+  <param name="theta"><m:cn>10</m:cn></param>
  </var>
 
  <var id="min" type="minimum">
