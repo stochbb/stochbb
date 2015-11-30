@@ -97,7 +97,10 @@ UserVariableDefinition::instantiate(QDomElement &node, ContextObj *ctx, XmlParse
     throw err;
   }
 
-  return local->var(_name.toStdString());
+  VarObj *var = local->var(_name.toStdString());
+  if (node.hasAttribute("name")) { var->setName(node.attribute("name").toStdString()); }
+  else if (node.hasAttribute("id")) { var->setName(node.attribute("id").toStdString()); }
+  return var;
 }
 
 /* ********************************************************************************************* *
@@ -227,7 +230,11 @@ XmlParser::parseDelta(QDomElement &node, ContextObj *sim, XmlParser *parser) {
         << ": " << node.tagName().toStdString() << " has no 'delay' parameter.";
     throw err;
   }
-  return GenericVarObj::delta(params["delay"]);
+
+  std::string name = "";
+  if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
+  else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
+  return GenericVarObj::delta(params["delay"], name);
 }
 
 VarObj *
@@ -246,7 +253,10 @@ XmlParser::parseUnif(QDomElement &node, ContextObj *sim, XmlParser *parser) {
     throw err;
   }
 
-  return GenericVarObj::unif(params["a"], params["b"]);
+  std::string name = "";
+  if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
+  else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
+  return GenericVarObj::unif(params["a"], params["b"], name);
 }
 
 VarObj *
@@ -265,7 +275,10 @@ XmlParser::parseNorm(QDomElement &node, ContextObj *sim, XmlParser *parser) {
     throw err;
   }
 
-  return GenericVarObj::norm(params["mu"], params["sigma"]);
+  std::string name = "";
+  if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
+  else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
+  return GenericVarObj::norm(params["mu"], params["sigma"], name);
 }
 
 VarObj *
@@ -283,7 +296,11 @@ XmlParser::parseGamma(QDomElement &node, ContextObj *sim, XmlParser *parser) {
         << ": " << node.tagName().toStdString() << " has no 'theta' parameter.";
     throw err;
   }
-  return GenericVarObj::norm(params["k"], params["theta"]);
+
+  std::string name = "";
+  if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
+  else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
+  return GenericVarObj::gamma(params["k"], params["theta"], name);
 }
 
 VarObj *
@@ -295,7 +312,11 @@ XmlParser::parseChain(QDomElement &node, ContextObj *sim, XmlParser *parser) {
         << ": " << node.tagName().toStdString() << " has no variables.";
     throw err;
   }
-  return new ChainObj(vars.toStdVector());
+
+  std::string name = "";
+  if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
+  else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
+  return new ChainObj(vars.toStdVector(), name);
 }
 
 VarObj *
@@ -307,7 +328,11 @@ XmlParser::parseMaximum(QDomElement &node, ContextObj *sim, XmlParser *parser) {
         << ": " << node.tagName().toStdString() << " has no variables.";
     throw err;
   }
-  return new MaximumObj(vars.toStdVector());
+
+  std::string name = "";
+  if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
+  else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
+  return new MaximumObj(vars.toStdVector(), name);
 }
 
 VarObj *
@@ -319,7 +344,11 @@ XmlParser::parseMinimum(QDomElement &node, ContextObj *sim, XmlParser *parser) {
         << ": " << node.tagName().toStdString() << " has no variables.";
     throw err;
   }
-  return new MinimumObj(vars.toStdVector());
+
+  std::string name = "";
+  if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
+  else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
+  return new MinimumObj(vars.toStdVector(), name);
 }
 
 VarObj *

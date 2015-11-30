@@ -1,47 +1,93 @@
 #include "lib/api.hh"
+#include "lib/option_parser.hh"
+#include "plot.hh"
 
 #include <iostream>
-#include <QFile>
-#include <QDomDocument>
+#include <fstream>
 
 using namespace sbb;
 
-int main(int argc, char *argv[]) {
-  if (2 > argc) {
-    std::cerr << "Usage: stochbb FILENAME" << std::endl;
+int main(int argc, char *argv[])
+{
+  /*
+   * Assemble command-line options grammar...
+   */
+  opt::Parser parser;
+  opt::RuleInterface &cmd_help
+      = parser.Flag("help");
+  opt::RuleInterface &cmd_version
+      = parser.Flag("version");
+  opt::RuleInterface &cmd_run =
+      (parser.opt(parser.Flag("log-debug")),
+       parser.Value("filename"),
+       parser.opt(parser.Flag("plot") | parser.Option("csv")));
+  parser.setGrammar( cmd_help | cmd_version | cmd_run );
+
+  // parse command line options
+  if (! parser.parse((const char **)argv, argc)) {
+    std::cerr << "Error while parsing arguments." << std::endl
+              << parser.format_help("stochbb") << std::endl;
     return -1;
   }
 
-  QFile file(argv[1]);
-  if (! file.open(QIODevice::ReadOnly)) {
-    std::cerr << "Cannot open file " << argv[1] << std::endl;
-    return -1;
+  // on "help" command
+  if (parser.has_flag("help")) {
+    std::cout << parser.format_help("wtcli")  << std::endl;
+    return 0;
   }
 
-  QDomDocument doc;
-  QString msg; int row;
-  if (! doc.setContent(&file, &msg, &row)) {
-    file.close();
-    std::cerr << "Cannot parse file " << argv[1] << ": " << msg.toStdString()
-              << " @" << argv[1] << ":" << row << std::endl;
-    return -1;
+  // on "version" command
+  if (parser.has_flag("version")) {
+    std::cout << "stochbb - version 0.0" << std::endl;
+    return 0;
   }
 
+  IOLogHandler *handler = 0;
+  if (parser.has_flag("log-debug")) {
+    handler = new IOLogHandler(std::cerr, LogMessage::DEBUG);
+  } else {
+    handler = new IOLogHandler(std::cerr, LogMessage::INFO);
+  }
+  Logger::addHandler(handler);
+
+  // Otherwise run "simulation"
   Simulation sim;
-  try { sim = Simulation::fromXml(argv[1]); }
+  // get & parse filename
+  std::string filename = parser.get_values("filename").front();
+  logDebug() << "Load file '" << filename << "'.";
+  try { sim = Simulation::fromXml(filename); }
   catch (Error &err) {
-    std::cerr << err.what() << std::endl;
+    std::cerr << "Error while parsing file " << filename
+              << ": " << err.what() << std::endl;
     return -1;
   }
 
+  // run simulation
   size_t N = sim.steps(), M = sim.numOutputVars();
   Eigen::MatrixXd out(N, M+1); sim.run(out);
-  for (size_t i=0; i<N; i++) {
-    std::cout << out(i,0);
-    for (size_t j=0; j<M; j++) {
-      std::cout << '\t' << out(i,j+1);
+
+  // assemble vector of output variable names
+  std::vector<std::string> names; names.reserve(M);
+  for (size_t i=0; i<M; i++) {
+    names.push_back(sim.outputVar(i).name());
+  }
+
+  if (parser.has_flag("plot")) {
+    // if plot flag is specified -> plot results
+    do_plot(argc, argv, out, names);
+  } else if (parser.has_option("csv")) {
+    std::string filename = parser.get_option("csv").front();
+    std::ofstream file;
+    file.open(filename.c_str());
+    if (! file.is_open()) {
+      std::cerr << "Cannot open file '" << filename << "' for output." << std::endl;
+      return -1;
     }
-    std::cout << std::endl;
+    output_csv(out, file);
+    file.flush(); file.close();
+  } else {
+    // otherwise dump as csv
+    output_csv(out, std::cout);
   }
 
   return 0;

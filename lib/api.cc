@@ -97,8 +97,8 @@ GenericVar::GenericVar(GenericVarObj *obj)
   // pass...
 }
 
-GenericVar::GenericVar(const Density &density)
-  : Var(new GenericVarObj(*density)),
+GenericVar::GenericVar(const Density &density, const std::string &name)
+  : Var(new GenericVarObj(*density, name)),
     _genericRV(static_cast<GenericVarObj *>(_randomVariable))
 {
   // pass...
@@ -142,8 +142,8 @@ Density::operator =(const Density &other) {
 /* ********************************************************************************************* *
  * Implementation of Chain container
  * ********************************************************************************************* */
-Chain::Chain(const Var &a, const Var &b)
-  : Var(new ChainObj(*a, *b)), _chain(static_cast<ChainObj *>(_randomVariable))
+Chain::Chain(const Var &a, const Var &b, const std::string &name)
+  : Var(new ChainObj(*a, *b, name)), _chain(static_cast<ChainObj *>(_randomVariable))
 {
   // pass...
 }
@@ -165,8 +165,8 @@ Maximum::Maximum(MaximumObj *obj)
   // pass...
 }
 
-Maximum::Maximum(const Var &a, const Var &b)
-  : Var(new MaximumObj(*a, *b)), _maximum(static_cast<MaximumObj *>(_randomVariable))
+Maximum::Maximum(const Var &a, const Var &b, const std::string &name)
+  : Var(new MaximumObj(*a, *b, name)), _maximum(static_cast<MaximumObj *>(_randomVariable))
 {
   // pass...
 }

@@ -11,7 +11,7 @@ namespace sbb {
 class VarObj: public Object
 {
 protected:
-  VarObj();
+  VarObj(const std::string &name="");
 
 public:
   virtual ~VarObj();
@@ -37,26 +37,32 @@ public:
     return true;
   }
 
+  inline const std::string &name() const { return _name; }
+  inline void setName(const std::string &name) { _name = name; }
 
 protected:
   std::set<VarObj *> _dependencies;
+  std::string _name;
+
+protected:
+  static std::set<std::string> _var_names;
 };
 
 
 class GenericVarObj: public VarObj
 {
 public:
-  GenericVarObj(DensityObj *density);
+  GenericVarObj(DensityObj *density, const std::string &name="");
   virtual ~GenericVarObj();
   virtual void mark();
 
   virtual DensityObj *density();
 
 public:
-  static GenericVarObj *delta(double delay);
-  static GenericVarObj *unif(double a, double b);
-  static GenericVarObj *norm(double mu, double sigma);
-  static GenericVarObj *gamma(double k, double theta);
+  static GenericVarObj *delta(double delay, const std::string &name="");
+  static GenericVarObj *unif(double a, double b, const std::string &name="");
+  static GenericVarObj *norm(double mu, double sigma, const std::string &name="");
+  static GenericVarObj *gamma(double k, double theta, const std::string &name="");
 
 protected:
   DensityObj *_density;

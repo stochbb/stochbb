@@ -67,8 +67,8 @@ public:
   virtual void sample(Eigen::VectorXd &out) const;
 
 protected:
-  double _mean;
-  double _stddev;
+  double _mu;
+  double _sigma;
 };
 
 

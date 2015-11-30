@@ -29,8 +29,8 @@ protected:
 class ChainObj : public VarObj
 {
 public:
-  ChainObj(VarObj *a, VarObj *b);
-  ChainObj(const std::vector<VarObj *> &variables);
+  ChainObj(VarObj *a, VarObj *b, const std::string &name="");
+  ChainObj(const std::vector<VarObj *> &variables, const std::string &name="");
   virtual ~ChainObj();
   virtual void mark();
 

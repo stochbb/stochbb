@@ -1,6 +1,7 @@
 #include "density.hh"
 #include "rng.hh"
 #include "math.hh"
+#include "logger.hh"
 
 using namespace sbb;
 
@@ -31,7 +32,7 @@ DensityObj::mark() {
 DeltaDensityObj::DeltaDensityObj(double delay)
   : DensityObj(), _delay(delay)
 {
-  // pass...
+  logDebug() << "Create DeltaDensity with delay=" << _delay << ".";
 }
 
 DeltaDensityObj::~DeltaDensityObj() {
@@ -74,7 +75,7 @@ DeltaDensityObj::sample(Eigen::VectorXd &out) const {
 UniformDensityObj::UniformDensityObj(double a, double b)
   : DensityObj(), _a(a), _b(b)
 {
-  // pass...
+  logDebug() << "Create UniformDensity with a=" << _a << ", b=" << _b << ".";
 }
 
 UniformDensityObj::~UniformDensityObj() {
@@ -117,9 +118,9 @@ UniformDensityObj::sample(Eigen::VectorXd &out) const {
  * Implementation of NormalDensityObj
  * ********************************************************************************************* */
 NormalDensityObj::NormalDensityObj(double mean, double stddev)
-  : DensityObj(), _mean(mean), _stddev(stddev)
+  : DensityObj(), _mu(mean), _sigma(stddev)
 {
-  // pass...
+  logDebug() << "Create NormalDensity with mu=" << _mu << ", sigma=" << _sigma << ".";
 }
 
 NormalDensityObj::~NormalDensityObj() {
@@ -136,7 +137,7 @@ void
 NormalDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = std::exp( -(t-_mean)*(t-_mean)/(2*_stddev*_stddev) ) / (_stddev*std::sqrt(2*M_PI));
+    out[i] = std::exp( -(t-_mu)*(t-_mu)/(2*_sigma*_sigma) ) / (_sigma*std::sqrt(2*M_PI));
   }
 }
 
@@ -144,14 +145,14 @@ void
 NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = 0.5*(1+std::erf((t-_mean)/(_stddev*std::sqrt(2))));
+    out[i] = 0.5*(1+std::erf((t-_mu)/(_sigma*std::sqrt(2))));
   }
 }
 
 void
 NormalDensityObj::sample(Eigen::VectorXd &out) const {
   for (int i=0; i<out.size(); i++) {
-    out[i] = RNG::norm(_mean, _stddev);
+    out[i] = RNG::norm(_mu, _sigma);
   }
 }
 
@@ -162,7 +163,7 @@ NormalDensityObj::sample(Eigen::VectorXd &out) const {
 GammaDensityObj::GammaDensityObj(double k, double theta)
   : DensityObj(), _k(k), _theta(theta)
 {
-  // pass...
+  logDebug() << "Create GammaDensity with k=" << _k << ", theta=" << _theta << ".";
 }
 
 GammaDensityObj::~GammaDensityObj() {

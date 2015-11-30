@@ -44,8 +44,8 @@ protected:
 class MaximumObj: public VarObj
 {
 public:
-  MaximumObj(VarObj *a, VarObj *b);
-  MaximumObj(const std::vector<VarObj *> &variables);
+  MaximumObj(VarObj *a, VarObj *b, const std::string &name="");
+  MaximumObj(const std::vector<VarObj *> &variables, const std::string &name="");
   virtual ~MaximumObj();
 
   virtual void mark();
@@ -65,8 +65,8 @@ protected:
 class MinimumObj: public VarObj
 {
 public:
-  MinimumObj(VarObj *a, VarObj *b);
-  MinimumObj(const std::vector<VarObj *> &variables);
+  MinimumObj(VarObj *a, VarObj *b, const std::string &name="");
+  MinimumObj(const std::vector<VarObj *> &variables, const std::string &name="");
   virtual ~MinimumObj();
 
   virtual void mark();

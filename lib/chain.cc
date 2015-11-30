@@ -44,7 +44,7 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) cons
     fft.fwd(tmp2, tmp1); prod.array() *= tmp2.array();
   }
   fft.inv(tmp1, prod);
-  out = tmp1.head(out.size());
+  out = tmp1.head(out.size())/dt;
 }
 
 void
@@ -68,8 +68,8 @@ ConvolutionDensityObj::sample(Eigen::VectorXd &out) const {
 /* ********************************************************************************************* *
  * Implementation of ChainObj
  * ********************************************************************************************* */
-ChainObj::ChainObj(VarObj *a, VarObj *b)
-  : VarObj(), _variables(), _density(0)
+ChainObj::ChainObj(VarObj *a, VarObj *b, const std::string &name)
+  : VarObj(name), _variables(), _density(0)
 {
   // Check if these two RVs are mutually independent
   if (! a->mutuallyIndep(b)) {
@@ -105,8 +105,8 @@ ChainObj::ChainObj(VarObj *a, VarObj *b)
   }
 }
 
-ChainObj::ChainObj(const std::vector<VarObj *> &variables)
-  : VarObj(), _variables(variables)
+ChainObj::ChainObj(const std::vector<VarObj *> &variables, const std::string &name)
+  : VarObj(name), _variables(variables)
 {
   _density = new ConvolutionDensityObj(_variables);
   // Collect dependencies

@@ -99,10 +99,20 @@ public:
   Var(const Var &other);
 
   Var &operator =(const Var &other);
-  inline VarObj *operator *() const { return _randomVariable; }
+
+  inline VarObj *operator *() const {
+    return _randomVariable;
+  }
 
   inline Density density() const {
     return _randomVariable->density();
+  }
+
+  inline const std::string &name() const {
+    return _randomVariable->name();
+  }
+  inline void setName(const std::string &name) {
+    _randomVariable->setName(name);
   }
 
 protected:
@@ -117,7 +127,7 @@ public:
 
 public:
   GenericVar(GenericVarObj *obj);
-  GenericVar(const Density &density);
+  GenericVar(const Density &density, const std::string &name="");
   GenericVar(const GenericVar &other);
 
   GenericVar &operator=(const GenericVar &other);
@@ -156,7 +166,7 @@ public:
   typedef ChainObj ObjectType;
 
 public:
-  Chain(const Var &a, const Var &b);
+  Chain(const Var &a, const Var &b, const std::string &name="");
 
   Chain &operator =(const Chain &other);
 
@@ -175,7 +185,7 @@ public:
 
 public:
   Maximum(MaximumObj *obj);
-  Maximum(const Var &a, const Var &b);
+  Maximum(const Var &a, const Var &b, const std::string &name="");
   Maximum(const Maximum &other);
   Maximum &operator=(const Maximum &other);
 
@@ -252,6 +262,6 @@ protected:
 }
 
 #include "operators.hh"
-
+#include "logger.hh"
 
 #endif // __SBB_API_HH__

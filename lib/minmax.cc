@@ -155,8 +155,8 @@ MinimumDensityObj::sample(Eigen::VectorXd &out) const {
 /* ********************************************************************************************* *
  * Implementation of MaximumObj
  * ********************************************************************************************* */
-MaximumObj::MaximumObj(VarObj *a, VarObj *b)
-  : VarObj(), _variables(), _density(0)
+MaximumObj::MaximumObj(VarObj *a, VarObj *b, const std::string &name)
+  : VarObj(name), _variables(), _density(0)
 {
   if (! a->mutuallyIndep(b)) {
     AssumptionError err;
@@ -188,8 +188,8 @@ MaximumObj::MaximumObj(VarObj *a, VarObj *b)
   _density = new MaximumDensityObj(_variables);
 }
 
-MaximumObj::MaximumObj(const std::vector<VarObj *> &variables)
-  : VarObj(), _variables(variables), _density(0)
+MaximumObj::MaximumObj(const std::vector<VarObj *> &variables, const std::string &name)
+  : VarObj(name), _variables(variables), _density(0)
 {
   // Collect dependencies
   for (size_t i=0; i<_variables.size(); i++) {
@@ -231,8 +231,8 @@ MaximumObj::density() {
 /* ********************************************************************************************* *
  * Implementation of MinimumObj
  * ********************************************************************************************* */
-MinimumObj::MinimumObj(VarObj *a, VarObj *b)
-  : VarObj(), _variables(), _density(0)
+MinimumObj::MinimumObj(VarObj *a, VarObj *b, const std::string &name)
+  : VarObj(name), _variables(), _density(0)
 {
   if (! a->mutuallyIndep(b)) {
     AssumptionError err;
@@ -264,8 +264,8 @@ MinimumObj::MinimumObj(VarObj *a, VarObj *b)
   _density = new MinimumDensityObj(_variables);
 }
 
-MinimumObj::MinimumObj(const std::vector<VarObj *> &variables)
-  : VarObj(), _variables(variables), _density(0)
+MinimumObj::MinimumObj(const std::vector<VarObj *> &variables, const std::string &name)
+  : VarObj(name), _variables(variables), _density(0)
 {
   // Collect dependencies
   for (size_t i=0; i<_variables.size(); i++) {
