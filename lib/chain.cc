@@ -78,17 +78,24 @@ ChainObj::ChainObj(VarObj *a, VarObj *b, const std::string &name)
     throw err;
   }
 
+  // Flatten chain a
   if (ChainObj *a_chain = dynamic_cast<ChainObj *>(a)) {
+    // if a is a chain too -> add its variables directly
     _variables = a_chain->variables();
   } else {
+    // otherwise simply add a
     _variables.push_back(a);
   }
+
+  // Flatten chain b
   if (ChainObj *b_chain = dynamic_cast<ChainObj *>(b)) {
+    // if b is a chain too -> add its variables directly
     _variables.reserve(_variables.size()+b_chain->variables().size());
     for (size_t i=0; i<b_chain->variables().size(); i++) {
       _variables.push_back(b_chain->variables()[i]);
     }
   } else {
+    // otherwise
     _variables.push_back(b);
   }
 
@@ -97,10 +104,10 @@ ChainObj::ChainObj(VarObj *a, VarObj *b, const std::string &name)
 
   // Collect dependencies
   for (size_t i=0; i<_variables.size(); i++) {
-    // Add implicit dependencies
+    // add implicit dependencies
     _dependencies.insert(_variables[i]->dependencies().begin(),
                          _variables[i]->dependencies().end());
-    // add variable itself
+    // add explicit dependency
     _dependencies.insert(_variables[i]);
   }
 }

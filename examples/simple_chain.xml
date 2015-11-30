@@ -17,15 +17,15 @@
  </var>
 
  <!-- Assemble the processing chain, result is "response" RV -->
- <var id="response" type="chain">
+ <var type="chain" id="response">
   <ref>delay</ref>  <!-- delay triggers process //-->
   <ref>process</ref>
  </var>
 
  <!-- Evaluate the PDF of the response as the output -->
  <output from="0" to="700" steps="1000">
+ <pdf><ref>process</ref></pdf>
   <pdf><ref>response</ref></pdf>
-  <pdf><ref>process</ref></pdf>
  </output>
 
 </simulation>

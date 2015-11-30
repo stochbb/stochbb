@@ -24,7 +24,7 @@ do_plot(int argc, char *argv[], const Eigen::MatrixXd &out, const std::vector<st
     // Add a graph
     plot->addGraph();
     plot->graph(j)->setData(x,y);
-    plot->graph(j)->setPen(QPen(colors.at(j % colors.size())));
+    plot->graph(j)->setPen(QPen(colors.at(j % colors.size()), 2));
     if (0 == j) { plot->graph(j)->rescaleAxes(); }
     else { plot->graph(j)->rescaleAxes(true); }
     // Add graph to legend

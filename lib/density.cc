@@ -179,9 +179,9 @@ GammaDensityObj::mark() {
 void
 GammaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
-  double c = std::tgamma(_k)*std::pow(_theta, _k);
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = (std::pow(t,_k-1)*std::exp(-t/_theta))/c;
+    if (t<=0) { out[i] = 0; }
+    else { out[i] = std::exp((_k-1)*std::log(t) - t/_theta -std::lgamma(_k) -_k*std::log(_theta)); }
   }
 }
 

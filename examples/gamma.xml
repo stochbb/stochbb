@@ -3,7 +3,7 @@
 <simulation xmlns="http://hmatuschek.github.com/stochbb/simulation-0.0.dtd"
             xmlns:m="http://www.w3.org/1998/Math/MathML">
 
- <output from="0" to="700" steps="1000">
+ <output from="0" to="1000" steps="1000">
   <!-- A single Gamma(1,100) variable. -->
   <pdf>
    <var type="gamma" name="Gamma(1,100)">
