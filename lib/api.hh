@@ -1,3 +1,5 @@
+/** @defgroup api Programming interface. */
+
 #ifndef __SBB_API_HH__
 #define __SBB_API_HH__
 

@@ -3,6 +3,7 @@
 <module xmlns="http://github.com/hmatuschek/stochbb/module-0.0"
         xmlns:m="http://www.w3.org/1998/Math/MathML">
 
+ <!-- load definition of exp. distr. RV -->
  <load>exp</load>
 
  <define name="exgauss">

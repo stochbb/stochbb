@@ -57,6 +57,7 @@ public:
   static GenericVarObj *unif(double a, double b);
   static GenericVarObj *norm(double mu, double sigma);
   static GenericVarObj *gamma(double k, double theta);
+
 protected:
   DensityObj *_density;
 };

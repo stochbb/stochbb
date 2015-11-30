@@ -2,7 +2,9 @@
 
 <simulation xmlns="http://github.com/hmatuschek/stochbb/simulation-0.0"
             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
  <output from="0" to="600" steps="1000">
+  <!-- Chain of 3 Gamma(10,100) i.i.d. variables. -->
   <pdf>
    <var type="chain">
     <var type="gamma">
@@ -19,6 +21,8 @@
     </var>
    </var>
   </pdf>
+
+  <!-- A single Gamma(30,100) variable. -->
   <pdf>
    <var type="gamma">
     <param name="k"><m:cn>30</m:cn></param>
@@ -26,4 +30,5 @@
    </var>
   </pdf>
  </output>
+
 </simulation>

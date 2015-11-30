@@ -2,6 +2,7 @@
 
 <simulation xmlns="http://github.com/hmatuschek/stochbb/simulation-0.0"
             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
  <!-- Get 3 iid. Gamma(3,10) distributed RV -->
  <var id="X1" type="gamma">
   <param name="k"><m:cn>5</m:cn></param>
@@ -16,9 +17,12 @@
   <param name="theta"><m:cn>10</m:cn></param>
  </var>
 
+ <!-- Minimum distribution of X1, X2 and X3 -->
  <var id="min" type="minimum">
   <ref>X1</ref> <ref>X2</ref> <ref>X3</ref>
  </var>
+
+ <!-- Maximum distribution of X1, X2 and X3 -->
  <var id="max" type="maximum">
   <ref>X1</ref> <ref>X2</ref> <ref>X3</ref>
  </var>

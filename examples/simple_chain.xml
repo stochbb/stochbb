@@ -2,40 +2,30 @@
 
 <simulation xmlns="http://github.com/hmatuschek/stochbb/simulation-0.0"
             xmlns:m="http://www.w3.org/1998/Math/MathML">
- <!-- Stimulus at t=0 -->
- <var id="stimulus" type="delta">
-  <param name="delay"><m:cn>0</m:cn></param>
- </var>
+
+ <!-- Load definition of exp RV. -->
+ <load>exp</load>
 
  <!-- A fixed processing delay of 100ms -->
- <var id="fixed_delay" type="delta">
+ <var id="delay" type="delta">
   <param name="delay"><m:cn>100</m:cn></param>
  </var>
 
  <!-- Processes the stimulus -->
- <var id="process" type="gamma">
-  <param name="k"><m:cn>10</m:cn></param>
-  <param name="theta"><m:cn>100</m:cn></param>
- </var>
-
- <!-- Some additional noise -->
- <var id="noise" type="gamma">
-  <param name="k"><m:cn>3</m:cn></param>
-  <param name="theta"><m:cn>10</m:cn></param>
+ <var id="process" type="exp">
+  <param name="lambda"><m:cn>0.01</m:cn></param>
  </var>
 
  <!-- Assemble the processing chain, result is "response" RV -->
  <var id="response" type="chain">
-  <ref>stimulus</ref>     <!-- stimulus tiggers delay//-->
-  <ref>fixed_delay</ref>  <!-- delay triggers process //-->
-  <ref>process</ref>      <!-- process tiggers noise //-->
-  <ref>noise</ref>
+  <ref>delay</ref>  <!-- delay triggers process //-->
+  <ref>process</ref>
  </var>
 
  <!-- Evaluate the PDF of the response as the output -->
  <output from="0" to="700" steps="1000">
   <pdf><ref>response</ref></pdf>
   <pdf><ref>process</ref></pdf>
-  <pdf><ref>noise</ref></pdf>
  </output>
+
 </simulation>

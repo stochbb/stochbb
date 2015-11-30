@@ -1,13 +1,76 @@
 #include "simulation.hh"
+#include "exception.hh"
 
 
 using namespace sbb;
 
 /* ********************************************************************************************* *
+ * Implementation of ContextObj
+ * ********************************************************************************************* */
+ContextObj::ContextObj(ContextObj *parent)
+  : Object(), _parent(parent), _symbols(), _parameters()
+{
+  // pass...
+}
+
+ContextObj::~ContextObj() {
+  // pass...
+}
+
+void
+ContextObj::mark() {
+  if (isMarked()) { return; }
+  Object::mark();
+  std::map<std::string, VarObj *>::iterator item = _symbols.begin();
+  for (; item != _symbols.end(); item++) {
+    item->second->mark();
+  }
+}
+
+bool
+ContextObj::hasVar(const std::string &id) const {
+  if (_symbols.count(id)) { return true; }
+  if (_parent) { return _parent->hasVar(id); }
+  return false;
+}
+
+VarObj *
+ContextObj::var(const std::string &id) const {
+  if (_symbols.count(id)) { return _symbols.find(id)->second; }
+  return _parent->var(id);
+}
+
+void
+ContextObj::addVar(const std::string &id, VarObj *var) {
+  if (0 != _symbols.count(id)) {
+    ParserError err;
+    err << "ParserError: Cannot redefine variable '" << id << "'.";
+    throw err;
+  }
+  _symbols[id] = var;
+}
+
+bool
+ContextObj::hasParam(const std::string &id) const {
+  return ( 0 != _parameters.count(id) );
+}
+
+double
+ContextObj::param(const std::string &id) const {
+  return _parameters.find(id)->second;
+}
+
+void
+ContextObj::setParam(const std::string &id, double value) {
+  _parameters[id] = value;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of SimulationObj
  * ********************************************************************************************* */
 SimulationObj::SimulationObj()
-  : Object(), _symbols()
+  : ContextObj(0)
 {
   // pass...
 }
@@ -19,29 +82,10 @@ SimulationObj::~SimulationObj() {
 void
 SimulationObj::mark() {
   if (isMarked()) { return; }
-  Object::mark();
-  std::map<std::string, VarObj *>::iterator item = _symbols.begin();
-  for (; item != _symbols.end(); item++) {
-    item->second->mark();
-  }
+  ContextObj::mark();
   for (size_t i=0; i<_outputVariables.size(); i++) {
     _outputVariables[i]->mark();
   }
-}
-
-bool
-SimulationObj::hasVar(const std::string &id) {
-  return 0 != _symbols.count(id);
-}
-
-VarObj *
-SimulationObj::var(const std::string &id) {
-  return _symbols[id];
-}
-
-void
-SimulationObj::addVar(const std::string &id, VarObj *var) {
-  _symbols[id] = var;
 }
 
 double
