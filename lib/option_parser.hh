@@ -13,7 +13,8 @@ namespace opt {
 // forward declaration:
 class Parser;
 
-/** Interface class for all option rules. */
+/** Interface class for all option rules.
+ * @ingroup optionparser */
 class RuleInterface
 {
 public:
@@ -81,16 +82,22 @@ protected:
   std::string _long_name;
   /** If this is true the option does not accept a value, it is a flag. */
   bool _is_flag;
+
   friend class Parser;
 };
 
 
+/** Implements a simple keyword rule.
+ * @ingroup optionparser */
 class KeywordRule: public RuleInterface
 {
 protected:
+  /** Hidden constructor, use the @c Keyword static method of @c Parser to
+   * construct a keyword rule. */
   KeywordRule(Parser *parser, const std::string &keyword);
 
 public:
+  /** Destructor. */
   virtual ~KeywordRule();
 
   /** Tries to parse the option rule, returns true on success. */
@@ -100,7 +107,9 @@ public:
   virtual std::string dump();
 
 protected:
+  /** The keyword. */
   std::string _keyword;
+
   friend class Parser;
 };
 
@@ -189,10 +198,10 @@ public:
   virtual bool operator()(const char *argv[], int argc, size_t &idx, Parser &parser);
   virtual std::string dump();
 
-  friend class Parser;
-
 protected:
   std::string _id;
+
+  friend class Parser;
 };
 
 
@@ -250,13 +259,13 @@ public:
 
   virtual std::string dump();
 
-  friend class Parser;
-
 protected:
   /**
    * The optional option.
    */
   RuleInterface *rule;
+
+  friend class Parser;
 };
 
 

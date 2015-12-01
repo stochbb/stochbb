@@ -1,5 +1,6 @@
 #include "logger.hh"
 #include <QFileInfo>
+#include <iomanip>
 
 /* ********************************************************************************************* *
  * Implementation of LogMessage
@@ -111,8 +112,9 @@ IOLogHandler::handleMessage(const LogMessage &msg) {
   case LogMessage::WARNING: _stream << "WARNING: "; break;
   case LogMessage::ERROR: _stream << "ERROR: "; break;
   }
-  _stream << std::strftime(&msg.timestamp())
-          << ", @"  << msg.filename() << " line " << msg.linenumber()
+  std::string basename = msg.filename().substr(msg.filename().find_last_of("/\\") + 1);
+  _stream << std::put_time(std::localtime(&msg.timestamp()), "%c")
+          << ", @"  << basename << ":" << msg.linenumber()
           << ": " << msg.message() << "\n";
   _stream.flush();
 }

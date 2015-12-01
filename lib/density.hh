@@ -7,12 +7,16 @@
 namespace sbb {
 
 
+/** Base class of all densities.
+ * @ingroup internal */
 class DensityObj: public Object
 {
 protected:
+  /** Hidden constructor. */
   DensityObj();
 
 public:
+  /** Destructor. */
   virtual ~DensityObj();
   virtual void mark();
 
@@ -22,10 +26,14 @@ public:
 };
 
 
+/** Implements the delta distribution.
+ * @ingroup internal */
 class DeltaDensityObj: public DensityObj
 {
 public:
+  /** Constructor. */
   DeltaDensityObj(double delay);
+  /** Destructor. */
   virtual ~DeltaDensityObj();
   virtual void mark();
 
@@ -34,14 +42,19 @@ public:
   virtual void sample(Eigen::VectorXd &out) const;
 
 protected:
+  /** Holds the center of the distribution. */
   double _delay;
 };
 
 
+/** Implements the uniform distribution on the interval \f$[a,b]\f$.
+ * @ingroup internal */
 class UniformDensityObj: public DensityObj
 {
 public:
+  /** Constructor. */
   UniformDensityObj(double a, double b);
+  /** Destructor. */
   virtual ~UniformDensityObj();
   virtual void mark();
 
@@ -50,15 +63,21 @@ public:
   virtual void sample(Eigen::VectorXd &out) const;
 
 protected:
+  /** The lower end of the interval. */
   double _a;
+  /** The upper end of the interval. */
   double _b;
 };
 
 
+/** Implements the normal distribution.
+ * @ingroup internal */
 class NormalDensityObj: public DensityObj
 {
 public:
+  /** Constructor with mean and standard deviation. */
   NormalDensityObj(double mean, double stddev);
+  /** Destructor. */
   virtual ~NormalDensityObj();
   virtual void mark();
 
@@ -67,15 +86,21 @@ public:
   virtual void sample(Eigen::VectorXd &out) const;
 
 protected:
+  /** The mean. */
   double _mu;
+  /** The standard deviation. */
   double _sigma;
 };
 
 
+/** Implements the Gamma distribution.
+ * @ingroup internal */
 class GammaDensityObj: public DensityObj
 {
 public:
+  /** Constructor. */
   GammaDensityObj(double k, double theta);
+  /** Destructor. */
   virtual ~GammaDensityObj();
   virtual void mark();
 
@@ -84,7 +109,9 @@ public:
   virtual void sample(Eigen::VectorXd &out) const;
 
 protected:
+  /** The shape paramter. */
   double _k;
+  /** The scale parameter. */
   double _theta;
 };
 

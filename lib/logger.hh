@@ -82,7 +82,7 @@ protected:
 
 
 /** The base class of all log-handlers.
- * @ingroup internal */
+ * @ingroup api  */
 class LogHandler
 {
 protected:
