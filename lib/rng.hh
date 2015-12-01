@@ -5,20 +5,32 @@
 
 namespace sbb {
 
+/** Singleton class of the random number generator using the @c MersenneTwister.
+ * The singleton instance is not directly accessible, but random numbers can be drawn using the
+ * static methods.
+ * @ingroup internal */
 class RNG: protected MersenneTwister
 {
 protected:
+  /** Hidden constructor. */
   RNG();
 
 public:
+  /** Returns a uniformly distributed random value on the interval [0,1]. */
   static double unif();
+  /** Returns a uniformly distributed random value on the interval [a,b]. */
   static double unif(double a, double b);
+  /** Returns a stdandard normal distributed random value. */
   static double norm();
-  static double norm(double mean, double stddev);
+  /** Returns a normal distributed random value with mean mu and standard deviation sigma. */
+  static double norm(double mu, double sigma);
+  /** Returns a Gamma(k, theta) distributed random variable. */
   static double gamma(double k, double theta);
 
 protected:
+  /** Factory function. */
   static RNG *get();
+  /** Singleton instance. */
   static RNG *_instance;
 };
 

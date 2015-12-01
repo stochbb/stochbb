@@ -72,23 +72,16 @@ int main(int argc, char *argv[])
     names.push_back(sim.outputVar(i).name());
   }
 
+  // if plot flag is specified -> plot results
   if (parser.has_flag("plot")) {
-    // if plot flag is specified -> plot results
-    do_plot(argc, argv, out, names);
-  } else if (parser.has_option("csv")) {
-    std::string filename = parser.get_option("csv").front();
-    std::ofstream file;
-    file.open(filename.c_str());
-    if (! file.is_open()) {
-      std::cerr << "Cannot open file '" << filename << "' for output." << std::endl;
-      return -1;
-    }
-    output_csv(out, file);
-    file.flush(); file.close();
-  } else {
-    // otherwise dump as csv
-    output_csv(out, std::cout);
+    return do_plot(argc, argv, out, names);
   }
 
-  return 0;
+  // if CSV flag is specified -> save as CSV file
+  if (parser.has_option("csv")) {
+    return output_csv(out, parser.get_option("csv").front());
+  }
+
+  // otherwise dump as CSV to stdout
+  return output_csv(out, std::cout);
 }

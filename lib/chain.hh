@@ -6,11 +6,14 @@
 
 namespace sbb {
 
-
+/** Implements the convolution of several PDFs using the FFT convolution.
+ * @ingroup internal */
 class ConvolutionDensityObj: public DensityObj
 {
 public:
+  /** Constructs a new PDF as the convolution of the PDFs of the given variables. */
   ConvolutionDensityObj(const std::vector<VarObj *> &variables);
+  /** Destructor. */
   virtual ~ConvolutionDensityObj();
 
   virtual void mark();
@@ -19,27 +22,41 @@ public:
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void sample(Eigen::VectorXd &out) const;
 
-  inline const std::vector<DensityObj *> &densities() const { return _densities; }
+  /** Returns the densities of the underlaying variables. */
+  inline const std::vector<DensityObj *> &densities() const {
+    return _densities;
+  }
 
 protected:
+  /** The @c DensityObj instances of the underlaying variables. */
   std::vector<DensityObj *> _densities;
 };
 
 
+/** Represetns the sum of several independent random variables.
+ * @ingroup internal */
 class ChainObj : public VarObj
 {
 public:
+  /** Constructs the sum of the given random variables. */
   ChainObj(VarObj *a, VarObj *b, const std::string &name="");
+  /** Constructs the sum of the given random variables. */
   ChainObj(const std::vector<VarObj *> &variables, const std::string &name="");
+  /** Destructor. */
   virtual ~ChainObj();
   virtual void mark();
 
   virtual DensityObj *density();
 
-  inline const std::vector<VarObj *> &variables() const { return _variables; }
+  /** Returns the underlaying random variables. */
+  inline const std::vector<VarObj *> &variables() const {
+    return _variables;
+  }
 
 protected:
+  /** References to the underlaying random variables. */
   std::vector<VarObj *> _variables;
+  /** The density of the sum, the convolution of all PDFs of the underlaying random variables. */
   ConvolutionDensityObj *_density;
 };
 

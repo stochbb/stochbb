@@ -1,9 +1,11 @@
 #include "plot.hh"
 #include <QApplication>
 #include "qcustomplot.hh"
+#include <iostream>
+#include <fstream>
 
-void
-do_plot(int argc, char *argv[], const Eigen::MatrixXd &out, const std::vector<std::string> &names)
+
+int do_plot(int argc, char *argv[], const Eigen::MatrixXd &out, const std::vector<std::string> &names)
 {
   QApplication app(argc, argv);
   QCustomPlot *plot = new QCustomPlot();
@@ -37,10 +39,26 @@ do_plot(int argc, char *argv[], const Eigen::MatrixXd &out, const std::vector<st
   plot->setMinimumSize(700, 500);
   plot->show();
   app.exec();
+
+  return 0;
 }
 
 
-void
+int
+output_csv(Eigen::MatrixXd &out, const std::string &filename) {
+  std::ofstream file;
+  file.open(filename.c_str());
+  if (! file.is_open()) {
+    std::cerr << "Cannot open file '" << filename << "' for output." << std::endl;
+    return -1;
+  }
+  output_csv(out, file);
+  file.flush(); file.close();
+  return 0;
+}
+
+
+int
 output_csv(Eigen::MatrixXd &out, std::ostream &stream) {
   for (int i=0; i<out.rows(); i++) {
     stream << out(i,0);
@@ -49,4 +67,5 @@ output_csv(Eigen::MatrixXd &out, std::ostream &stream) {
     }
     stream << std::endl;
   }
+  return 0;
 }

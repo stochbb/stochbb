@@ -111,7 +111,7 @@ IOLogHandler::handleMessage(const LogMessage &msg) {
   case LogMessage::WARNING: _stream << "WARNING: "; break;
   case LogMessage::ERROR: _stream << "ERROR: "; break;
   }
-  _stream << std::asctime(std::localtime(&msg.timestamp()))
+  _stream << std::strftime(&msg.timestamp())
           << ", @"  << msg.filename() << " line " << msg.linenumber()
           << ": " << msg.message() << "\n";
   _stream.flush();

@@ -5,7 +5,11 @@
 #include <vector>
 
 
-void do_plot(int argc, char *argv[], const Eigen::MatrixXd &out, const std::vector<std::string> &names);
-void output_csv(Eigen::MatrixXd &out, std::ostream &stream);
+int do_plot(int argc, char *argv[], const Eigen::MatrixXd &out,
+            const std::vector<std::string> &names);
+
+int output_csv(Eigen::MatrixXd &out, const std::string &filename);
+
+int output_csv(Eigen::MatrixXd &out, std::ostream &stream);
 
 #endif // PLOT_HH

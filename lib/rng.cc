@@ -37,8 +37,8 @@ RNG::norm() {
 }
 
 double
-RNG::norm(double mean, double stddev) {
-  return mean + stddev*norm();
+RNG::norm(double mu, double sigma) {
+  return mu + sigma*norm();
 }
 
 double

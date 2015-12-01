@@ -142,6 +142,12 @@ Density::operator =(const Density &other) {
 /* ********************************************************************************************* *
  * Implementation of Chain container
  * ********************************************************************************************* */
+Chain::Chain(ChainObj *obj)
+  : Var(obj), _chain(obj)
+{
+  // pass...
+}
+
 Chain::Chain(const Var &a, const Var &b, const std::string &name)
   : Var(new ChainObj(*a, *b, name)), _chain(static_cast<ChainObj *>(_randomVariable))
 {

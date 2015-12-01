@@ -12,12 +12,12 @@ using namespace sbb;
 /* ********************************************************************************************* *
  * Implementation of VariableDefinition
  * ********************************************************************************************* */
-VariableDefinition::VariableDefinition()
+XmlParser::VariableDefinition::VariableDefinition()
 {
   // pass...
 }
 
-VariableDefinition::~VariableDefinition() {
+XmlParser::VariableDefinition::~VariableDefinition() {
   // pass...
 }
 
@@ -25,14 +25,15 @@ VariableDefinition::~VariableDefinition() {
 /* ********************************************************************************************* *
  * Implementation of GenericVariableDefinition
  * ********************************************************************************************* */
-GenericVariableDefinition::GenericVariableDefinition(VarObj *(*func)(QDomElement &, ContextObj *, XmlParser *))
+XmlParser::GenericVariableDefinition::GenericVariableDefinition(
+    VarObj *(*func)(QDomElement &, ContextObj *, XmlParser *))
   : VariableDefinition(), _func(func)
 {
   // pass...
 }
 
 VarObj *
-GenericVariableDefinition::instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser) {
+XmlParser::GenericVariableDefinition::instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser) {
   return _func(node, ctx, parser);
 }
 
@@ -40,7 +41,7 @@ GenericVariableDefinition::instantiate(QDomElement &node, ContextObj *ctx, XmlPa
 /* ********************************************************************************************* *
  * Implementation of UserVariableDefinition
  * ********************************************************************************************* */
-UserVariableDefinition::UserVariableDefinition(QDomElement &node)
+XmlParser::UserVariableDefinition::UserVariableDefinition(QDomElement &node)
   : VariableDefinition(), _definition(node.cloneNode().toElement()), _name()
 {
   // Get name
@@ -54,7 +55,7 @@ UserVariableDefinition::UserVariableDefinition(QDomElement &node)
 }
 
 VarObj *
-UserVariableDefinition::instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser) {
+XmlParser::UserVariableDefinition::instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser) {
   // Get parameter specification
   QHash<QString, double> params = parser->parseParams(node, ctx);
   // Create local context of variable definition
@@ -102,6 +103,7 @@ UserVariableDefinition::instantiate(QDomElement &node, ContextObj *ctx, XmlParse
   else if (node.hasAttribute("id")) { var->setName(node.attribute("id").toStdString()); }
   return var;
 }
+
 
 /* ********************************************************************************************* *
  * Implementation of XmlParser

@@ -8,7 +8,7 @@
 
 
 /** A log message.
- * @ingroup utils */
+ * @ingroup internal */
 class LogMessage
 {
 public:
@@ -82,7 +82,7 @@ protected:
 
 
 /** The base class of all log-handlers.
- * @ingroup utils */
+ * @ingroup internal */
 class LogHandler
 {
 protected:
@@ -103,7 +103,7 @@ protected:
 
 
 /** Serializes log messages to the given file.
- * @ingroup utils */
+ * @ingroup api */
 class IOLogHandler: public LogHandler
 {
 public:
@@ -122,7 +122,7 @@ protected:
 
 
 /** A singleton logger class.
- * @ingroup utils */
+ * @ingroup api */
 class Logger
 {
 protected:
@@ -152,16 +152,16 @@ protected:
 };
 
 /** Convenience macro to create a @c LogMessageStream with log level "DEBUG".
- * @ingroup utils */
+ * @ingroup api */
 #define logDebug()   (LogMessageStream(__FILE__, __LINE__, LogMessage::DEBUG))
 /** Convenience macro to create a @c LogMessageStream with log level "INFO".
- * @ingroup utils */
+ * @ingroup api */
 #define logInfo()    (LogMessageStream(__FILE__, __LINE__, LogMessage::INFO))
 /** Convenience macro to create a @c LogMessageStream with log level "Warning".
- * @ingroup utils */
+ * @ingroup api */
 #define logWarning() (LogMessageStream(__FILE__, __LINE__, LogMessage::WARNING))
 /** Convenience macro to create a @c LogMessageStream with log level "ERROR".
- * @ingroup utils */
+ * @ingroup api */
 #define logError()   (LogMessageStream(__FILE__, __LINE__, LogMessage::ERROR))
 
 #endif // LOGGER_H

@@ -1,3 +1,5 @@
+/** @defgroup internal Internal used objects
+ */
 #ifndef __SBB_OBJECT_HH__
 #define __SBB_OBJECT_HH__
 
@@ -13,7 +15,8 @@ namespace sbb {
 // Forward declaration
 class Object;
 
-/** Garbage collector. */
+/** Garbage collector.
+ * @ingroup internal */
 class GC
 {
 protected:
@@ -57,7 +60,8 @@ protected:
 };
 
 
-/** Base class of all managed objects. */
+/** Base class of all managed objects.
+ * @ingroup internal */
 class Object
 {
 protected:
