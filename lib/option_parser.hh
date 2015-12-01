@@ -57,12 +57,13 @@ class OptionRule: public RuleInterface
 protected:
   /** Constructor.
    * @param parser Specifies the parser that owns this rule.
+   * @param identifier Unique identifier of the option.
    * @param long_name Specifies the long name for the option.
    * @param is_flag Specifies if the option is a flag and do not take a value.
    * @param short_name Specifies the short name for the option. By default it is 0 this
    *    means there is no short name. */
-  OptionRule(Parser *parser, const std::string &identifier, const std::string &_long_name,
-             bool _is_flag = false, char _short_name=0);
+  OptionRule(Parser *parser, const std::string &identifier, const std::string &long_name,
+             bool is_flag = false, char short_name=0);
 
 public:
   /** Destructor. */
@@ -181,10 +182,8 @@ protected:
 
 
 
-/**
- * Represents a value of an option.
- * @ingroup optionparser
- */
+/** Represents a value of an option.
+ * @ingroup optionparser */
 class ValueRule: public RuleInterface
 {
 protected:
@@ -199,6 +198,7 @@ public:
   virtual std::string dump();
 
 protected:
+  /** Identifier of the value option. */
   std::string _id;
 
   friend class Parser;
@@ -364,6 +364,7 @@ public:
     return *rule;
   }
 
+  /** Constructs a @c OptionRule as a flag. */
   inline RuleInterface &Flag(const std::string &identifier, const std::string &name, char short_name=0) {
     RuleInterface *rule = new OptionRule(this, identifier, name, true, short_name);
     return *rule;

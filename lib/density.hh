@@ -20,8 +20,15 @@ public:
   virtual ~DensityObj();
   virtual void mark();
 
+  /** Evaluates the density at a regular grid on the interval \f$[Tmin, Tmax)\f$ and
+   * stores it into the given output vector. The number of grid points is determined
+   * by the length of the output vector. */
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const = 0;
+  /** Evaluates the probability function (CDF) at a regular grid on the interval \f$[Tmin, Tmax)\f$
+   * and stores it into the given output vector. The number of grid points is determined
+   * by the length of the output vector. */
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const = 0;
+  /** Samples from the distribution. */
   virtual void sample(Eigen::VectorXd &out) const = 0;
 };
 

@@ -7,9 +7,6 @@
 
 using namespace sbb::opt;
 
-struct str_convert_toupper {
-   void operator()(char& c) { c = ::toupper((unsigned char)c); }
-};
 
 RuleInterface::RuleInterface(Parser *parser)
   : _parser(parser)
@@ -40,7 +37,8 @@ RuleInterface::operator ,(RuleInterface &other)
 }
 
 
-OptionRule::OptionRule(Parser *parser, const std::string &identifier, const std::string &long_name, bool is_flag, char short_name)
+OptionRule::OptionRule(Parser *parser, const std::string &identifier,
+                       const std::string &long_name, bool is_flag, char short_name)
   : RuleInterface(parser), _short_name(short_name), _id(identifier), _long_name(long_name), _is_flag(is_flag)
 {
 }

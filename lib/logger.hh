@@ -109,7 +109,7 @@ class IOLogHandler: public LogHandler
 public:
   /** Constructor.
    * @param level Spicifies the mimimum log level to process.
-   * @param device File to log to, default: stderr. */
+   * @param stream Specifies the output stream. */
   IOLogHandler(std::ostream &stream, LogMessage::Level level=LogMessage::DEBUG);
 
   /** Implements the @c LogHandler interface. */

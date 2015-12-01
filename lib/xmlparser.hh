@@ -27,31 +27,31 @@ public:
   Simulation parse(QDomElement &doc);
 
 protected:
-  /** Parses a <load> statement. */
+  /** Parses a 'load' statement. */
   void parseLoad(QDomElement &node, ContextObj *ctx);
-  /** Parses a <module>. */
+  /** Parses a 'module' statement. */
   void parseModule(QDomElement &node, ContextObj *ctx);
-  /** Parses a <define> statement. */
+  /** Parses a 'define' statement. */
   void parseDefine(QDomElement &node, ContextObj *ctx);
-  /** Parses a <output> statement. */
+  /** Parses a 'output' statement. */
   void parseOutput(QDomElement &node, SimulationObj *sim);
   /** Parses a list of variable reference statements. */
   QVector<VarObj *> parseVars(QDomElement &node, ContextObj *sim);
-  /** Parses a variable reference, either a <ref> or <var> statement. */
+  /** Parses a variable reference, either a 'ref' or 'var' statement. */
   VarObj *parseVar(QDomElement &node, ContextObj *sim);
-  /** Parses a <var> statement. */
+  /** Parses a 'var' statement. */
   VarObj *parseVarDef(QDomElement &node, ContextObj *sim);
-  /** Parses a <ref> statement. */
+  /** Parses a 'ref' statement. */
   VarObj *parseVarRef(QDomElement &node, ContextObj *sim);
-  /** Parses a list of <param> statements. */
+  /** Parses a list of 'param' statements. */
   QHash<QString, double> parseParams(QDomElement &node, ContextObj *sim);
   /** Parses and evaluates MathML expressions. */
   double parseMathML(QDomElement &node, ContextObj *ctx);
-  /** Parses a MathML <cn> expression. */
+  /** Parses a MathML 'cn' expression. */
   double parseMMLNumber(QDomElement &node, ContextObj *ctx);
-  /** Parses a MathML <ci> expression. */
+  /** Parses a MathML 'ci' expression. */
   double parseMMLSymbol(QDomElement &node, ContextObj *ctx);
-  /** Parses a MathML <apply> expression. */
+  /** Parses a MathML 'apply' expression. */
   double parseMMLApply(QDomElement &node, ContextObj *ctx);
   /** Instantiates a delta distribution. */
   static VarObj *parseDelta(QDomElement &node, ContextObj *sim, XmlParser *parser);
@@ -120,7 +120,7 @@ protected:
 protected:
   /** Table of known variable types. */
   QHash<QString, VariableDefinition *> _factories;
-  /** Stack of current directories, needed to <load> with relative paths. */
+  /** Stack of current directories, needed to process 'load' statements with relative paths. */
   QList<QString> _pathStack;
 };
 
