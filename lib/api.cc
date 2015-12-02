@@ -1,5 +1,9 @@
 #include "api.hh"
 #include "xmlparser.hh"
+#include "density.hh"
+#include "randomvariable.hh"
+#include "chain.hh"
+#include "minmax.hh"
 
 
 using namespace sbb;
@@ -17,26 +21,18 @@ Container::Container()
 Container::Container(Object *obj)
   : _object(obj)
 {
-  // Register object with GC
-  if (0 != _object) {
-    GC::get().box(_object);
-  }
+  // pass...
 }
 
 Container::Container(const Container &other)
   : _object(other._object)
 {
-  // Register object with GC
-  if (0 != _object) {
-    GC::get().box(_object);
-  }
+  // pass...
 }
 
 Container::~Container() {
-  // Unregister object with GC
-  if (0 != _object) {
-    GC::get().unbox(_object);
-  }
+  // Decrement reference count
+  if (0 != _object) { _object->unref(); }
   _object = 0;
 }
 
@@ -44,10 +40,10 @@ const Container &
 Container::operator =(const Container &other)
 {
   // Unregister current object:
-  if (0 != _object) { GC::get().unbox(_object); }
+  if (0 != _object) { _object->unref(); }
   _object = other._object;
   // Register new object
-  if (0 != _object) { GC::get().box(_object); }
+  if (0 != _object) { _object->ref(); }
   // done.
   return *this;
 }
@@ -55,13 +51,6 @@ Container::operator =(const Container &other)
 bool
 Container::isNull() const {
   return 0 == _object;
-}
-
-void
-Container::box(Object *obj) {
-  if (0 != _object) { GC::get().unbox(_object); }
-  _object = obj;
-  if (0 != _object) { GC::get().box(_object); }
 }
 
 
@@ -85,6 +74,21 @@ Var::operator =(const Var &other) {
   Container::operator =(other);
   _randomVariable = other._randomVariable;
   return *this;
+}
+
+Density
+Var::density() const {
+  return _randomVariable->density();
+}
+
+const std::string &
+Var::name() const {
+  return _randomVariable->name();
+}
+
+void
+Var::setName(const std::string &name) {
+  _randomVariable->setName(name);
 }
 
 
@@ -117,6 +121,27 @@ GenericVar::operator =(const GenericVar &other) {
   return *this;
 }
 
+GenericVar
+GenericVar::delta(double delay) {
+  return GenericVarObj::delta(delay);
+}
+
+GenericVar
+GenericVar::unif(double a, double b) {
+  return GenericVarObj::unif(a,b);
+}
+
+GenericVar
+GenericVar::norm(double mu, double sigma) {
+  return GenericVarObj::norm(mu, sigma);
+}
+
+GenericVar
+GenericVar::gamma(double k, double theta) {
+  return GenericVarObj::gamma(k, theta);
+}
+
+
 /* ********************************************************************************************* *
  * Implementation of Density container
  * ********************************************************************************************* */
@@ -139,6 +164,17 @@ Density::operator =(const Density &other) {
   return *this;
 }
 
+void
+Density::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  _density->eval(Tmin, Tmax, out);
+}
+
+void
+Density::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  _density->evalCDF(Tmin, Tmax, out);
+}
+
+
 /* ********************************************************************************************* *
  * Implementation of Chain container
  * ********************************************************************************************* */
@@ -159,6 +195,16 @@ Chain::operator=(const Chain &other) {
   Var::operator=(other);
   _chain = other._chain;
   return *this;
+}
+
+size_t
+Chain::numVariables() const {
+  return _chain->numVariables();
+}
+
+Var
+Chain::variable(size_t idx) const {
+  return _chain->variable(idx);
 }
 
 
@@ -190,6 +236,16 @@ Maximum::operator =(const Maximum &other) {
   return *this;
 }
 
+size_t
+Maximum::numVariables() const {
+  return _maximum->numVariables();
+}
+
+Var
+Maximum::variable(size_t idx) const {
+  return _maximum->variable(idx);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of Minimum container
@@ -217,6 +273,16 @@ Minimum::operator =(const Minimum &other) {
   Var::operator =(other);
   _minimum = other._minimum;
   return *this;
+}
+
+size_t
+Minimum::numVariables() const {
+  return _minimum->numVariables();
+}
+
+Var
+Minimum::variable(size_t idx) const {
+  return _minimum->variable(idx);
 }
 
 
@@ -253,3 +319,70 @@ Simulation::fromXml(const std::string &filename) {
   XmlParser parser;
   return parser.parse(filename.c_str());
 }
+
+bool
+Simulation::hasVar(const std::string &id) const {
+  return _simulation->hasVar(id);
+}
+
+Var
+Simulation::var(const std::string &id) const {
+  return _simulation->var(id);
+}
+
+void
+Simulation::addVar(const std::string &id, Var &var) const {
+  _simulation->addVar(id, var);
+}
+
+double
+Simulation::tMin() const {
+  return _simulation->tMin();
+}
+
+void
+Simulation::setTMin(double tMin) {
+  _simulation->setTMin(tMin);
+}
+
+double
+Simulation::tMax() const {
+  return _simulation->tMax();
+}
+
+void
+Simulation::setTMax(double tMax) {
+  _simulation->setTMax(tMax);
+}
+
+size_t
+Simulation::steps() const {
+  return _simulation->steps();
+}
+
+void
+Simulation::setSteps(size_t steps) const {
+  _simulation->setSteps(steps);
+}
+
+size_t
+Simulation::numOutputVars() const {
+  return _simulation->numOutputVars();
+}
+
+Var outputVar(size_t idx) const {
+  Simulation::return _simulation->outputVar(idx);
+}
+
+
+void
+Simulation::addOutputVar(const Var &var) {
+  return _simulation->addOutputVar(var);
+}
+
+
+void
+Simulation::run(Eigen::MatrixXd &out) const {
+  return _simulation->run(out);
+}
+

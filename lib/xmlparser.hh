@@ -2,6 +2,7 @@
 #define __SBB_XMLPARSER_HH__
 
 #include "api.hh"
+#include "simulation.hh"
 
 #include <QDomElement>
 #include <QVector>

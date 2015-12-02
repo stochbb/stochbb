@@ -26,25 +26,19 @@ void
 GC::run()
 {
   // Mark all boxed objects:
-  std::unordered_map<Object *, size_t>::iterator item = _objects.begin();
-  for (; item!=_objects.end(); item++) {
-    if (item->second)
-      item->first->mark();
+  for (std::unordered_set<Object *>::iterator item=_objects.begin(); item!=_objects.end(); item++) {
+    if ((*item)->refcount())
+      (*item)->mark();
   }
   // Delete all unmarked objects:
-  std::list<Object *> del;
-  for (std::unordered_map<Object *, size_t>::iterator item=_objects.begin(); item!=_objects.end(); ) {
-    if (item->first->isMarked()) {
-      item->first->unmark(); item++;
+  for (std::unordered_set<Object *>::iterator item=_objects.begin(); item!=_objects.end(); ) {
+    if ((*item)->isMarked()) {
+      (*item)->unmark(); item++;
     } else {
-      Object *obj = item->first;
+      Object *obj = *item;
       item = _objects.erase(item);
       delete obj;
     }
-  }
-  // Free objects
-  for (std::list<Object *>::iterator item=del.begin(); item!=del.end(); item++) {
-    delete *item;
   }
 }
 
@@ -61,9 +55,9 @@ GC::get() {
  * Implementation of Object
  * ********************************************************************************************* */
 Object::Object()
-  : _marked(false)
+  : _marked(false), _refcount(1)
 {
-  GC::get().box(this);
+  GC::get().add(this);
 }
 
 Object::~Object() {

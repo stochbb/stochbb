@@ -196,7 +196,7 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 
 void
 GammaDensityObj::sample(Eigen::VectorXd &out) const {
-  for (size_t i=0; i<out.size(); i++) {
+  for (int i=0; i<out.size(); i++) {
     out[i] = RNG::gamma(_k, _theta);
   }
 }

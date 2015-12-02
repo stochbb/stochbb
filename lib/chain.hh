@@ -2,6 +2,7 @@
 #define CHAIN_HH
 
 #include <vector>
+#include "api.hh"
 #include "randomvariable.hh"
 
 namespace sbb {
@@ -21,6 +22,14 @@ public:
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void sample(Eigen::VectorXd &out) const;
+
+  /** Returns the number of underlaying densities. */
+  inline size_t numDensities() const { return _densities.size(); }
+  /** Returns the i-th density. */
+  inline Density density(size_t i) const {
+    _densities[i]->ref();
+    return _densities[i];
+  }
 
   /** Returns the densities of the underlaying variables. */
   inline const std::vector<DensityObj *> &densities() const {
@@ -48,10 +57,8 @@ public:
 
   virtual DensityObj *density();
 
-  /** Returns the underlaying random variables. */
-  inline const std::vector<VarObj *> &variables() const {
-    return _variables;
-  }
+  inline size_t numVariables() const { return _variables.size(); }
+  inline Var variable(size_t i) { return _variables[i]; }
 
 protected:
   /** References to the underlaying random variables. */

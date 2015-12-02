@@ -30,12 +30,14 @@ public:
   void run();
   /** Factory method. */
   static GC &get();
+
+protected:
   /** Registers an object with the GC. */
   inline void add(Object *obj) { _objects.insert(obj); }
 
 protected:
   /** The set of all objects. */
-  std::unordered_map<Object *, size_t> _objects;
+  std::unordered_set<Object *> _objects;
   /** The singleton instance. */
   static GC *_instance;
 
@@ -60,10 +62,18 @@ public:
   virtual void mark();
   /** Unmark the object. */
   void unmark();
+  /** Increments the reference counter. */
+  inline void ref() { _refcount++; }
+  /** Decrement the reference counter. */
+  inline void unref() { if (_refcount) _refcount--; if (!_refcount) GC::get().run(); }
+  /** Retruns the reference count. */
+  inline size_t refcount() const { return _refcount; }
 
 protected:
   /** If @c true, the object is marked. */
   bool _marked;
+  /** The reference counter. */
+  size_t _refcount;
 };
 
 }

@@ -13,16 +13,27 @@
 #ifndef __SBB_API_HH__
 #define __SBB_API_HH__
 
+#include <Eigen/Eigen>
 #include "exception.hh"
 #include "object.hh"
-#include "randomvariable.hh"
-#include "density.hh"
-#include "chain.hh"
-#include "minmax.hh"
-#include "simulation.hh"
+//#include "randomvariable.hh"
+//#include "density.hh"
+//#include "chain.hh"
+//#include "minmax.hh"
+//#include "simulation.hh"
 
 
 namespace sbb {
+
+// Forward declarations
+class DensityObj;
+class VarObj;
+class GenericVarObj;
+class ChainObj;
+class MaximumObj;
+class MinimumObj;
+class SimulationObj;
+
 
 /** Base class of all container classes.
  * @ingroup api */
@@ -35,7 +46,7 @@ public:
 protected:
   /** Hidden constructor. */
   Container();
-  /** Packs the given objects. */
+  /** Packs the given objects. Takes the reference of the object. */
   explicit Container(Object *obj);
   /** Copy constructor. */
   Container(const Container &other);
@@ -63,10 +74,6 @@ public:
   }
 
 protected:
-  /** Boxes the given object. */
-  void box(Object *obj);
-
-protected:
   /** Holds the object. */
   Object *_object;
 };
@@ -91,19 +98,13 @@ public:
   /** Evaluates the density (PDF) on a regular grid \f$[Tmin, Tmax)\f$ where the number
    * of grid points is specified via the length of the output vector @c out. The results are
    * stored into the output vector. */
-  inline void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-    _density->eval(Tmin, Tmax, out);
-  }
+  void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+
   /** Evaluates the probability function (CDF) on a regular grid \f$[Tmin, Tmax)\f$ where the number
    * of grid points is specified via the length of the output vector @c out. The results are
    * stored into the output vector. */
-  inline void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-    _density->evalCDF(Tmin, Tmax, out);
-  }
-  /** Samples from the distribution. */
-  inline void sample(Eigen::VectorXd &out) const {
-    _density->sample(out);
-  }
+  void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+
   /** Retruns a reference to the @c DensityObj. */
   inline DensityObj *operator *() const { return _density; }
 
@@ -134,17 +135,13 @@ public:
   }
 
   /** Returns a reference to the density associated with this random variable. */
-  inline Density density() const {
-    return _randomVariable->density();
-  }
+  Density density() const;
+
   /** Returns the optional name of the random variable. */
-  inline const std::string &name() const {
-    return _randomVariable->name();
-  }
+  const std::string &name() const;
+
   /** Sets the name of the random variable. */
-  inline void setName(const std::string &name) {
-    _randomVariable->setName(name);
-  }
+  void setName(const std::string &name);
 
 protected:
   /** Holds the pointer to the random variable object. */
@@ -172,21 +169,13 @@ public:
 
 public:
   /** Constructs a delta-distributed "random" variable. */
-  inline static GenericVar delta(double delay) {
-    return GenericVarObj::delta(delay);
-  }
+  static GenericVar delta(double delay);
   /** Constructs a uniformly distributed random variable. */
-  inline static GenericVar unif(double a, double b) {
-    return GenericVarObj::unif(a,b);
-  }
+  static GenericVar unif(double a, double b);
   /** Constructs a normal distributed random variable. */
-  inline static GenericVar norm(double mu, double sigma) {
-    return GenericVarObj::norm(mu, sigma);
-  }
+  static GenericVar norm(double mu, double sigma);
   /** Constructs a gamma distributed random variable. */
-  inline static GenericVar gamma(double k, double theta) {
-    return GenericVarObj::gamma(k, theta);
-  }
+  static GenericVar gamma(double k, double theta);
 
 protected:
   /** Holds the @c GenericVarObj. */
@@ -218,9 +207,9 @@ public:
   Chain &operator =(const Chain &other);
 
   /** Returns the number of random variables the chain depends on. */
-  inline size_t numVariables() const { return _chain->variables().size(); }
+  size_t numVariables() const;
   /** Returns the i-th random variable the chain depends on. */
-  inline Var variable(size_t idx) const { return _chain->variables()[idx]; }
+  Var variable(size_t idx) const;
 
 protected:
   /** Holds the @c ChainObj. */
@@ -252,9 +241,9 @@ public:
   Maximum &operator=(const Maximum &other);
 
   /** Returns the number of random variables the maximum depends on. */
-  inline size_t numVariables() const { return _maximum->variables().size(); }
+  size_t numVariables() const;
   /** Returns the i-th random variable the maximum depends on. */
-  inline Var variable(size_t idx) { return _maximum->variables()[idx]; }
+  Var variable(size_t idx) const;
 
 protected:
   /** Holds the @c MaximumObj. */
@@ -286,9 +275,9 @@ public:
   Minimum &operator=(const Minimum &other);
 
   /** Returns the number of random variables the minimum depends on. */
-  inline size_t numVariables() const { return _minimum->variables().size(); }
+  size_t numVariables() const;
   /** Returns the i-th random variable the minimum depends on. */
-  inline Var variable(size_t idx) { return _minimum->variables()[idx]; }
+  Var variable(size_t idx) const;
 
 protected:
   /** Holds the @c MinimumObj. */
@@ -322,41 +311,35 @@ public:
   Simulation &operator= (const Simulation &other);
 
   /** Returns @c true if the given random variable is known. */
-  inline bool hasVar(const std::string &id) const {
-    return _simulation->hasVar(id);
-  }
+  bool hasVar(const std::string &id) const;
   /** Returns the specified random variable. */
-  inline Var var(const std::string &id) const {
-    return _simulation->var(id);
-  }
+  Var var(const std::string &id) const;
   /** Adds a random variable to the simulation. */
-  inline void addVar(const std::string &id, Var &var) const {
-    _simulation->addVar(id, *var);
-  }
+  void addVar(const std::string &id, Var &var) const;
 
   /** Returns the start time of the simulation. */
-  inline double tMin() const { return _simulation->tMin(); }
+  double tMin() const;
   /** Sets the start time of the simulation. */
-  inline void setTMin(double tMin) { _simulation->setTMin(tMin); }
+  void setTMin(double tMin);
   /** Returns the end time of the simulation. */
-  inline double tMax() const { return _simulation->tMax(); }
+  double tMax() const;
   /** Sets the end time of the simulation. */
-  inline void setTMax(double tMax) { _simulation->setTMax(tMax); }
+  void setTMax(double tMax);
   /** Returns the number of time-steps. */
-  inline size_t steps() const { return _simulation->steps(); }
+  size_t steps() const;
   /** Sets the number of time-steps. */
-  inline void setSteps(size_t steps) const { _simulation->setSteps(steps); }
+  void setSteps(size_t steps) const;
   /** Returns the number of output variables. */
-  inline size_t numOutputVars() const { return _simulation->outputVars().size(); }
+  size_t numOutputVars() const;
   /** Returns the specified output variable. */
-  inline Var outputVar(size_t idx) const { return _simulation->outputVars()[idx]; }
+  Var outputVar(size_t idx) const;
   /** Adds a output variable to the simulation. */
-  inline void addOutputVar(const Var &var) { return _simulation->addOutputVar(*var); }
+  void addOutputVar(const Var &var);
 
   /** Performs the simulation and stores the results into the given matrix.
    * The matrix gets resized. Each column represents a output variable where the first
    * column is time. Each row represetns a time-point at which the PDFs are evaluated. */
-  inline void run(Eigen::MatrixXd &out) const { return _simulation->run(out); }
+  void run(Eigen::MatrixXd &out) const;
 
 public:
   /** Parses the simulation specification from XML.

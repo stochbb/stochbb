@@ -72,7 +72,7 @@ MaximumDensityObj::sample(Eigen::VectorXd &out) const {
   for (size_t i=0; i<_densities.size(); i++) {
     _densities[i]->sample(tmp); samples.col(i) = tmp;
   }
-  for (size_t i=0; i<out.size(); i++) {
+  for (int i=0; i<out.size(); i++) {
     out[i] = samples.row(i).maxCoeff();
   }
 }
@@ -147,7 +147,7 @@ MinimumDensityObj::sample(Eigen::VectorXd &out) const {
   for (size_t i=0; i<_densities.size(); i++) {
     _densities[i]->sample(tmp); samples.col(i) = tmp;
   }
-  for (size_t i=0; i<out.size(); i++) {
+  for (int i=0; i<out.size(); i++) {
     out[i] = samples.row(i).minCoeff();
   }
 }
