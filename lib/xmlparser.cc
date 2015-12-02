@@ -26,13 +26,13 @@ XmlParser::VariableDefinition::~VariableDefinition() {
  * Implementation of GenericVariableDefinition
  * ********************************************************************************************* */
 XmlParser::GenericVariableDefinition::GenericVariableDefinition(
-    VarObj *(*func)(QDomElement &, ContextObj *, XmlParser *))
+    Var (*func)(QDomElement &, ContextObj *, XmlParser *))
   : VariableDefinition(), _func(func)
 {
   // pass...
 }
 
-VarObj *
+Var
 XmlParser::GenericVariableDefinition::instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser) {
   return _func(node, ctx, parser);
 }
@@ -54,7 +54,7 @@ XmlParser::UserVariableDefinition::UserVariableDefinition(QDomElement &node)
   _name = _definition.attribute("name");
 }
 
-VarObj *
+Var
 XmlParser::UserVariableDefinition::instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser) {
   // Get parameter specification
   QHash<QString, double> params = parser->parseParams(node, ctx);
@@ -98,9 +98,9 @@ XmlParser::UserVariableDefinition::instantiate(QDomElement &node, ContextObj *ct
     throw err;
   }
 
-  VarObj *var = local->var(_name.toStdString());
-  if (node.hasAttribute("name")) { var->setName(node.attribute("name").toStdString()); }
-  else if (node.hasAttribute("id")) { var->setName(node.attribute("id").toStdString()); }
+  Var var(local->var(_name.toStdString()));
+  if (node.hasAttribute("name")) { var.setName(node.attribute("name").toStdString()); }
+  else if (node.hasAttribute("id")) { var.setName(node.attribute("id").toStdString()); }
   return var;
 }
 
@@ -223,7 +223,7 @@ XmlParser::parseModule(QDomElement &node, ContextObj *ctx) {
 }
 
 
-VarObj *
+Var
 XmlParser::parseDelta(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   QHash<QString, double> params = parser->parseParams(node, sim);
   if (0 == params.count("delay")) {
@@ -239,7 +239,7 @@ XmlParser::parseDelta(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   return GenericVarObj::delta(params["delay"], name);
 }
 
-VarObj *
+Var
 XmlParser::parseUnif(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   QHash<QString, double> params = parser->parseParams(node, sim);
   if (0 == params.count("a")) {
@@ -261,7 +261,7 @@ XmlParser::parseUnif(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   return GenericVarObj::unif(params["a"], params["b"], name);
 }
 
-VarObj *
+Var
 XmlParser::parseNorm(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   QHash<QString, double> params = parser->parseParams(node, sim);
   if (0 == params.count("mu")) {
@@ -283,7 +283,7 @@ XmlParser::parseNorm(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   return GenericVarObj::norm(params["mu"], params["sigma"], name);
 }
 
-VarObj *
+Var
 XmlParser::parseGamma(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   QHash<QString, double> params = parser->parseParams(node, sim);
   if (0 == params.count("k")) {
@@ -305,9 +305,9 @@ XmlParser::parseGamma(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   return GenericVarObj::gamma(params["k"], params["theta"], name);
 }
 
-VarObj *
+Var
 XmlParser::parseChain(QDomElement &node, ContextObj *sim, XmlParser *parser) {
-  QVector<VarObj *> vars = parser->parseVars(node, sim);
+  QVector<Var> vars = parser->parseVars(node, sim);
   if (0 == vars.size()) {
     ParserError err;
     err << "ParserError @" << node.lineNumber()
@@ -321,9 +321,9 @@ XmlParser::parseChain(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   return new ChainObj(vars.toStdVector(), name);
 }
 
-VarObj *
+Var
 XmlParser::parseMaximum(QDomElement &node, ContextObj *sim, XmlParser *parser) {
-  QVector<VarObj *> vars = parser->parseVars(node, sim);
+  QVector<Var> vars = parser->parseVars(node, sim);
   if (0 == vars.size()) {
     ParserError err;
     err << "ParserError @" << node.lineNumber()
@@ -337,9 +337,9 @@ XmlParser::parseMaximum(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   return new MaximumObj(vars.toStdVector(), name);
 }
 
-VarObj *
+Var
 XmlParser::parseMinimum(QDomElement &node, ContextObj *sim, XmlParser *parser) {
-  QVector<VarObj *> vars = parser->parseVars(node, sim);
+  QVector<Var> vars = parser->parseVars(node, sim);
   if (0 == vars.size()) {
     ParserError err;
     err << "ParserError @" << node.lineNumber()
@@ -353,7 +353,7 @@ XmlParser::parseMinimum(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   return new MinimumObj(vars.toStdVector(), name);
 }
 
-VarObj *
+Var
 XmlParser::parseVar(QDomElement &node, ContextObj *sim) {
   if ("var" == node.tagName()) { return parseVarDef(node, sim); }
   if ("ref" == node.tagName()) { return parseVarRef(node, sim); }
@@ -365,7 +365,7 @@ XmlParser::parseVar(QDomElement &node, ContextObj *sim) {
   throw err;
 }
 
-VarObj *
+Var
 XmlParser::parseVarDef(QDomElement &node, ContextObj *sim) {
   if (! node.hasAttribute("type")) {
     ParserError err;
@@ -380,14 +380,14 @@ XmlParser::parseVarDef(QDomElement &node, ContextObj *sim) {
         << node.attribute("type").toStdString() << "'.";
     throw err;
   }
-  VarObj *var = _factories[node.attribute("type")]->instantiate(node, sim, this);
+  Var var = _factories[node.attribute("type")]->instantiate(node, sim, this);
   if (node.hasAttribute("id")) {
     sim->addVar(node.attribute("id").toStdString(), var);
   }
   return var;
 }
 
-VarObj *
+Var
 XmlParser::parseVarRef(QDomElement &node, ContextObj *sim) {
   QString name = node.text();
   if (0 == name.size()) {
@@ -422,8 +422,8 @@ XmlParser::parseParams(QDomElement &node, ContextObj *sim) {
   return params;
 }
 
-QVector<VarObj *> XmlParser::parseVars(QDomElement &node, ContextObj *sim) {
-  QVector<VarObj *> vars;
+QVector<Var> XmlParser::parseVars(QDomElement &node, ContextObj *sim) {
+  QVector<Var> vars;
   for (QDomElement p=node.firstChildElement(); !p.isNull(); p=p.nextSiblingElement()) {
     vars.push_back(parseVar(p, sim));
   }
@@ -481,7 +481,7 @@ XmlParser::parseOutput(QDomElement &node, SimulationObj *sim) {
       throw err;
     }
     QDomElement cp = p.firstChildElement();
-    VarObj *var = parseVar(cp, sim);
+    Var var = parseVar(cp, sim);
     sim->addOutputVar(var);
   }
 }

@@ -37,13 +37,13 @@ protected:
   /** Parses a 'output' statement. */
   void parseOutput(QDomElement &node, SimulationObj *sim);
   /** Parses a list of variable reference statements. */
-  QVector<VarObj *> parseVars(QDomElement &node, ContextObj *sim);
+  QVector<Var> parseVars(QDomElement &node, ContextObj *sim);
   /** Parses a variable reference, either a 'ref' or 'var' statement. */
-  VarObj *parseVar(QDomElement &node, ContextObj *sim);
+  Var parseVar(QDomElement &node, ContextObj *sim);
   /** Parses a 'var' statement. */
-  VarObj *parseVarDef(QDomElement &node, ContextObj *sim);
+  Var parseVarDef(QDomElement &node, ContextObj *sim);
   /** Parses a 'ref' statement. */
-  VarObj *parseVarRef(QDomElement &node, ContextObj *sim);
+  Var parseVarRef(QDomElement &node, ContextObj *sim);
   /** Parses a list of 'param' statements. */
   QHash<QString, double> parseParams(QDomElement &node, ContextObj *sim);
   /** Parses and evaluates MathML expressions. */
@@ -55,19 +55,19 @@ protected:
   /** Parses a MathML 'apply' expression. */
   double parseMMLApply(QDomElement &node, ContextObj *ctx);
   /** Instantiates a delta distribution. */
-  static VarObj *parseDelta(QDomElement &node, ContextObj *sim, XmlParser *parser);
+  static Var parseDelta(QDomElement &node, ContextObj *sim, XmlParser *parser);
   /** Instantiates a uniform distribution. */
-  static VarObj *parseUnif(QDomElement &node, ContextObj *sim, XmlParser *parser);
+  static Var parseUnif(QDomElement &node, ContextObj *sim, XmlParser *parser);
   /** Instantiates a normal distribution. */
-  static VarObj *parseNorm(QDomElement &node, ContextObj *sim, XmlParser *parser);
+  static Var parseNorm(QDomElement &node, ContextObj *sim, XmlParser *parser);
   /** Instantiates a gamma distribution. */
-  static VarObj *parseGamma(QDomElement &node, ContextObj *sim, XmlParser *parser);
+  static Var parseGamma(QDomElement &node, ContextObj *sim, XmlParser *parser);
   /** Instantiates a chain of random processes. */
-  static VarObj *parseChain(QDomElement &node, ContextObj *sim, XmlParser *parser);
+  static Var parseChain(QDomElement &node, ContextObj *sim, XmlParser *parser);
   /** Instantiates a maximum of random variables. */
-  static VarObj *parseMaximum(QDomElement &node, ContextObj *sim, XmlParser *parser);
+  static Var parseMaximum(QDomElement &node, ContextObj *sim, XmlParser *parser);
   /** Instantiates a minimum of random variables. */
-  static VarObj *parseMinimum(QDomElement &node, ContextObj *sim, XmlParser *parser);
+  static Var parseMinimum(QDomElement &node, ContextObj *sim, XmlParser *parser);
 
 protected:
   /** Abstract class of known random variable types.
@@ -83,7 +83,7 @@ protected:
     virtual ~VariableDefinition();
 
     /** Needs to be implemented to instantiate a random variable. */
-    virtual VarObj *instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser) = 0;
+    virtual Var instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser) = 0;
   };
 
   /** User defined random variable definition in XML.
@@ -94,7 +94,7 @@ protected:
     /** Constructor. */
     UserVariableDefinition(QDomElement &node);
 
-    virtual VarObj *instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser);
+    virtual Var instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser);
 
   protected:
     /** The variable type definition. */
@@ -109,13 +109,13 @@ protected:
   {
   public:
     /** Constructor. Taks a factor function. */
-    GenericVariableDefinition(VarObj *(*func)(QDomElement &node, ContextObj *ctx, XmlParser *parser));
+    GenericVariableDefinition(Var (*func)(QDomElement &node, ContextObj *ctx, XmlParser *parser));
 
-    VarObj *instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser);
+    Var instantiate(QDomElement &node, ContextObj *ctx, XmlParser *parser);
 
   protected:
     /** The factory function. */
-    VarObj *(*_func)(QDomElement &node, ContextObj *ctx, XmlParser *parser);
+    Var (*_func)(QDomElement &node, ContextObj *ctx, XmlParser *parser);
   };
 
 protected:

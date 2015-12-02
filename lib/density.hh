@@ -28,8 +28,6 @@ public:
    * and stores it into the given output vector. The number of grid points is determined
    * by the length of the output vector. */
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const = 0;
-  /** Samples from the distribution. */
-  virtual void sample(Eigen::VectorXd &out) const = 0;
 };
 
 
@@ -46,7 +44,6 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
 
 protected:
   /** Holds the center of the distribution. */
@@ -67,7 +64,6 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
 
 protected:
   /** The lower end of the interval. */
@@ -90,7 +86,6 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
 
 protected:
   /** The mean. */
@@ -113,7 +108,6 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
 
 protected:
   /** The shape paramter. */

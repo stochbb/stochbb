@@ -34,20 +34,25 @@ ContextObj::hasVar(const std::string &id) const {
   return false;
 }
 
-VarObj *
-ContextObj::var(const std::string &id) const {
-  if (_symbols.count(id)) { return _symbols.find(id)->second; }
-  return _parent->var(id);
+Var ContextObj::var(const std::string &id) const {
+  if (_symbols.count(id)) {
+    _symbols.find(id)->second->ref();
+    return _symbols.find(id)->second;
+  }
+  if (_parent) {
+    return _parent->var(id);
+  }
+  return 0;
 }
 
 void
-ContextObj::addVar(const std::string &id, VarObj *var) {
+ContextObj::addVar(const std::string &id, const Var &var) {
   if (0 != _symbols.count(id)) {
     ParserError err;
     err << "ParserError: Cannot redefine variable '" << id << "'.";
     throw err;
   }
-  _symbols[id] = var;
+  _symbols[id] = *var;
 }
 
 bool
@@ -118,14 +123,9 @@ SimulationObj::setSteps(size_t steps) {
   _steps = steps;
 }
 
-const std::vector<VarObj *> &
-SimulationObj::outputVars() const {
-  return _outputVariables;
-}
-
 void
-SimulationObj::addOutputVar(VarObj *var) {
-  _outputVariables.push_back(var);
+SimulationObj::addOutputVar(const Var &var) {
+  _outputVariables.push_back(*var);
 }
 
 void

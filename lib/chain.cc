@@ -13,7 +13,7 @@ ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<VarObj *> &variab
 {
   _densities.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
-    _densities.push_back(variables[i]->density());
+    _densities.push_back(*variables[i]->density());
   }
 }
 
@@ -56,50 +56,45 @@ ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) c
   }
 }
 
-void
-ConvolutionDensityObj::sample(Eigen::VectorXd &out) const {
-  Eigen::VectorXd tmp(out.size()); out.setZero();
-  for (size_t i=0; i<_densities.size(); i++) {
-    _densities[i]->sample(tmp); out += tmp;
-  }
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of ChainObj
  * ********************************************************************************************* */
-ChainObj::ChainObj(VarObj *a, VarObj *b, const std::string &name)
+ChainObj::ChainObj(const Var &a, const Var &b, const std::string &name)
   : VarObj(name), _variables(), _density(0)
 {
   // Check if these two RVs are mutually independent
-  if (! a->mutuallyIndep(b)) {
+  if (! a.mutuallyIndep(b)) {
     AssumptionError err;
     err << "Cannot assemble chain variable, arguments are not mutually independent.";
     throw err;
   }
 
   // Flatten chain a
-  if (ChainObj *a_chain = dynamic_cast<ChainObj *>(a)) {
+  if (a.is<Chain>()) {
+    // cast container
+    Chain a_chain = a.as<Chain>();
     // if a is a chain too -> add its variables directly
-    _variables.reserve(a_chain->numVariables());
-    for (size_t i=0; i<a_chain->numVariables(); i++) {
-      _variables.push_back(*a_chain->variable(i));
+    _variables.reserve(a_chain.numVariables());
+    for (size_t i=0; i<a_chain.numVariables(); i++) {
+      _variables.push_back(*a_chain.variable(i));
     }
   } else {
     // otherwise simply add a
-    _variables.push_back(a);
+    _variables.push_back(*a);
   }
 
   // Flatten chain b
-  if (ChainObj *b_chain = dynamic_cast<ChainObj *>(b)) {
+  if (b.is<Chain>()) {
+    Chain b_chain = b.as<Chain>();
     // if b is a chain too -> add its variables directly
-    _variables.reserve(_variables.size()+b_chain->numVariables());
-    for (size_t i=0; i<b_chain->numVariables(); i++) {
-      _variables.push_back(*b_chain->variable(i));
+    _variables.reserve(_variables.size()+b_chain.numVariables());
+    for (size_t i=0; i<b_chain.numVariables(); i++) {
+      _variables.push_back(*b_chain.variable(i));
     }
   } else {
     // otherwise
-    _variables.push_back(b);
+    _variables.push_back(*b);
   }
 
   // Create density
@@ -115,9 +110,15 @@ ChainObj::ChainObj(VarObj *a, VarObj *b, const std::string &name)
   }
 }
 
-ChainObj::ChainObj(const std::vector<VarObj *> &variables, const std::string &name)
-  : VarObj(name), _variables(variables)
+ChainObj::ChainObj(const std::vector<Var> &variables, const std::string &name)
+  : VarObj(name), _variables()
 {
+  // Get & store variable objects
+  _variables.reserve(variables.size());
+  for (size_t i=0; i<variables.size(); i++) {
+    _variables.push_back(*variables[i]);
+  }
+
   _density = new ConvolutionDensityObj(_variables);
   // Collect dependencies
   for (size_t i=0; i<_variables.size(); i++) {
@@ -150,8 +151,8 @@ ChainObj::mark() {
   _density->mark();
 }
 
-DensityObj *
-ChainObj::density() {
+Density ChainObj::density() {
+  _density->ref();
   return _density;
 }
 

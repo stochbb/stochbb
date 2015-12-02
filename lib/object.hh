@@ -1,5 +1,32 @@
 /** @defgroup internal Internal used objects
+ * The classes in StochBB are separated into two groups @ref api are all classes intended to be
+ * used by other software using libstochbb, while all classes of the group @ref internal should
+ * only be used within libstochbb. Dividing them into two groups provides two advantages: (a) The
+ * API is well defined and clean. It does not contain any interface that is intended to be
+ * used by thrid-party-software. And (b), it allows to implement everything in terms of actual
+ * objects and containers. The "objects" do the voodoo while containers provide the intended API and
+ * manage "objects". This allows to implement some automatc memmory management and the user does not
+ * need to deal with it.
+ *
+ * \section mem Memory Management
+ * Almost all classes of the API are derived from the @c Container class. This class implements a
+ * simple reference counting which ensures that any @c Object being held in a container by the
+ * user will never be freed. As objects may reference other object, a simple mark and sweep garbage
+ * collector is implemented too, which searches for unreachable objects that are not held in a
+ * container and frees them.
+ *
+ * Therefore, when extending libstochbb, two basic rules must be considered:
+ * \list
+ *  \li Never pass around an @c Object directly. Only pass around @c Container. This ensures that
+ *      the object referenced by the Container is freed although being used.
+ *  \li Never store containers in an @c Object. This rule ensures that there are no circular
+ *      references which will result in a memory leak.
+ * \endlist
+ *
+ * Following these rules will ensure that now @c Object is freed while beeing used and all
+ * unreachable Objects are freed.
  */
+
 #ifndef __SBB_OBJECT_HH__
 #define __SBB_OBJECT_HH__
 

@@ -1,6 +1,7 @@
 #ifndef __SBB_RANDOMVARIABLE_HH__
 #define __SBB_RANDOMVARIABLE_HH__
 
+#include "api.hh"
 #include "density.hh"
 #include <set>
 #include <vector>
@@ -24,7 +25,7 @@ public:
   virtual void mark();
 
   /** Retruns the @c DensityObj of the random variable. */
-  virtual DensityObj *density() = 0;
+  virtual Density density() = 0;
 
   /** Returns the set of random variables, this RV depends on. */
   inline const std::set<VarObj *> &dependencies() const {
@@ -32,12 +33,12 @@ public:
   }
 
   /** Returns @c true if this random variable depends on the specified one. */
-  inline bool dependsOn(VarObj *var) const {
-    return 0 != _dependencies.count(var);
+  inline bool dependsOn(const Var var) const {
+    return 0 != _dependencies.count(*var);
   }
 
   /** Returns @c true if this random variable is mutually independent from the given on. */
-  inline bool mutuallyIndep(VarObj *var) const {
+  inline bool mutuallyIndep(const Var &var) const {
     if (dependsOn(var)) { return false; }
     std::set<VarObj *>::const_iterator item = var->dependencies().begin();
     for (; item != var->dependencies().end(); item++) {
@@ -74,7 +75,7 @@ public:
   virtual ~GenericVarObj();
 
   virtual void mark();
-  virtual DensityObj *density();
+  virtual Density density();
 
 public:
   /** Constructs a delta distributed random variable. */

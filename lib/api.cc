@@ -27,7 +27,7 @@ Container::Container(Object *obj)
 Container::Container(const Container &other)
   : _object(other._object)
 {
-  // pass...
+  other._object->ref();
 }
 
 Container::~Container() {
@@ -39,11 +39,12 @@ Container::~Container() {
 const Container &
 Container::operator =(const Container &other)
 {
-  // Unregister current object:
-  if (0 != _object) { _object->unref(); }
+  Object *old_obj = _object;
   _object = other._object;
-  // Register new object
+  // reference new object
   if (0 != _object) { _object->ref(); }
+  // unreference old object:
+  if (0 != old_obj) { old_obj->unref(); }
   // done.
   return *this;
 }
@@ -57,6 +58,12 @@ Container::isNull() const {
 /* ********************************************************************************************* *
  * Implementation of RandomVariable container
  * ********************************************************************************************* */
+Var::Var()
+  : Container(), _randomVariable(0)
+{
+  // pass...
+}
+
 Var::Var(VarObj *obj)
   : Container(obj), _randomVariable(obj)
 {
@@ -79,6 +86,16 @@ Var::operator =(const Var &other) {
 Density
 Var::density() const {
   return _randomVariable->density();
+}
+
+bool
+Var::dependsOn(const Var &other) const {
+  return _randomVariable->dependsOn(other);
+}
+
+bool
+Var::mutuallyIndep(const Var &other) const {
+  return _randomVariable->mutuallyIndep(other);
 }
 
 const std::string &
@@ -332,7 +349,7 @@ Simulation::var(const std::string &id) const {
 
 void
 Simulation::addVar(const std::string &id, Var &var) const {
-  _simulation->addVar(id, var);
+  _simulation->addVar(id, *var);
 }
 
 double
@@ -370,8 +387,9 @@ Simulation::numOutputVars() const {
   return _simulation->numOutputVars();
 }
 
-Var outputVar(size_t idx) const {
-  Simulation::return _simulation->outputVar(idx);
+Var
+Simulation::outputVar(size_t idx) const {
+  return _simulation->outputVar(idx);
 }
 
 

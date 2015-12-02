@@ -63,11 +63,6 @@ DeltaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   out.tail(out.size()-idx).setConstant(1);
 }
 
-void
-DeltaDensityObj::sample(Eigen::VectorXd &out) const {
-  out.setConstant(_delay);
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of UniformDensityObj
@@ -103,13 +98,6 @@ UniformDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const
     if (t<_a) { out[i] = 0.0; }
     else if (t>_b) { out[i] = 1.0; }
     else { out[i] = (t-_a)/(_b-_a); }
-  }
-}
-
-void
-UniformDensityObj::sample(Eigen::VectorXd &out) const {
-  for (int i=0; i<out.size(); i++) {
-    out[i] = RNG::unif(_a, _b);
   }
 }
 
@@ -149,13 +137,6 @@ NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const 
   }
 }
 
-void
-NormalDensityObj::sample(Eigen::VectorXd &out) const {
-  for (int i=0; i<out.size(); i++) {
-    out[i] = RNG::norm(_mu, _sigma);
-  }
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of GammaDensityObj
@@ -191,13 +172,6 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   double c = std::tgamma(_k);
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = sbb::gamma_li(_k, t/_theta) / c;
-  }
-}
-
-void
-GammaDensityObj::sample(Eigen::VectorXd &out) const {
-  for (int i=0; i<out.size(); i++) {
-    out[i] = RNG::gamma(_k, _theta);
   }
 }
 

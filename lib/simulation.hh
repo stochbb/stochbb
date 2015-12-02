@@ -1,6 +1,7 @@
 #ifndef SIMULATION_HH
 #define SIMULATION_HH
 
+#include "api.hh"
 #include "randomvariable.hh"
 #include <map>
 #include <vector>
@@ -22,9 +23,9 @@ public:
   /** Returns @c true if the given identifier is assinged to a random variable. */
   bool hasVar(const std::string &id) const;
   /** Returns the random variable specified by the identifier. */
-  VarObj *var(const std::string &id) const;
+  Var var(const std::string &id) const;
   /** Adds a random variable to the context. */
-  void addVar(const std::string &id, VarObj *variable);
+  void addVar(const std::string &id, const Var &variable);
   /** Returns @c true if the given parameter is specified. */
   bool hasParam(const std::string &id) const;
   /** Returns the value of the specified parameter. */
@@ -69,10 +70,17 @@ public:
   /** Sets the number of time steps. */
   void setSteps(size_t steps);
 
-  /** Returns the output variables. */
-  const std::vector<VarObj *> &outputVars() const;
-  /** Adds an output variable. */
-  void addOutputVar(VarObj *var);
+  /** Returns the number of output variables defined in the simulation. */
+  inline size_t numOutputVars() const {
+    return _outputVariables.size();
+  }
+  /** Returns the specified output variable. */
+  inline Var outputVar(size_t i) const {
+    _outputVariables[i]->ref();
+    return _outputVariables[i];
+  }
+  /** Adds an output variable to the simulation. */
+  void addOutputVar(const Var &var);
 
   /** Performs the analysis. */
   void run(Eigen::MatrixXd &out) const;

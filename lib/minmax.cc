@@ -13,7 +13,7 @@ MaximumDensityObj::MaximumDensityObj(const std::vector<VarObj *> &variables)
 {
   _densities.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
-    _densities.push_back(variables[i]->density());
+    _densities.push_back(*variables[i]->density());
   }
 }
 
@@ -65,18 +65,6 @@ MaximumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const
   }
 }
 
-void
-MaximumDensityObj::sample(Eigen::VectorXd &out) const {
-  Eigen::VectorXd tmp;
-  Eigen::MatrixXd samples(out.size(), _densities.size());
-  for (size_t i=0; i<_densities.size(); i++) {
-    _densities[i]->sample(tmp); samples.col(i) = tmp;
-  }
-  for (int i=0; i<out.size(); i++) {
-    out[i] = samples.row(i).maxCoeff();
-  }
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of MinimumDensityObj
@@ -86,7 +74,7 @@ MinimumDensityObj::MinimumDensityObj(const std::vector<VarObj *> &variables)
 {
   _densities.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
-    _densities.push_back(variables[i]->density());
+    _densities.push_back(*variables[i]->density());
   }
 }
 
@@ -140,41 +128,34 @@ MinimumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const
   out.array() = (1-out.array());
 }
 
-void
-MinimumDensityObj::sample(Eigen::VectorXd &out) const {
-  Eigen::VectorXd tmp;
-  Eigen::MatrixXd samples(out.size(), _densities.size());
-  for (size_t i=0; i<_densities.size(); i++) {
-    _densities[i]->sample(tmp); samples.col(i) = tmp;
-  }
-  for (int i=0; i<out.size(); i++) {
-    out[i] = samples.row(i).minCoeff();
-  }
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of MaximumObj
  * ********************************************************************************************* */
-MaximumObj::MaximumObj(VarObj *a, VarObj *b, const std::string &name)
+MaximumObj::MaximumObj(const Var &a, const Var &b, const std::string &name)
   : VarObj(name), _variables(), _density(0)
 {
-  if (! a->mutuallyIndep(b)) {
+  if (! a.mutuallyIndep(b)) {
     AssumptionError err;
     err << "Cannot assemble maximum variable, arguments are not mutually independent.";
     throw err;
   }
-  if (MaximumObj *max_a = dynamic_cast<MaximumObj *>(a)) {
-    _variables = max_a->variables();
-  } else {
-    _variables.push_back(a);
-  }
-  if (MaximumObj *max_b = dynamic_cast<MaximumObj *>(b)) {
-    for (size_t i=0; i<max_b->variables().size(); i++) {
-      _variables.push_back(max_b->variables()[i]);
+
+  if (MaximumObj *max_a = dynamic_cast<MaximumObj *>(*a)) {
+    _variables.reserve(max_a->numVariables());
+    for (size_t i=0; i<max_a->numVariables(); i++) {
+      _variables.push_back(*max_a->variable(i));
     }
   } else {
-    _variables.push_back(b);
+    _variables.push_back(*a);
+  }
+
+  if (MaximumObj *max_b = dynamic_cast<MaximumObj *>(*b)) {
+    for (size_t i=0; i<max_b->numVariables(); i++) {
+      _variables.push_back(*max_b->variable(i));
+    }
+  } else {
+    _variables.push_back(*b);
   }
 
   // Collect dependencies
@@ -189,7 +170,7 @@ MaximumObj::MaximumObj(VarObj *a, VarObj *b, const std::string &name)
   _density = new MaximumDensityObj(_variables);
 }
 
-MaximumObj::MaximumObj(const std::vector<VarObj *> &variables, const std::string &name)
+MaximumObj::MaximumObj(const std::vector<Var> &variables, const std::string &name)
   : VarObj(name), _variables(), _density(0)
 {
   // Reserve some space
@@ -197,9 +178,9 @@ MaximumObj::MaximumObj(const std::vector<VarObj *> &variables, const std::string
 
   // Expand maximum object
   for (size_t i=0; i<variables.size(); i++) {
-    if (MaximumObj *max = dynamic_cast<MaximumObj *>(variables[i])) {
-      for (size_t j=0; j<max->variables().size(); j++) {
-        _variables.push_back(max->variables()[j]);
+    if (MaximumObj *max = dynamic_cast<MaximumObj *>(*variables[i])) {
+      for (size_t j=0; j<max->numVariables(); j++) {
+        _variables.push_back(*max->variable(j));
       }
     }
   }
@@ -235,8 +216,9 @@ MaximumObj::mark() {
   _density->mark();
 }
 
-DensityObj *
+Density
 MaximumObj::density() {
+  _density->ref();
   return _density;
 }
 
@@ -260,8 +242,8 @@ sbb::maximum(const std::vector<VarObj *> &variables) {
   std::vector<VarObj *> vars; vars.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
     if (MaximumObj *max = dynamic_cast<MaximumObj *>(variables[i])) {
-      for (size_t j=0; j<max->variables().size(); j++) {
-        vars.push_back(max->variables()[j]);
+      for (size_t j=0; j<max->numVariables(); j++) {
+        vars.push_back(*max->variable(j));
       }
     }
   }
@@ -270,7 +252,9 @@ sbb::maximum(const std::vector<VarObj *> &variables) {
   std::vector<VarSetObj *> indepvars;
   for (size_t i=0; i<vars.size(); i++) {
     if (ChainObj *chain = dynamic_cast<ChainObj *>(vars[i])) {
-      indepvars.push_back(new VarSetObj(chain->variables()));
+      VarSetObj *tmp = new VarSetObj();
+      for (size_t i=0; i<chain->numVariables(); i++) { tmp->add(*chain->variable(i)); }
+      indepvars.push_back(tmp);
     } else {
       VarSetObj *tmp = new VarSetObj(); tmp->add(vars[i]);
       indepvars.push_back(tmp);
@@ -287,15 +271,16 @@ sbb::maximum(const std::vector<VarObj *> &variables) {
   }
   // Assemble result
   VarObj *result = 0;
-  std::vector<VarObj *> args; args.reserve(indepvars.size());
+  std::vector<Var> args; args.reserve(indepvars.size());
   for (size_t i=0; i<indepvars.size(); i++) {
     if (1 == indepvars[i]->size()) {
+      (*indepvars[i]->begin())->ref();
       args.push_back(*(indepvars[i]->begin()));
     } else {
-      std::vector<VarObj *> chain_args; chain_args.reserve(indepvars[i]->size());
+      std::vector<Var> chain_args; chain_args.reserve(indepvars[i]->size());
       VarSetObj::iterator item = indepvars[i]->begin();
       for (; item != indepvars[i]->end(); item++) {
-        chain_args.push_back(*item);
+        (*item)->ref(); chain_args.push_back(*item);
       }
       args.push_back(new ChainObj(chain_args));
     }
@@ -304,11 +289,11 @@ sbb::maximum(const std::vector<VarObj *> &variables) {
 
   // If there is a common part -> assemble chain
   if (! common->isEmpty()) {
-    std::vector<VarObj *> chain_args; chain_args.reserve(common->size()+1);
+    std::vector<Var> chain_args; chain_args.reserve(common->size()+1);
     chain_args.push_back(result);
     VarSetObj::iterator item = common->begin();
     for (; item != common->end(); item++) {
-      chain_args.push_back(*item);
+      (*item)->ref(); chain_args.push_back(*item);
     }
     result = new ChainObj(chain_args);
   }
@@ -321,25 +306,29 @@ sbb::maximum(const std::vector<VarObj *> &variables) {
 /* ********************************************************************************************* *
  * Implementation of MinimumObj
  * ********************************************************************************************* */
-MinimumObj::MinimumObj(VarObj *a, VarObj *b, const std::string &name)
+MinimumObj::MinimumObj(const Var &a, const Var &b, const std::string &name)
   : VarObj(name), _variables(), _density(0)
 {
-  if (! a->mutuallyIndep(b)) {
+  if (! a.mutuallyIndep(b)) {
     AssumptionError err;
     err << "Cannot assemble minimum variable, arguments are not mutually independent.";
     throw err;
   }
-  if (MinimumObj *max_a = dynamic_cast<MinimumObj *>(a)) {
-    _variables = max_a->variables();
-  } else {
-    _variables.push_back(a);
-  }
-  if (MinimumObj *max_b = dynamic_cast<MinimumObj *>(b)) {
-    for (size_t i=0; i<max_b->variables().size(); i++) {
-      _variables.push_back(max_b->variables()[i]);
+
+  if (MinimumObj *min_a = dynamic_cast<MinimumObj *>(*a)) {
+    _variables.reserve(min_a->numVariables());
+    for (size_t i=0; i<min_a->numVariables(); i++) {
+      _variables.push_back(*min_a->variable(i));
     }
   } else {
-    _variables.push_back(b);
+    _variables.push_back(*a);
+  }
+  if (MinimumObj *min_b = dynamic_cast<MinimumObj *>(*b)) {
+    for (size_t i=0; i<min_b->numVariables(); i++) {
+      _variables.push_back(*min_b->variable(i));
+    }
+  } else {
+    _variables.push_back(*b);
   }
 
   // Collect dependencies
@@ -354,9 +343,13 @@ MinimumObj::MinimumObj(VarObj *a, VarObj *b, const std::string &name)
   _density = new MinimumDensityObj(_variables);
 }
 
-MinimumObj::MinimumObj(const std::vector<VarObj *> &variables, const std::string &name)
-  : VarObj(name), _variables(variables), _density(0)
+MinimumObj::MinimumObj(const std::vector<Var> &variables, const std::string &name)
+  : VarObj(name), _variables(), _density(0)
 {
+  // Get & store variable objects
+  _variables.reserve(variables.size());
+  for (size_t i=0; i<variables.size(); i++) { _variables.push_back(*variables[i]); }
+
   // Collect dependencies
   for (size_t i=0; i<_variables.size(); i++) {
     if (! this->mutuallyIndep(_variables[i])) {
@@ -388,7 +381,7 @@ MinimumObj::mark() {
   _density->mark();
 }
 
-DensityObj *
-MinimumObj::density() {
+Density MinimumObj::density() {
+  _density->ref();
   return _density;
 }

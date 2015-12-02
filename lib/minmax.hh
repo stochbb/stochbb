@@ -2,6 +2,7 @@
 #define __SBB_MINMAX_HH__
 
 #include <vector>
+#include "api.hh"
 #include "randomvariable.hh"
 
 namespace sbb {
@@ -22,9 +23,8 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
 
-  /** Returns the vector of densities. */
+  /** Returns a vector of weak references to the underlaying densities. */
   inline const std::vector<DensityObj *> &densities() const { return _densities; }
 
 protected:
@@ -49,9 +49,8 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
 
-  /** Returns the vector of densities. */
+  /** Returns a vector of weak references to the underlaying densities. */
   inline const std::vector<DensityObj *> &densities() const { return _densities; }
 
 protected:
@@ -68,20 +67,18 @@ class MaximumObj: public VarObj
 public:
   /** Constructor from two random variables.
    * @throws AssumptionError If these two random variables are not independent. */
-  MaximumObj(VarObj *a, VarObj *b, const std::string &name="");
+  MaximumObj(const Var &a, const Var &b, const std::string &name="");
   /** Constructor from a vector of random variables.
    * @throws AssumptionError If these random variables are not independent. */
-  MaximumObj(const std::vector<VarObj *> &variables, const std::string &name="");
+  MaximumObj(const std::vector<Var> &variables, const std::string &name="");
   /** Destructor. */
   virtual ~MaximumObj();
   virtual void mark();
 
-  virtual DensityObj *density();
+  virtual Density density();
 
-  /** Returns the vector of random variables, this RV depends on. */
-  const std::vector<VarObj *> variables() const {
-    return _variables;
-  }
+  inline size_t numVariables() const { return _variables.size(); }
+  inline Var variable(size_t i) const { _variables[i]->ref(); return _variables[i]; }
 
 protected:
   /** The vector of random variables, this RV depends on. */
@@ -112,21 +109,19 @@ class MinimumObj: public VarObj
 public:
   /** Constructor from two random variables.
    * @throws AssumptionError If these two random variables are not independent. */
-  MinimumObj(VarObj *a, VarObj *b, const std::string &name="");
+  MinimumObj(const Var &a, const Var &b, const std::string &name="");
   /** Constructor from a vector of random variables.
    * @throws AssumptionError If these random variables are not independent. */
-  MinimumObj(const std::vector<VarObj *> &variables, const std::string &name="");
+  MinimumObj(const std::vector<Var> &variables, const std::string &name="");
   /** Destructor. */
   virtual ~MinimumObj();
 
   virtual void mark();
 
-  virtual DensityObj *density();
+  virtual Density density();
 
-  /** Returns the vector of random variables, this RV depends on. */
-  const std::vector<VarObj *> variables() const {
-    return _variables;
-  }
+  inline size_t numVariables() const { return _variables.size(); }
+  inline Var variable(size_t i) const { _variables[i]->ref(); return _variables[i]; }
 
 protected:
   /** The vector of random variables, this RV depends on. */

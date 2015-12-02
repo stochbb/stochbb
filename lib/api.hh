@@ -61,6 +61,13 @@ public:
   /** Returns @c true if the container is empty. */
   bool isNull() const;
 
+  /** Returns a weak reference to the object. */
+  Object *operator *() const { return _object; }
+  /** Returns a weak reference to the object. */
+  Object *operator ->() const { return _object; }
+  /** Returns a new reference to the object. */
+  Object *ref() const { _object->ref(); return _object; }
+
   /** Returns @c true if the object can be casted to the given container. */
   template <class T>
   bool is() const {
@@ -70,7 +77,9 @@ public:
   /** Casts the object to the given container. */
   template <class T>
   T as() const {
-    return T(dynamic_cast<typename T::ObjectType *>(this->_object));
+    typename T::ObjectType *obj = dynamic_cast<typename T::ObjectType *>(this->_object);
+    if (obj) { obj->ref(); }
+    return T(obj);
   }
 
 protected:
@@ -88,7 +97,7 @@ public:
   typedef DensityObj ObjectType;
 
 public:
-  /** Packs the given @c DensityObj. */
+  /** Packs the given @c DensityObj and taks the reference. */
   Density(DensityObj *obj);
   /** Copy constructor. */
   Density(const Density &other);
@@ -105,8 +114,12 @@ public:
    * stored into the output vector. */
   void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
 
-  /** Retruns a reference to the @c DensityObj. */
+  /** Retruns a weak reference to the @c DensityObj. */
   inline DensityObj *operator *() const { return _density; }
+  /** Retruns a weak reference to the @c DensityObj. */
+  inline DensityObj *operator ->() const { return _density; }
+  /** Retruns a new reference to the @c DensityObj. */
+  inline DensityObj *ref() const { _object->ref(); return _density; }
 
 protected:
   /** Holds the density object. */
@@ -123,23 +136,38 @@ public:
   typedef VarObj ObjectType;
 
 public:
-  /** Packs the given random variable object. */
+  /** Empty constructor. */
+  Var();
+  /** Packs the given random variable object and takes the reference. */
   Var(VarObj *obj);
   /** Copy constructor. */
   Var(const Var &other);
   /** Assingment operator. */
   Var &operator =(const Var &other);
-  /** Returns a pointer to the random variable object. */
+
+  /** Returns a weak reference to the random variable object. */
   inline VarObj *operator *() const {
     return _randomVariable;
+  }
+  /** Returns a weak reference to the random variable object. */
+  inline VarObj *operator ->() const {
+    return _randomVariable;
+  }
+  /** Returns a new reference to the random variable object. */
+  inline VarObj *ref() const {
+    _object->ref(); return _randomVariable;
   }
 
   /** Returns a reference to the density associated with this random variable. */
   Density density() const;
 
+  /** Returns @c true if this random variable depends on the given one. */
+  bool dependsOn(const Var &other) const;
+  /** Returns @c true if this and the given random variable are mutually independent. */
+  bool mutuallyIndep(const Var &other) const;
+
   /** Returns the optional name of the random variable. */
   const std::string &name() const;
-
   /** Sets the name of the random variable. */
   void setName(const std::string &name);
 

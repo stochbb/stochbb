@@ -59,8 +59,8 @@ GenericVarObj::mark() {
   _density->mark();
 }
 
-DensityObj *
-GenericVarObj::density() {
+Density GenericVarObj::density() {
+  _density->ref();
   return _density;
 }
 

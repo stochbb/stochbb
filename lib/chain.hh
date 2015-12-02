@@ -12,7 +12,8 @@ namespace sbb {
 class ConvolutionDensityObj: public DensityObj
 {
 public:
-  /** Constructs a new PDF as the convolution of the PDFs of the given variables. */
+  /** Constructs a new PDF as the convolution of the PDFs of the given variables
+   * (weak references). */
   ConvolutionDensityObj(const std::vector<VarObj *> &variables);
   /** Destructor. */
   virtual ~ConvolutionDensityObj();
@@ -21,17 +22,17 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
 
   /** Returns the number of underlaying densities. */
   inline size_t numDensities() const { return _densities.size(); }
+
   /** Returns the i-th density. */
   inline Density density(size_t i) const {
     _densities[i]->ref();
     return _densities[i];
   }
 
-  /** Returns the densities of the underlaying variables. */
+  /** Returns a vector of weak references to the densities of the underlaying variables. */
   inline const std::vector<DensityObj *> &densities() const {
     return _densities;
   }
@@ -48,17 +49,17 @@ class ChainObj : public VarObj
 {
 public:
   /** Constructs the sum of the given random variables. */
-  ChainObj(VarObj *a, VarObj *b, const std::string &name="");
+  ChainObj(const Var &a, const Var &b, const std::string &name="");
   /** Constructs the sum of the given random variables. */
-  ChainObj(const std::vector<VarObj *> &variables, const std::string &name="");
+  ChainObj(const std::vector<Var> &variables, const std::string &name="");
   /** Destructor. */
   virtual ~ChainObj();
   virtual void mark();
 
-  virtual DensityObj *density();
+  virtual Density density();
 
   inline size_t numVariables() const { return _variables.size(); }
-  inline Var variable(size_t i) { return _variables[i]; }
+  inline Var variable(size_t i) { _variables[i]->ref(); return _variables[i]; }
 
 protected:
   /** References to the underlaying random variables. */
