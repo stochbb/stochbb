@@ -1,5 +1,6 @@
 #include "minmax.hh"
 #include "exception.hh"
+#include "chain.hh"
 
 using namespace sbb;
 
@@ -189,9 +190,21 @@ MaximumObj::MaximumObj(VarObj *a, VarObj *b, const std::string &name)
 }
 
 MaximumObj::MaximumObj(const std::vector<VarObj *> &variables, const std::string &name)
-  : VarObj(name), _variables(variables), _density(0)
+  : VarObj(name), _variables(), _density(0)
 {
-  // Collect dependencies
+  // Reserve some space
+  _variables.reserve(variables.size());
+
+  // Expand maximum object
+  for (size_t i=0; i<variables.size(); i++) {
+    if (MaximumObj *max = dynamic_cast<MaximumObj *>(variables[i])) {
+      for (size_t j=0; j<max->variables().size(); j++) {
+        _variables.push_back(max->variables()[j]);
+      }
+    }
+  }
+
+  // Collect dependencies and check for independence
   for (size_t i=0; i<_variables.size(); i++) {
     if (! this->mutuallyIndep(_variables[i])) {
       AssumptionError err;
@@ -225,6 +238,83 @@ MaximumObj::mark() {
 DensityObj *
 MaximumObj::density() {
   return _density;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of maximum
+ * ********************************************************************************************* */
+VarObj *
+sbb::maximum(const std::vector<VarObj *> &variables) {
+  // Check size of variables
+  if (0 == variables.size()) {
+    AssumptionError err;
+    err << "Cannot construct the maximum of no variable.";
+    throw err;
+  } else if (1 == variables.size()) {
+    // If only one variable is given -> return it
+    return variables[0];
+  }
+
+  // Expand maximum objects, e.g. max(max(A,B),C) -> max(A,B,C)
+  std::vector<VarObj *> vars; vars.reserve(variables.size());
+  for (size_t i=0; i<variables.size(); i++) {
+    if (MaximumObj *max = dynamic_cast<MaximumObj *>(variables[i])) {
+      for (size_t j=0; j<max->variables().size(); j++) {
+        vars.push_back(max->variables()[j]);
+      }
+    }
+  }
+
+  // Find the common part of the variables formed as a sum
+  std::vector<VarSetObj *> indepvars;
+  for (size_t i=0; i<vars.size(); i++) {
+    if (ChainObj *chain = dynamic_cast<ChainObj *>(vars[i])) {
+      indepvars.push_back(new VarSetObj(chain->variables()));
+    } else {
+      VarSetObj *tmp = new VarSetObj(); tmp->add(vars[i]);
+      indepvars.push_back(tmp);
+    }
+  }
+  // Get the intersection of all variable sets
+  VarSetObj *common = indepvars[0]->intersect(indepvars[1]);
+  for (size_t j=2; j<indepvars.size(); j++) {
+    common = common->intersect(indepvars[j]);
+  }
+  // Remove common part from all sets
+  for (size_t i=0; i<indepvars.size(); i++) {
+    indepvars[i] = indepvars[i]->difference(common);
+  }
+  // Assemble result
+  VarObj *result = 0;
+  std::vector<VarObj *> args; args.reserve(indepvars.size());
+  for (size_t i=0; i<indepvars.size(); i++) {
+    if (1 == indepvars[i]->size()) {
+      args.push_back(*(indepvars[i]->begin()));
+    } else {
+      std::vector<VarObj *> chain_args; chain_args.reserve(indepvars[i]->size());
+      VarSetObj::iterator item = indepvars[i]->begin();
+      for (; item != indepvars[i]->end(); item++) {
+        chain_args.push_back(*item);
+      }
+      args.push_back(new ChainObj(chain_args));
+    }
+    result = new MaximumObj(args);
+  }
+
+  // If there is a common part -> assemble chain
+  if (! common->isEmpty()) {
+    std::vector<VarObj *> chain_args; chain_args.reserve(common->size()+1);
+    chain_args.push_back(result);
+    VarSetObj::iterator item = common->begin();
+    for (; item != common->end(); item++) {
+      chain_args.push_back(*item);
+    }
+    result = new ChainObj(chain_args);
+  }
+
+  // done.
+  return result;
 }
 
 

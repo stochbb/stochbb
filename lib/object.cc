@@ -2,6 +2,7 @@
 #include <list>
 #include <iostream>
 #include <typeinfo>
+#include "logger.hh"
 
 using namespace sbb;
 
@@ -12,7 +13,7 @@ using namespace sbb;
 GC *GC::_instance = 0;
 
 GC::GC()
-  : _objects(), _boxed(), _lockCount(0)
+  : _objects()
 {
   // pass...
 }
@@ -24,88 +25,27 @@ GC::~GC() {
 void
 GC::run()
 {
-  if (0 != _lockCount) { return; }
-  _lockCount++;  // <- avoid recursive calls of run()
-
   // Mark all boxed objects:
-  std::unordered_map<Object *, size_t>::iterator item = _boxed.begin();
-  for (; item!=_boxed.end(); item++) {
-    item->first->mark();
+  std::unordered_map<Object *, size_t>::iterator item = _objects.begin();
+  for (; item!=_objects.end(); item++) {
+    if (item->second)
+      item->first->mark();
   }
   // Delete all unmarked objects:
   std::list<Object *> del;
-  for (std::unordered_set<Object *>::iterator item=_objects.begin(); item!=_objects.end(); ) {
-    if ((*item)->isMarked()) {
-      (*item)->unmark(); item++;
+  for (std::unordered_map<Object *, size_t>::iterator item=_objects.begin(); item!=_objects.end(); ) {
+    if (item->first->isMarked()) {
+      item->first->unmark(); item++;
     } else {
-      Object *obj = *item;
+      Object *obj = item->first;
       item = _objects.erase(item);
       delete obj;
     }
   }
   // Free objects
   for (std::list<Object *>::iterator item=del.begin(); item!=del.end(); item++) {
-    _objects.erase(*item);
     delete *item;
   }
-  _lockCount--;
-}
-
-void
-GC::box(Object *obj) {
-  std::unordered_map<Object *, size_t>::iterator item = _boxed.find(obj);
-  if (_boxed.end() != item) {
-    // If the object is already boxed -> increment counter
-    //std::cerr << "GC: Increment counter for " << obj << " " << item->second;
-    item->second += 1;
-    //std::cerr << " -> " << item->second << std::endl;
-  } else {
-    //std::cerr << "GC: Box " << obj << " (" << typeid(obj).name() << ")" << std::endl;
-    // Other wise add to table of boxed objects
-    _boxed[obj] = 1;
-  }
-}
-
-void
-GC::unbox(Object *obj) {
-  std::unordered_map<Object *, size_t>::iterator item = _boxed.find(obj);
-  // If object is not boxed -> skip
-  if (_boxed.end() == item) {
-    std::cerr << "GC: Warning: Unbox unboxed object: " <<  obj << std::endl;
-    return;
-  }
-  if (0 == item->second) {
-    std::cerr << "GC: Warning: Object already unboxed!" <<  obj << std::endl;
-    return;
-  }
-  // Decrease counter
-  //std::cerr << "GC: Decrement counter for " << item->first << " " << item->second;
-  item->second--;
-  //std::cerr << " -> " << item->second << std::endl;
-  // If no container refers to this object anymore -> add to set of unboxed objects
-  if (0 == item->second) {
-    //std::cerr << "GC: Unbox " << item->first << std::endl;
-    _boxed.erase(item);
-    // Collect unreachables
-    run();
-  }
-}
-
-void
-GC::add(Object *obj) {
-  if (0 == obj) { return; }
-  _objects.insert(obj);
-}
-
-void
-GC::lock() {
-  _lockCount++;
-}
-
-void
-GC::unlock() {
-  _lockCount--;
-  if (0 == _lockCount) { run(); }
 }
 
 GC&
@@ -123,11 +63,11 @@ GC::get() {
 Object::Object()
   : _marked(false)
 {
-  GC::get().add(this);
+  GC::get().box(this);
 }
 
 Object::~Object() {
-  GC::get().remove(this);
+  // pass...
 }
 
 void

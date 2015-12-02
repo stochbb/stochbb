@@ -30,29 +30,12 @@ public:
   void run();
   /** Factory method. */
   static GC &get();
-  /** Box an object. This method implements the reference counting. */
-  void box(Object *obj);
-  /** Unbox an object. This method implements the reference counting. */
-  void unbox(Object *obj);
-  /** Adds an object to the GC. */
-  void add(Object *obj);
-  /** Lock the GC, this prevents the collection of unreachable objects until @c unlock()
-   * is called. */
-  void lock();
-  /** Unlocks the GC. */
-  void unlock();
-
-protected:
-  /** Removes an object from the GC. */
-  inline void remove(Object *obj) { _objects.erase(obj); }
+  /** Registers an object with the GC. */
+  inline void add(Object *obj) { _objects.insert(obj); }
 
 protected:
   /** The set of all objects. */
-  std::unordered_set<Object *> _objects;
-  /** The set of objects which are referenced by containers. */
-  std::unordered_map<Object *, size_t> _boxed;
-  /** The counter for blocking the GC. */
-  size_t _lockCount;
+  std::unordered_map<Object *, size_t> _objects;
   /** The singleton instance. */
   static GC *_instance;
 

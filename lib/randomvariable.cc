@@ -84,3 +84,41 @@ GenericVarObj::gamma(double k, double theta, const std::string &name) {
   return new GenericVarObj(new GammaDensityObj(k, theta), name);
 }
 
+
+
+/* ********************************************************************************************* *
+ * Implementation of VarSetObj
+ * ********************************************************************************************* */
+VarSetObj::VarSetObj()
+  : Object(), _vars()
+{
+  // pass...
+}
+
+VarSetObj::VarSetObj(const std::set<VarObj *> &variables)
+  : Object(), _vars(variables)
+{
+  // pass...
+}
+
+VarSetObj::VarSetObj(const std::vector<VarObj *> &variables)
+  : Object(), _vars()
+{
+  _vars.insert(variables.begin(), variables.end());
+}
+
+VarSetObj::VarSetObj(const VarSetObj &other)
+  : Object(), _vars(other._vars)
+{
+  // pass...
+}
+
+void
+VarSetObj::mark() {
+  if (isMarked()) { return; }
+  Object::mark();
+  iterator item = begin();
+  for (; item != end(); item++) {
+    (*item)->mark();
+  }
+}

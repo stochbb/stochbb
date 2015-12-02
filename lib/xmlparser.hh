@@ -13,7 +13,7 @@ namespace sbb {
 class XmlParser;
 
 /** Parses simulations specified in XML.
- * @ingroup api */
+ * @ingroup internal */
 class XmlParser
 {
 public:

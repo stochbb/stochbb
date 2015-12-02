@@ -91,6 +91,19 @@ protected:
 };
 
 
+/** Constructs a random variable \f$Y\f$, as the maximum of the given random variables.
+ * In contrast to the @c MaximumObj, it handles partial dependency between the random variables
+ * if they are formed as sums of independent random variables by first separating the common
+ * part. For example
+ * \f[
+ *  Y = max(X_1+X_2,X_1+X_3) \longrightarrow Y = X_1+max(X_2,X_3)\,,
+ * \f]
+ * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
+ * @ingroup internal
+ */
+VarObj *maximum(const std::vector<VarObj *> &variables);
+
+
 /** Implements the random variable being the minimum of several independent random
  * variables.
  * @ingroup internal */
