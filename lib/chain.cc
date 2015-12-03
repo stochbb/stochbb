@@ -128,7 +128,27 @@ ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<Var> &variables)
     _densities.push_back(*variables[i]->density());
   }
 
-  // Sort densities
+  // Try to reduce the number of densities
+  _combine_densities();
+}
+
+ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<VarObj *> &variables)
+  : DensityObj(), _densities()
+{
+  // Get & store the densities of all variables, assuming they are mutually independent.
+  _densities.reserve(variables.size());
+  for (size_t i=0; i<variables.size(); i++) {
+    _densities.push_back(*variables[i]->density());
+  }
+
+  // Try to reduce the number of densities
+  _combine_densities();
+}
+
+
+void
+ConvolutionDensityObj::_combine_densities() {
+  // Sort densities w.r.t type and parameters
   std::sort(_densities.begin(), _densities.end(), density_pointer_compare);
 
   // Try to combine some of the densities
@@ -146,16 +166,6 @@ ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<Var> &variables)
       // If densities cannot be combined -> advance iterators
       last++; current++;
     }
-  }
-  // done.
-}
-
-ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<VarObj *> &variables)
-  : DensityObj(), _densities()
-{
-  _densities.reserve(variables.size());
-  for (size_t i=0; i<variables.size(); i++) {
-    _densities.push_back(*variables[i]->density());
   }
 }
 
@@ -196,6 +206,32 @@ ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) c
   for (int i=1; i<out.size(); i++) {
     out[i] = out[i-1] + out[i]*dt;
   }
+}
+
+int
+ConvolutionDensityObj::compare(const DensityObj &other) const {
+  // Compare by type
+  if (int res = DensityObj::compare(other)) { return res; }
+  // If types match
+  const ConvolutionDensityObj *o_conv = dynamic_cast<const ConvolutionDensityObj *>(&other);
+  // Compare by number of densities
+  if (_densities.size() < o_conv->_densities.size()) { return -1; }
+  else if (_densities.size() > o_conv->_densities.size()) { return 1; }
+  // Compare densities
+  for (size_t i=0; i<_densities.size(); i++) {
+    if (int res = _densities[i]->compare(*o_conv->_densities[i])) { return res; }
+  }
+  // equal
+  return 0;
+}
+
+void
+ConvolutionDensityObj::print(std::ostream &stream) const {
+  stream << "<ConvolutionDensityObj of";
+  for (size_t i=0; i<_densities.size(); i++) {
+    stream << " "; _densities[i]->print(stream);
+  }
+  stream << " #" << this << ">";
 }
 
 
@@ -253,7 +289,7 @@ ChainObj::ChainObj(const Var &a, const Var &b, const std::string &name)
 }
 
 ChainObj::ChainObj(const std::vector<Var> &variables, const std::string &name)
-  : VarObj(name), _variables()
+  : VarObj(name), _variables(), _density(0)
 {
   // Get & store variable objects
   _variables.reserve(variables.size());
@@ -290,7 +326,9 @@ ChainObj::mark() {
     _variables[i]->mark();
   }
   // mark density
-  _density->mark();
+  if (_density) {
+    _density->mark();
+  }
 }
 
 Density ChainObj::density() {

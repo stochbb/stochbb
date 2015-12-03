@@ -74,6 +74,32 @@ MaximumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const
   }
 }
 
+int
+MaximumDensityObj::compare(const DensityObj &other) const {
+  // Compare types
+  if (int res = DensityObj::compare(other)) { return res; }
+  // If types match
+  const MaximumDensityObj *o_max = dynamic_cast<const MaximumDensityObj *>(&other);
+  // Compare by number of densities
+  if (_densities.size() < o_max->_densities.size()) { return -1; }
+  else if (_densities.size() > o_max->densities().size()) { return 1; }
+  // Compare densities
+  for (size_t i=0; i<_densities.size(); i++) {
+    if (int res = _densities[i]->compare(*o_max->_densities[i])) { return res; }
+  }
+  // otherwise -> identical
+  return 0;
+}
+
+void
+MaximumDensityObj::print(std::ostream &stream) const {
+  stream << "<MaximumDensityObj of";
+  for (size_t i=0; i<_densities.size(); i++) {
+    stream << " "; _densities[i]->print(stream);
+  }
+  stream << " #" << this << ">";
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of MinimumDensityObj
@@ -144,6 +170,32 @@ MinimumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const
     out.array() *= (1-tmp.array());
   }
   out.array() = (1-out.array());
+}
+
+int
+MinimumDensityObj::compare(const DensityObj &other) const {
+  // Compare types
+  if (int res = DensityObj::compare(other)) { return res; }
+  // If types match
+  const MinimumDensityObj *o_max = dynamic_cast<const MinimumDensityObj *>(&other);
+  // Compare by number of densities
+  if (_densities.size() < o_max->_densities.size()) { return -1; }
+  else if (_densities.size() > o_max->densities().size()) { return 1; }
+  // Compare densities
+  for (size_t i=0; i<_densities.size(); i++) {
+    if (int res = _densities[i]->compare(*o_max->_densities[i])) { return res; }
+  }
+  // otherwise -> identical
+  return 0;
+}
+
+void
+MinimumDensityObj::print(std::ostream &stream) const {
+  stream << "<MinimumDensityObj of";
+  for (size_t i=0; i<_densities.size(); i++) {
+    stream << " "; _densities[i]->print(stream);
+  }
+  stream << " #" << this << ">";
 }
 
 
@@ -231,7 +283,7 @@ MaximumObj::mark() {
   for (size_t i=0; i<_variables.size(); i++) {
     _variables[i]->mark();
   }
-  _density->mark();
+  if (_density) { _density->mark(); }
 }
 
 Density
@@ -316,7 +368,7 @@ MinimumObj::mark() {
   for (size_t i=0; i<_variables.size(); i++) {
     _variables[i]->mark();
   }
-  _density->mark();
+  if (_density) { _density->mark(); }
 }
 
 Density MinimumObj::density() {

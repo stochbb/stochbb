@@ -35,6 +35,9 @@ public:
   /** Returns a vector of weak references to the underlaying densities. */
   inline const std::vector<DensityObj *> &densities() const { return _densities; }
 
+  virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &stream) const;
+
 protected:
   /** The vector of densities. */
   std::vector<DensityObj *> _densities;
@@ -69,6 +72,9 @@ public:
   /** Returns a vector of weak references to the underlaying densities. */
   inline const std::vector<DensityObj *> &densities() const { return _densities; }
 
+  virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &stream) const;
+
 protected:
   /** The vector of densities. */
   std::vector<DensityObj *> _densities;
@@ -94,7 +100,9 @@ public:
 
   virtual Density density();
 
+  /** Returns the number of underlying random variables. */
   inline size_t numVariables() const { return _variables.size(); }
+  /** Returns the i-th underlying random variable. */
   inline Var variable(size_t i) const { _variables[i]->ref(); return _variables[i]; }
 
 protected:
@@ -124,7 +132,9 @@ public:
 
   virtual Density density();
 
+  /** Returns the number of underlying random variables. */
   inline size_t numVariables() const { return _variables.size(); }
+  /** Returns the i-th underlying random variable. */
   inline Var variable(size_t i) const { _variables[i]->ref(); return _variables[i]; }
 
 protected:

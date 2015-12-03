@@ -41,6 +41,13 @@ public:
     return _densities;
   }
 
+  int compare(const DensityObj &other) const;
+  void print(std::ostream &stream) const;
+
+protected:
+  /** Inernal used function to perfrom some convolutions analytically. */
+  void _combine_densities();
+
 protected:
   /** The @c DensityObj instances of the underlaying variables. */
   std::vector<DensityObj *> _densities;
@@ -63,7 +70,9 @@ public:
 
   virtual Density density();
 
+  /** Returns the number of underlying random variables. */
   inline size_t numVariables() const { return _variables.size(); }
+  /** Returns the i-th underlying random variable. */
   inline Var variable(size_t i) { _variables[i]->ref(); return _variables[i]; }
 
 protected:

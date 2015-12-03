@@ -59,6 +59,7 @@ public:
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &stream) const;
 
   /** Retruns the delay of the delta distribution. */
   inline double delay() const { return _delay; }
@@ -85,6 +86,7 @@ public:
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &stream) const;
 
   /** Returns the lower-bound of the uniform distribution. */
   inline double a() const { return _a; }
@@ -115,6 +117,7 @@ public:
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &stream) const;
 
   /** Returns the mean of the normal distribution. */
   inline double mu() const { return _mu; }
@@ -145,6 +148,7 @@ public:
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &stream) const;
 
   /** Returns the shape parameter of the gamma distribution. */
   inline double k() const { return _k; }

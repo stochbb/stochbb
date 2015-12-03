@@ -34,10 +34,8 @@ DensityObj::compare(const DensityObj &other) const {
   if (this == &other) { return 0; }
 
   // compare by type
-  std::type_index a = std::type_index(typeid(this));
-  std::type_index b = std::type_index(typeid(&other));
-  if (a < b) { return -1; }
-  else if (b > a) { return 1; }
+  if (typeid(*this).before(typeid(other))) { return -1; }
+  else if (typeid(other).before(typeid(*this))) { return -1; }
   return 0;
 }
 
@@ -95,6 +93,12 @@ DeltaDensityObj::compare(const DensityObj &other) const {
   return 0;
 }
 
+void
+DeltaDensityObj::print(std::ostream &stream) const {
+  stream << "<DeltaDensityObj delay=" << _delay << " #" << (void *)this << ">";
+}
+
+
 /* ********************************************************************************************* *
  * Implementation of UniformDensityObj
  * ********************************************************************************************* */
@@ -143,6 +147,11 @@ UniformDensityObj::compare(const DensityObj &other) const {
   if (_b < ounif->_b) { return -1; }
   else if (_b > ounif->_b) { return 1; }
   return 0;
+}
+
+void
+UniformDensityObj::print(std::ostream &stream) const {
+  stream << "<UniformDensityObj a=" << _a << ", b=" << _b << " #" << (void *)this << ">";
 }
 
 
@@ -194,6 +203,12 @@ NormalDensityObj::compare(const DensityObj &other) const {
   return 0;
 }
 
+void
+NormalDensityObj::print(std::ostream &stream) const {
+  stream << "<NormalDensityObj mu=" << _mu << ", sigma=" << _sigma
+         << " #" << (void *)this << ">";
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of GammaDensityObj
@@ -237,11 +252,17 @@ GammaDensityObj::compare(const DensityObj &other) const {
   // Compare types
   if (int res = DensityObj::compare(other)) { return res; }
   // Compare uniform densities
-  const GammaDensityObj *ogamma= dynamic_cast<const GammaDensityObj *>(&other);
+  const GammaDensityObj *ogamma = dynamic_cast<const GammaDensityObj *>(&other);
   if (_theta < ogamma->_theta) { return -1; }
   else if (_theta > ogamma->_theta) { return 1; }
   if (_k < ogamma->_k) { return -1; }
   else if (_k > ogamma->_k) { return 1; }
   return 0;
+}
+
+void
+GammaDensityObj::print(std::ostream &stream) const {
+  stream << "<GammaDensityObj k=" << _k << ", theta=" << _theta
+         << " #" << (void *)this << ">";
 }
 

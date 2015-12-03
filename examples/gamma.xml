@@ -23,10 +23,10 @@
   <!-- Chain of 3 Gamma(1,100) i.i.d. variables. -->
   <pdf>
    <var type="chain" name="3*Gamma(1,100)">
-   <var type="gamma">
-    <param name="k"><m:cn>1</m:cn></param>
-    <param name="theta"><m:cn>100</m:cn></param>
-   </var>
+    <var type="gamma">
+     <param name="k"><m:cn>1</m:cn></param>
+     <param name="theta"><m:cn>100</m:cn></param>
+    </var>
     <var type="gamma">
      <param name="k"><m:cn>1</m:cn></param>
      <param name="theta"><m:cn>100</m:cn></param>

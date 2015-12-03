@@ -16,12 +16,10 @@
  * container and frees them.
  *
  * Therefore, when extending libstochbb, two basic rules must be considered:
- * \list
- *  \li Never pass around an @c Object directly. Only pass around @c Container. This ensures that
+ *   -# Never pass around an @c Object directly. Only pass around @c Container. This ensures that
  *      the object referenced by the Container is freed although being used.
- *  \li Never store containers in an @c Object. This rule ensures that there are no circular
+ *   -# Never store containers in an @c Object. This rule ensures that there are no circular
  *      references which will result in a memory leak.
- * \endlist
  *
  * Following these rules will ensure that now @c Object is freed while beeing used and all
  * unreachable Objects are freed.
