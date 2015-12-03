@@ -158,6 +158,15 @@ public:
     _object->ref(); return _randomVariable;
   }
 
+  /** Retruns true if the given variable container refers to the same random variable. */
+  inline bool operator==(const Var &other) const {
+        return _randomVariable == other._randomVariable;
+  }
+  /** Implements a partial ordering of random variables. */
+  inline bool operator<(const Var &other) const {
+    return _randomVariable < other._randomVariable;
+  }
+
   /** Returns a reference to the density associated with this random variable. */
   Density density() const;
 

@@ -89,36 +89,26 @@ GenericVarObj::gamma(double k, double theta, const std::string &name) {
 /* ********************************************************************************************* *
  * Implementation of VarSetObj
  * ********************************************************************************************* */
-VarSetObj::VarSetObj()
-  : Object(), _vars()
+VarSet::VarSet()
+  : std::set<Var>(), _vars()
 {
   // pass...
 }
 
-VarSetObj::VarSetObj(const std::set<VarObj *> &variables)
-  : Object(), _vars(variables)
+VarSet::VarSet(const std::set<Var> &variables)
+  : std::set<Var>(), _vars(variables)
 {
   // pass...
 }
 
-VarSetObj::VarSetObj(const std::vector<VarObj *> &variables)
-  : Object(), _vars()
+VarSet::VarSet(const std::vector<Var> &variables)
+  : std::set<Var>(), _vars()
 {
   _vars.insert(variables.begin(), variables.end());
 }
 
-VarSetObj::VarSetObj(const VarSetObj &other)
-  : Object(), _vars(other._vars)
+VarSet::VarSet(const VarSet &other)
+  : std::set<Var>(), _vars(other._vars)
 {
   // pass...
-}
-
-void
-VarSetObj::mark() {
-  if (isMarked()) { return; }
-  Object::mark();
-  iterator item = begin();
-  for (; item != end(); item++) {
-    (*item)->mark();
-  }
 }

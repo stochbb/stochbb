@@ -11,10 +11,14 @@ namespace sbb {
  * @ingroup internal */
 class ConvolutionDensityObj: public DensityObj
 {
-public:
+protected:
   /** Constructs a new PDF as the convolution of the PDFs of the given variables
    * (weak references). */
   ConvolutionDensityObj(const std::vector<VarObj *> &variables);
+
+public:
+  /** Constructs a new PDF as the convolution of the PDFs of the given variables. */
+  ConvolutionDensityObj(const std::vector<Var> &variables);
   /** Destructor. */
   virtual ~ConvolutionDensityObj();
 
@@ -40,6 +44,7 @@ public:
 protected:
   /** The @c DensityObj instances of the underlaying variables. */
   std::vector<DensityObj *> _densities;
+  friend class ChainObj;
 };
 
 

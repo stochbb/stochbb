@@ -97,23 +97,21 @@ protected:
  * Additionally, this class provides methods to compute the union and intersect of
  * two sets.
  * @ingroup internal */
-class VarSetObj : public Object
+class VarSet: public std::set<Var>
 {
 public:
   /** Iterator type. */
-  typedef std::set<VarObj *>::const_iterator iterator;
+  typedef std::set<Var>::const_iterator iterator;
 
 public:
   /** Empty constructor. */
-  VarSetObj();
+  VarSet();
   /** Constructor from a std::set of random variables. */
-  VarSetObj(const std::set<VarObj *> &variables);
+  VarSet(const std::set<Var> &variables);
   /** Constructor from a vector of random variables. */
-  VarSetObj(const std::vector<VarObj *> &variables);
+  VarSet(const std::vector<Var> &variables);
   /** Copy constructor. */
-  VarSetObj(const VarSetObj &other);
-
-  virtual void mark();
+  VarSet(const VarSet &other);
 
   /** Returns @c true if the set is empty. */
   inline bool isEmpty() const {
@@ -126,48 +124,48 @@ public:
   }
 
   /** Returns @c true if the set contains the given variable. */
-  inline bool contains(VarObj *var) const {
+  inline bool contains(const Var &var) const {
     return (0 != _vars.count(var));
   }
 
   /** Adds a variable to the set. */
-  inline void add(VarObj *var) {
+  inline void add(const Var &var) {
     _vars.insert(var);
   }
   /** Removes the given variable from the set. */
-  inline void remove(VarObj *var) {
+  inline void remove(const Var &var) {
     _vars.erase(var);
   }
 
   /** Computes the union with the given set. */
-  inline VarSetObj *unite(VarSetObj *other) const {
-    VarSetObj *u = new VarSetObj(*this);
-    VarSetObj::iterator item = other->begin();
-    for (; item != other->end(); item++) {
-      u->add(*item);
+  inline VarSet unite(const VarSet &other) const {
+    VarSet u(*this);
+    VarSet::iterator item = other.begin();
+    for (; item != other.end(); item++) {
+      u.add(*item);
     }
     return u;
   }
 
   /** Computes the intersection with the given set. */
-  inline VarSetObj *intersect(VarSetObj *other) const {
-    VarSetObj *sec = new VarSetObj();
-    VarSetObj::iterator item = other->begin();
-    for (; item != other->end(); item++) {
+  inline VarSet intersect(const VarSet &other) const {
+    VarSet sec;
+    VarSet::iterator item = other.begin();
+    for (; item != other.end(); item++) {
       if (this->contains(*item)) {
-        sec->add(*item);
+        sec.add(*item);
       }
     }
     return sec;
   }
 
   /** Computes the difference between this and the given set. */
-  inline VarSetObj *difference(VarSetObj *other) const {
-    VarSetObj *diff = new VarSetObj(*this);
-    iterator item = other->begin();
-    for (; item != other->end(); item++) {
-      if (diff->contains(*item)) {
-        diff->remove(*item);
+  inline VarSet difference(const VarSet &other) const {
+    VarSet diff(*this);
+    iterator item = other.begin();
+    for (; item != other.end(); item++) {
+      if (diff.contains(*item)) {
+        diff.remove(*item);
       }
     }
     return diff;
@@ -185,7 +183,7 @@ public:
 
 protected:
   /** The set of variables. */
-  std::set<VarObj *> _vars;
+  std::set<Var> _vars;
 };
 
 }

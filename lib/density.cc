@@ -2,6 +2,9 @@
 #include "rng.hh"
 #include "math.hh"
 #include "logger.hh"
+#include <typeinfo>
+#include <typeindex>
+
 
 using namespace sbb;
 
@@ -23,6 +26,24 @@ void
 DensityObj::mark() {
   if (isMarked()) { return; }
   Object::mark();
+}
+
+int
+DensityObj::compare(const DensityObj &other) const {
+  // Same object -> equal
+  if (this == &other) { return 0; }
+
+  // compare by type
+  std::type_index a = std::type_index(typeid(this));
+  std::type_index b = std::type_index(typeid(&other));
+  if (a < b) { return -1; }
+  else if (b > a) { return 1; }
+  return 0;
+}
+
+void
+DensityObj::print(std::ostream &stream) const {
+  stream << "<DensityObj #" << (void *)this << ">";
 }
 
 
@@ -63,6 +84,16 @@ DeltaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   out.tail(out.size()-idx).setConstant(1);
 }
 
+int
+DeltaDensityObj::compare(const DensityObj &other) const {
+  // Compare types
+  if (int res = DensityObj::compare(other)) { return res; }
+  // Compare delta densities
+  const DeltaDensityObj *odelta = dynamic_cast<const DeltaDensityObj *>(&other);
+  if (_delay < odelta->_delay) { return -1; }
+  else if (_delay > odelta->_delay) { return 1; }
+  return 0;
+}
 
 /* ********************************************************************************************* *
  * Implementation of UniformDensityObj
@@ -101,6 +132,19 @@ UniformDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const
   }
 }
 
+int
+UniformDensityObj::compare(const DensityObj &other) const {
+  // Compare types
+  if (int res = DensityObj::compare(other)) { return res; }
+  // Compare uniform densities
+  const UniformDensityObj *ounif = dynamic_cast<const UniformDensityObj *>(&other);
+  if (_a < ounif->_a) { return -1; }
+  else if (_a > ounif->_a) { return 1; }
+  if (_b < ounif->_b) { return -1; }
+  else if (_b > ounif->_b) { return 1; }
+  return 0;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of NormalDensityObj
@@ -135,6 +179,19 @@ NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const 
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = 0.5*(1+std::erf((t-_mu)/(_sigma*std::sqrt(2))));
   }
+}
+
+int
+NormalDensityObj::compare(const DensityObj &other) const {
+  // Compare types
+  if (int res = DensityObj::compare(other)) { return res; }
+  // Compare uniform densities
+  const NormalDensityObj *onorm= dynamic_cast<const NormalDensityObj *>(&other);
+  if (_mu < onorm->_mu) { return -1; }
+  else if (_mu > onorm->_mu) { return 1; }
+  if (_sigma < onorm->_sigma) { return -1; }
+  else if (_sigma > onorm->_sigma) { return 1; }
+  return 0;
 }
 
 
@@ -173,5 +230,18 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = sbb::gamma_li(_k, t/_theta) / c;
   }
+}
+
+int
+GammaDensityObj::compare(const DensityObj &other) const {
+  // Compare types
+  if (int res = DensityObj::compare(other)) { return res; }
+  // Compare uniform densities
+  const GammaDensityObj *ogamma= dynamic_cast<const GammaDensityObj *>(&other);
+  if (_theta < ogamma->_theta) { return -1; }
+  else if (_theta > ogamma->_theta) { return 1; }
+  if (_k < ogamma->_k) { return -1; }
+  else if (_k > ogamma->_k) { return 1; }
+  return 0;
 }
 

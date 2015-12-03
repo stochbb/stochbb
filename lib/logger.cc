@@ -103,6 +103,14 @@ IOLogHandler::IOLogHandler(std::ostream &stream, LogMessage::Level level)
   // pass...
 }
 
+std::ostream & operator<<(std::ostream &stream, const std::tm &time) {
+  char datetime[257];
+  size_t len = std::strftime(datetime, 256, "%c", &time);
+  datetime[len] = 0;
+  stream << datetime;
+  return stream;
+}
+
 void
 IOLogHandler::handleMessage(const LogMessage &msg) {
   if (msg.level() < _minLevel) { return; }
@@ -113,7 +121,7 @@ IOLogHandler::handleMessage(const LogMessage &msg) {
   case LogMessage::ERROR: _stream << "ERROR: "; break;
   }
   std::string basename = msg.filename().substr(msg.filename().find_last_of("/\\") + 1);
-  _stream << std::ctime(&msg.timestamp())
+  _stream << *std::localtime(&msg.timestamp())
           << ", @"  << basename << ":" << msg.linenumber()
           << ": " << msg.message() << "\n";
   _stream.flush();
