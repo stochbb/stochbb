@@ -252,16 +252,22 @@ protected:
 };
 
 
+/** Base class of all derived random variables.
+ * @ingroup api */
 class DerivedVar: public Var
 {
 public:
+  /** The object type of the container. */
   typedef DerivedVarObj ObjectType;
 
 protected:
+  /** Hidden constructor. */
   DerivedVar(DerivedVarObj *obj);
 
 public:
+  /** Copy constructor. */
   DerivedVar(const DerivedVar &other);
+  /** Assignment operator. */
   DerivedVar &operator =(const DerivedVar &other);
 
   /** Returns the number of random variables the variable depends on directly. */
@@ -270,6 +276,7 @@ public:
   Var variable(size_t idx) const;
 
 protected:
+  /** Holds a reference to the @c DerivedVarObj instance. */
   DerivedVarObj *_derived_var;
 };
 
