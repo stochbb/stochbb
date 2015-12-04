@@ -13,8 +13,7 @@ namespace sbb {
  * depend on others, is sampled only once. Moreover, the samples of derived random variables need
  * to be cached for performance. Upon construction, this class first determines in which and in
  * which order the random variables must be sampled. By calling @c sample, a sample is drawn from
- * the system.
- * @ingroup internal */
+ * the system. */
 class ExactSamplerObj : public Object
 {
 public:

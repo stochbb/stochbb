@@ -56,8 +56,7 @@ namespace sbb {
 
 /** This is a 64-bit version of Mersenne Twister pseudo random number
  * generator. Initialize the state by calling @c seed or pass a seed to the
- * constructor.
- * @ingroup internal */
+ * constructor. */
 class MersenneTwister
 {
 private:

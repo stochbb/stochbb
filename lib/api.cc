@@ -4,6 +4,9 @@
 #include "randomvariable.hh"
 #include "chain.hh"
 #include "minmax.hh"
+#include "simulation.hh"
+#include "exactsampler.hh"
+#include "marginalsampler.hh"
 
 
 using namespace sbb;
@@ -435,3 +438,59 @@ Simulation::run(Eigen::MatrixXd &out) const {
   return _simulation->run(out);
 }
 
+
+/* ********************************************************************************************* *
+ * Implementation of ExactSampler container
+ * ********************************************************************************************* */
+ExactSampler::ExactSampler(const std::vector<Var> &variables)
+  : Container(new ExactSamplerObj(variables)), _sampler(static_cast<ExactSamplerObj *>(_object))
+{
+  // pass...
+}
+
+ExactSampler::ExactSampler(const ExactSampler &other)
+  : Container(other), _sampler(other._sampler)
+{
+  // pass...
+}
+
+ExactSampler &
+ExactSampler::operator =(const ExactSampler &other) {
+  Container::operator =(other);
+  _sampler = other._sampler;
+  return *this;
+}
+
+void
+ExactSampler::sample(Eigen::MatrixXd &out) const {
+  _sampler->sample(out);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of MarginalSampler container
+ * ********************************************************************************************* */
+MarginalSampler::MarginalSampler(const Var &var, double Tmin, double Tmax, size_t steps)
+  : Container(new MarginalSamplerObj(var, Tmin, Tmax, steps)),
+    _sampler(static_cast<MarginalSamplerObj *>(_object))
+{
+  // pass...
+}
+
+MarginalSampler::MarginalSampler(const MarginalSampler &other)
+  : Container(other), _sampler(other._sampler)
+{
+  // pass...
+}
+
+MarginalSampler &
+MarginalSampler::operator =(const MarginalSampler &other) {
+  Container::operator =(other);
+  _sampler = other._sampler;
+  return *this;
+}
+
+void
+MarginalSampler::sample(Eigen::VectorXd &out) const {
+  _sampler->sample(out);
+}

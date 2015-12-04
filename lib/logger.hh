@@ -7,8 +7,7 @@
 #include <list>
 
 
-/** A log message.
- * @ingroup internal */
+/** A log message. */
 class LogMessage
 {
 public:
@@ -56,8 +55,7 @@ protected:
 
 
 /** A stream object assembling a log message. Upon destruction, a log message gets assembled and
- * passed to the logger.
- * @ingroup internal */
+ * passed to the logger. */
 class LogMessageStream: public std::stringstream
 {
 public:
@@ -81,8 +79,7 @@ protected:
 };
 
 
-/** The base class of all log-handlers.
- * @ingroup api  */
+/** The base class of all log-handlers. */
 class LogHandler
 {
 protected:
@@ -102,8 +99,7 @@ protected:
 };
 
 
-/** Serializes log messages to the given file.
- * @ingroup api */
+/** Serializes log messages to the given file. */
 class IOLogHandler: public LogHandler
 {
 public:
@@ -121,8 +117,7 @@ protected:
 };
 
 
-/** A singleton logger class.
- * @ingroup api */
+/** A singleton logger class. */
 class Logger
 {
 protected:
@@ -151,17 +146,13 @@ protected:
   static Logger *_instance;
 };
 
-/** Convenience macro to create a @c LogMessageStream with log level "DEBUG".
- * @ingroup api */
+/** Convenience macro to create a @c LogMessageStream with log level "DEBUG". */
 #define logDebug()   (LogMessageStream(__FILE__, __LINE__, LogMessage::DEBUG))
-/** Convenience macro to create a @c LogMessageStream with log level "INFO".
- * @ingroup api */
+/** Convenience macro to create a @c LogMessageStream with log level "INFO". */
 #define logInfo()    (LogMessageStream(__FILE__, __LINE__, LogMessage::INFO))
-/** Convenience macro to create a @c LogMessageStream with log level "Warning".
- * @ingroup api */
+/** Convenience macro to create a @c LogMessageStream with log level "Warning". */
 #define logWarning() (LogMessageStream(__FILE__, __LINE__, LogMessage::WARNING))
-/** Convenience macro to create a @c LogMessageStream with log level "ERROR".
- * @ingroup api */
+/** Convenience macro to create a @c LogMessageStream with log level "ERROR". */
 #define logError()   (LogMessageStream(__FILE__, __LINE__, LogMessage::ERROR))
 
 #endif // LOGGER_H

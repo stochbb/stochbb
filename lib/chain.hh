@@ -7,8 +7,7 @@
 
 namespace sbb {
 
-/** Implements the convolution of several PDFs using the FFT convolution.
- * @ingroup internal */
+/** Implements the convolution of several PDFs using the FFT convolution. */
 class ConvolutionDensityObj: public DensityObj
 {
 protected:
@@ -55,8 +54,7 @@ protected:
 };
 
 
-/** Represetns the sum of several independent random variables.
- * @ingroup internal */
+/** Represetns the sum of several independent random variables. */
 class ChainObj : public DerivedVarObj
 {
 public:

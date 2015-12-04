@@ -14,9 +14,8 @@ namespace sbb {
  * from an piece-wise linear CDF:
  * Assume that probability function of a random variable \f$X\f$ is \f$F_X(x)\f$, then
  * \f$Y = F_X(X)\f$ is uniformly distributed on the interval \f$[0,1]\f$. Consquently will
- *  \f$F_X^{-1}(Y)\f$ be distributed like \f$X\f$.
- * @ingroup internal */
-class DirectMarginalSamplerObj : public Object
+ *  \f$F_X^{-1}(Y)\f$ be distributed like \f$X\f$. */
+class MarginalSamplerObj : public Object
 {
 public:
   /** Constructs a direct marginal sampler.
@@ -24,7 +23,7 @@ public:
    * @param Tmin Specifies the lower-bound of the interval on which the CDF is evaluated.
    * @param Tmax Specifies the upper-bound of the interval on which the CDF is evaluated.
    * @param steps Specifies the number of bins on which the CDF is evaluated. */
-  DirectMarginalSamplerObj(Var &variable, double Tmin, double Tmax, size_t steps);
+  MarginalSamplerObj(const Var &variable, double Tmin, double Tmax, size_t steps);
   virtual void mark();
 
   /** Samples from the variable. */

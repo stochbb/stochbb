@@ -1,4 +1,4 @@
-#include "directmarginalsampler.hh"
+#include "marginalsampler.hh"
 #include "rng.hh"
 #include "randomvariable.hh"
 
@@ -15,7 +15,7 @@ size_t _find_index(double p, size_t a, size_t b, const Eigen::VectorXd &cdf) {
   return b;
 }
 
-DirectMarginalSamplerObj::DirectMarginalSamplerObj(Var &variable, double Tmin, double Tmax, size_t steps)
+MarginalSamplerObj::MarginalSamplerObj(const Var &variable, double Tmin, double Tmax, size_t steps)
   : Object(), _variable(*variable), _Tmin(Tmin), _Tmax(Tmax)
 {
   // Resize cdf vector
@@ -25,14 +25,14 @@ DirectMarginalSamplerObj::DirectMarginalSamplerObj(Var &variable, double Tmin, d
 }
 
 void
-DirectMarginalSamplerObj::mark() {
+MarginalSamplerObj::mark() {
   if (isMarked()) { return; }
   Object::mark();
   _variable->mark();
 }
 
 void
-DirectMarginalSamplerObj::sample(Eigen::VectorXd &out) {
+MarginalSamplerObj::sample(Eigen::VectorXd &out) {
   double dt = (_Tmax-_Tmin)/_cdf.size();
   // First, sample probabilities from unif(0,1)
   for (int i=0; i<out.size(); i++) {

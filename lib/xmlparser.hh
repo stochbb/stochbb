@@ -50,10 +50,14 @@
  *
  * \section xmlrvs Build-in random variables
  * There are only very few build-in random variable types. They can be devided into two groups:
- * atomic and derived random variables. Atomic random variables are RVs which follow a specific
+ * atomic and derived random variables.
+ *
+ * \subsection xmlatomic Atomic random variables
+ * Atomic random variables are RVs which follow a specific
  * distribution and are independent from any other RV defined.
  *
  *   Type | Parameters | Process description
+ *   --- | --- | ---
  *   @c delta | delay | A constant delay or a process with a fixed waiting time.
  *   @c uniform | a, b | A process with a uniform-distributed waiting time.
  *   @c normal | mu, sigma | A process with a normal-distributed waiting.
@@ -86,7 +90,12 @@
  *
  * \subsection xmlmin Minimum of parallel processes
  * Likewise, the "minimum" derived random variable is simply the minimum of the referred random
- * variables and represents the waiting time of the fastest parallel processes.
+ * variables and represents the waiting time of the fastest parallel processes X1-X3:
+ * \code
+ *  <var type="minimum">
+ *   <var ref="X1"/> <var ref="X2"/> <var ref="X2"/>
+ *  </var>
+ * \endcode
  *
  * \section xmluserrv User defined random variable types
  * The limited build-in random variable type would turn the definition of complex stationary random

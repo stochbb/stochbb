@@ -5,20 +5,15 @@
 
 namespace sbb {
 
-/** Logarithm of the gamma function.
- * @ingroup internal */
+/** Logarithm of the gamma function. */
 double lgamma(double z);
-/** The error function.
- * @ingroup internal */
+/** The error function. */
 double erfc(double x);
-/** The lower-incomplete gamma function.
- * @ingroup internal */
+/** The lower-incomplete gamma function. */
 double gamma_li(double s, double z);
-/** The upper-incomplete gamma function.
- * @ingroup internal */
+/** The upper-incomplete gamma function. */
 double gamma_ui(double s, double z);
-/** The beta function.
- * @ingroup internal */
+/** The beta function. */
 double betai(double a, double b, double x);
 
 }

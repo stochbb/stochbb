@@ -1,14 +1,13 @@
-/** @defgroup internal Internal used objects
- * The classes in StochBB are separated into two groups @ref api are all classes intended to be
- * used by other software using libstochbb, while all classes of the group @ref internal should
+/** \internal \page mem Memory Management
+ * The classes in StochBB are separated into two groups API are all classes intended to be
+ * used by other software using libstochbb, while all remainnig classes should
  * only be used within libstochbb. Dividing them into two groups provides two advantages: (a) The
  * API is well defined and clean. It does not contain any interface that is intended to be
  * used by thrid-party-software. And (b), it allows to implement everything in terms of actual
  * objects and containers. The "objects" do the voodoo while containers provide the intended API and
  * manage "objects". This allows to implement some automatc memmory management and the user does not
  * need to deal with it.
- *
- * \section mem Memory Management
+
  * Almost all classes of the API are derived from the @c Container class. This class implements a
  * simple reference counting which ensures that any @c Object being held in a container by the
  * user will never be freed. As objects may reference other object, a simple mark and sweep garbage
@@ -40,8 +39,7 @@ namespace sbb {
 // Forward declaration
 class Object;
 
-/** Garbage collector.
- * @ingroup internal */
+/** Garbage collector. */
 class GC
 {
 protected:
@@ -70,8 +68,7 @@ protected:
 };
 
 
-/** Base class of all managed objects.
- * @ingroup internal */
+/** Base class of all managed objects. */
 class Object
 {
 protected:

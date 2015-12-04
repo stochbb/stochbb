@@ -13,8 +13,7 @@ namespace opt {
 // forward declaration:
 class Parser;
 
-/** Interface class for all option rules.
- * @ingroup optionparser */
+/** Interface class for all option rules. */
 class RuleInterface
 {
 public:
@@ -49,9 +48,7 @@ protected:
 
 
 
-/** A rule representing an option or flag.
- * @ingroup optionparser
- */
+/** A rule representing an option or flag. */
 class OptionRule: public RuleInterface
 {
 protected:
@@ -88,8 +85,7 @@ protected:
 };
 
 
-/** Implements a simple keyword rule.
- * @ingroup optionparser */
+/** Implements a simple keyword rule. */
 class KeywordRule: public RuleInterface
 {
 protected:
@@ -116,9 +112,7 @@ protected:
 
 
 /** Consumes exactly on option rule from the owned set of options.
- * This class can be used to express conflicting options.
- * @ingroup optionparser
- */
+ * This class can be used to express conflicting options. */
 class OneOfRule: public RuleInterface
 {
 protected:
@@ -154,10 +148,7 @@ protected:
 
 
 
-/**
- * Consumes any number of the enclosed option rules to be applied.
- * @ingroup optionparser
- */
+/** Consumes any number of the enclosed option rules to be applied. */
 class ZeroOrMoreRule: public RuleInterface
 {
 protected:
@@ -182,8 +173,7 @@ protected:
 
 
 
-/** Represents a value of an option.
- * @ingroup optionparser */
+/** Represents a value of an option. */
 class ValueRule: public RuleInterface
 {
 protected:
@@ -206,10 +196,7 @@ protected:
 
 
 
-/**
- * Represents a list of option rules that all have to match the input in the given order.
- * @ingroup optionparser
- */
+/** Represents a list of option rules that all have to match the input in the given order. */
 class ListRule: public RuleInterface
 {
 protected:
@@ -241,10 +228,7 @@ protected:
 
 
 
-/**
- * An optional rule.
- * @ingroup optionparser
- */
+/** An optional rule. */
 class OptionalRule: public RuleInterface
 {
 protected:
@@ -270,8 +254,7 @@ protected:
 
 
 
-/**
- * The parser class encapsulating all option rules.
+/** The parser class encapsulating all option rules.
  *
  * The following example shows how to use the option parser for a simple case:
  *
@@ -299,8 +282,6 @@ protected:
  * Parser parser(
  *    (Parser::opt(Parser::Flag("help") | Parser::Flag("version")), Parser::Value()) );
  * \endcode
- *
- * @ingroup optionparser
  */
 class Parser
 {

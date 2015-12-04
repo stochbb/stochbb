@@ -7,8 +7,7 @@
 namespace sbb {
 
 
-/** Base class of all densities.
- * @ingroup internal */
+/** Base class of all densities. */
 class DensityObj: public Object
 {
 protected:
@@ -46,8 +45,7 @@ inline std::ostream &operator<<(std::ostream &stream, const DensityObj &density)
 
 /** Implements the base class of all densities of atomic random variables.
  * As atomic variables do not depend on other random variables, it is possible to sample them
- * directly. Hence their densities implement a @c sample method.
- * @ingroup internal */
+ * directly. Hence their densities implement a @c sample method. */
 class AtomicDensityObj: public DensityObj
 {
 protected:
@@ -65,8 +63,7 @@ public:
 };
 
 
-/** Implements the delta distribution.
- * @ingroup internal */
+/** Implements the delta distribution. */
 class DeltaDensityObj: public AtomicDensityObj
 {
 public:
@@ -93,8 +90,7 @@ protected:
 };
 
 
-/** Implements the uniform distribution on the interval \f$[a,b]\f$.
- * @ingroup internal */
+/** Implements the uniform distribution on the interval \f$[a,b]\f$. */
 class UniformDensityObj: public AtomicDensityObj
 {
 public:
@@ -125,8 +121,7 @@ protected:
 };
 
 
-/** Implements the normal distribution.
- * @ingroup internal */
+/** Implements the normal distribution. */
 class NormalDensityObj: public AtomicDensityObj
 {
 public:
@@ -157,8 +152,7 @@ protected:
 };
 
 
-/** Implements the Gamma distribution.
- * @ingroup internal */
+/** Implements the Gamma distribution. */
 class GammaDensityObj: public AtomicDensityObj
 {
 public:

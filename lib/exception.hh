@@ -7,8 +7,7 @@
 
 namespace sbb {
 
-/** Base class of all exceptions.
- * @ingroup api */
+/** Base class of all exceptions. */
 class Error: public std::exception, public std::stringstream
 {
 public:
@@ -23,8 +22,7 @@ public:
 };
 
 
-/** This exception gets thrown if the parser fails.
- * @ingroup api */
+/** This exception gets thrown if the parser fails. */
 class ParserError: public Error
 {
 public:
@@ -37,8 +35,7 @@ public:
 };
 
 /** This exception gets thrown if an assumption (usually about independence)
- * is not met.
- * @ingroup api */
+ * is not met. */
 class AssumptionError: public Error
 {
 public:
@@ -51,6 +48,7 @@ public:
 };
 
 
+/** This exception gets thrown if an unexpected object type is found. */
 class TypeError: public Error
 {
 public:

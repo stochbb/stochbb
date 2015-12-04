@@ -8,8 +8,7 @@
 namespace sbb {
 
 /** Implements the density of a random variable being the maximum of several independent random
- * variables.
- * @ingroup internal */
+ * variables. */
 class MaximumDensityObj: public DensityObj
 {
 protected:
@@ -46,8 +45,7 @@ protected:
 
 
 /** Implements the density of a random variable being the minimum of several independent random
- * variables.
- * @ingroup internal */
+ * variables. */
 class MinimumDensityObj: public DensityObj
 {
 protected:
@@ -83,8 +81,7 @@ protected:
 
 
 /** Implements the random variable being the maximum of several independent random
- * variables.
- * @ingroup internal */
+ * variables. */
 class MaximumObj: public DerivedVarObj
 {
 public:
@@ -104,8 +101,7 @@ protected:
 
 
 /** Implements the random variable being the minimum of several independent random
- * variables.
- * @ingroup internal */
+ * variables. */
 class MinimumObj: public DerivedVarObj
 {
 public:
