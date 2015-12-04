@@ -5,46 +5,38 @@
 
  <output from="0" to="1000" steps="1000">
   <!-- A single Gamma(1,100) variable. -->
-  <pdf>
-   <var type="gamma" name="Gamma(1,100)">
+  <var type="gamma" name="Gamma(1,100)">
+   <param name="k"><m:cn>1</m:cn></param>
+   <param name="theta"><m:cn>100</m:cn></param>
+  </var>
+
+  <!-- A single Gamma(2,100) variable. -->
+  <var type="gamma" name="Gamma(2,100)">
+   <param name="k"><m:cn>2</m:cn></param>
+   <param name="theta"><m:cn>100</m:cn></param>
+  </var>
+
+  <!-- Chain of 3 Gamma(1,100) i.i.d. variables. -->
+  <var type="chain" name="3*Gamma(1,100)">
+   <var type="gamma">
     <param name="k"><m:cn>1</m:cn></param>
     <param name="theta"><m:cn>100</m:cn></param>
    </var>
-  </pdf>
-
-  <!-- A single Gamma(2,100) variable. -->
-  <pdf>
-   <var type="gamma" name="Gamma(2,100)">
-    <param name="k"><m:cn>2</m:cn></param>
+   <var type="gamma">
+    <param name="k"><m:cn>1</m:cn></param>
     <param name="theta"><m:cn>100</m:cn></param>
    </var>
-  </pdf>
-
-  <!-- Chain of 3 Gamma(1,100) i.i.d. variables. -->
-  <pdf>
-   <var type="chain" name="3*Gamma(1,100)">
-    <var type="gamma">
-     <param name="k"><m:cn>1</m:cn></param>
-     <param name="theta"><m:cn>100</m:cn></param>
-    </var>
-    <var type="gamma">
-     <param name="k"><m:cn>1</m:cn></param>
-     <param name="theta"><m:cn>100</m:cn></param>
-    </var>
-    <var type="gamma">
-     <param name="k"><m:cn>1</m:cn></param>
-     <param name="theta"><m:cn>100</m:cn></param>
-    </var>
+   <var type="gamma">
+    <param name="k"><m:cn>1</m:cn></param>
+    <param name="theta"><m:cn>100</m:cn></param>
    </var>
-  </pdf>
+  </var>
 
   <!-- A single Gamma(3,100) variable. -->
-  <pdf>
-   <var type="gamma" name="Gamma(3,100)">
-    <param name="k"><m:cn>3</m:cn></param>
-    <param name="theta"><m:cn>100</m:cn></param>
-   </var>
-  </pdf>
+  <var type="gamma" name="Gamma(3,100)">
+   <param name="k"><m:cn>3</m:cn></param>
+   <param name="theta"><m:cn>100</m:cn></param>
+  </var>
  </output>
 
 </simulation>

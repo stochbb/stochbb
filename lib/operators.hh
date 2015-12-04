@@ -7,7 +7,9 @@
 /** Overloads the +-operator to construct a @c Chain.
  * @ingroup api */
 inline sbb::Chain operator+(const sbb::Var &a, const sbb::Var &b) {
-  return sbb::Chain(a,b);
+  std::vector<sbb::Var> args; args.reserve(2);
+  args.push_back(a); args.push_back(b);
+  return sbb::Chain(args);
 }
 
 namespace sbb {

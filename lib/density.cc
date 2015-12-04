@@ -46,10 +46,30 @@ DensityObj::print(std::ostream &stream) const {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AtomicDensityObj
+ * ********************************************************************************************* */
+AtomicDensityObj::AtomicDensityObj()
+  : DensityObj()
+{
+  // pass...
+}
+
+AtomicDensityObj::~AtomicDensityObj() {
+  // pass...
+}
+
+void
+AtomicDensityObj::mark() {
+  if (isMarked()) { return; }
+  DensityObj::mark();
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of DeltaDensityObj
  * ********************************************************************************************* */
 DeltaDensityObj::DeltaDensityObj(double delay)
-  : DensityObj(), _delay(delay)
+  : AtomicDensityObj(), _delay(delay)
 {
   logDebug() << "Create DeltaDensity with delay=" << _delay << ".";
 }
@@ -82,6 +102,11 @@ DeltaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   out.tail(out.size()-idx).setConstant(1);
 }
 
+void
+DeltaDensityObj::sample(Eigen::VectorXd &out) const {
+  out.setConstant(_delay);
+}
+
 int
 DeltaDensityObj::compare(const DensityObj &other) const {
   // Compare types
@@ -103,7 +128,7 @@ DeltaDensityObj::print(std::ostream &stream) const {
  * Implementation of UniformDensityObj
  * ********************************************************************************************* */
 UniformDensityObj::UniformDensityObj(double a, double b)
-  : DensityObj(), _a(a), _b(b)
+  : AtomicDensityObj(), _a(a), _b(b)
 {
   logDebug() << "Create UniformDensity with a=" << _a << ", b=" << _b << ".";
 }
@@ -136,6 +161,13 @@ UniformDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const
   }
 }
 
+void
+UniformDensityObj::sample(Eigen::VectorXd &out) const {
+  for (int i=0; i<out.size(); i++) {
+    out[i] = RNG::unif(_a, _b);
+  }
+}
+
 int
 UniformDensityObj::compare(const DensityObj &other) const {
   // Compare types
@@ -159,7 +191,7 @@ UniformDensityObj::print(std::ostream &stream) const {
  * Implementation of NormalDensityObj
  * ********************************************************************************************* */
 NormalDensityObj::NormalDensityObj(double mean, double stddev)
-  : DensityObj(), _mu(mean), _sigma(stddev)
+  : AtomicDensityObj(), _mu(mean), _sigma(stddev)
 {
   logDebug() << "Create NormalDensity with mu=" << _mu << ", sigma=" << _sigma << ".";
 }
@@ -190,6 +222,13 @@ NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const 
   }
 }
 
+void
+NormalDensityObj::sample(Eigen::VectorXd &out) const {
+  for (int i=0; i<out.size(); i++) {
+    out[i] = RNG::norm(_mu, _sigma);
+  }
+}
+
 int
 NormalDensityObj::compare(const DensityObj &other) const {
   // Compare types
@@ -214,7 +253,7 @@ NormalDensityObj::print(std::ostream &stream) const {
  * Implementation of GammaDensityObj
  * ********************************************************************************************* */
 GammaDensityObj::GammaDensityObj(double k, double theta)
-  : DensityObj(), _k(k), _theta(theta)
+  : AtomicDensityObj(), _k(k), _theta(theta)
 {
   logDebug() << "Create GammaDensity with k=" << _k << ", theta=" << _theta << ".";
 }
@@ -244,6 +283,13 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   double c = std::tgamma(_k);
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = sbb::gamma_li(_k, t/_theta) / c;
+  }
+}
+
+void
+GammaDensityObj::sample(Eigen::VectorXd &out) const {
+  for (int i=0; i<out.size(); i++) {
+    out[i] = RNG::gamma(_k, _theta);
   }
 }
 

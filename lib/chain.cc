@@ -201,11 +201,18 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) cons
 
 void
 ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-  this->eval(Tmin, Tmax, out); double dt = (Tmax-Tmin)/out.size();
-  /// @todo Implement mid-point method.
-  for (int i=1; i<out.size(); i++) {
-    out[i] = out[i-1] + out[i]*dt;
+  Eigen::FFT<double> fft;
+  Eigen::VectorXd tmp1(2*out.size());  tmp1.setZero();
+  Eigen::VectorXcd tmp2(2*out.size());
+  Eigen::VectorXcd prod(2*out.size()); prod.setOnes();
+  // Perform FFT convolution
+  for (size_t i=0; i<_densities.size(); i++) {
+    _densities[i]->evalCDF(Tmin, Tmax, out);
+    tmp1.head(out.size()) = out;
+    fft.fwd(tmp2, tmp1); prod.array() *= tmp2.array();
   }
+  fft.inv(tmp1, prod);
+  out = tmp1.head(out.size());
 }
 
 int
@@ -238,79 +245,10 @@ ConvolutionDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of ChainObj
  * ********************************************************************************************* */
-ChainObj::ChainObj(const Var &a, const Var &b, const std::string &name)
-  : VarObj(name), _variables(), _density(0)
-{
-  // Check if these two RVs are mutually independent
-  if (! a.mutuallyIndep(b)) {
-    AssumptionError err;
-    err << "Cannot assemble chain variable, arguments are not mutually independent.";
-    throw err;
-  }
-
-  // Flatten chain a
-  if (a.is<Chain>()) {
-    // cast container
-    Chain a_chain = a.as<Chain>();
-    // if a is a chain too -> add its variables directly
-    _variables.reserve(a_chain.numVariables());
-    for (size_t i=0; i<a_chain.numVariables(); i++) {
-      _variables.push_back(*a_chain.variable(i));
-    }
-  } else {
-    // otherwise simply add a
-    _variables.push_back(*a);
-  }
-
-  // Flatten chain b
-  if (b.is<Chain>()) {
-    Chain b_chain = b.as<Chain>();
-    // if b is a chain too -> add its variables directly
-    _variables.reserve(_variables.size()+b_chain.numVariables());
-    for (size_t i=0; i<b_chain.numVariables(); i++) {
-      _variables.push_back(*b_chain.variable(i));
-    }
-  } else {
-    // otherwise
-    _variables.push_back(*b);
-  }
-
-  // Create density
-  _density = new ConvolutionDensityObj(_variables);
-
-  // Collect dependencies
-  for (size_t i=0; i<_variables.size(); i++) {
-    // add implicit dependencies
-    _dependencies.insert(_variables[i]->dependencies().begin(),
-                         _variables[i]->dependencies().end());
-    // add explicit dependency
-    _dependencies.insert(_variables[i]);
-  }
-}
-
 ChainObj::ChainObj(const std::vector<Var> &variables, const std::string &name)
-  : VarObj(name), _variables(), _density(0)
+  : DerivedVarObj(variables, name), _density(0)
 {
-  // Get & store variable objects
-  _variables.reserve(variables.size());
-  for (size_t i=0; i<variables.size(); i++) {
-    _variables.push_back(*variables[i]);
-  }
-
   _density = new ConvolutionDensityObj(_variables);
-  // Collect dependencies
-  for (size_t i=0; i<_variables.size(); i++) {
-    if (! this->mutuallyIndep(_variables[i])) {
-      AssumptionError err;
-      err << "Cannot assemble chain variable, arguments are not mutually independent.";
-      throw err;
-    }
-    // Add implicit dependencies
-    _dependencies.insert(_variables[i]->dependencies().begin(),
-                         _variables[i]->dependencies().end());
-    // add variable itself
-    _dependencies.insert(_variables[i]);
-  }
 }
 
 ChainObj::~ChainObj() {
@@ -320,11 +258,7 @@ ChainObj::~ChainObj() {
 void
 ChainObj::mark() {
   if (isMarked()) { return; }
-  VarObj::mark();
-  // mark all variables held
-  for (size_t i=0; i<_variables.size(); i++) {
-    _variables[i]->mark();
-  }
+  DerivedVarObj::mark();
   // mark density
   if (_density) {
     _density->mark();

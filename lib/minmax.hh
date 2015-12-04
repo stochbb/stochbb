@@ -85,12 +85,9 @@ protected:
 /** Implements the random variable being the maximum of several independent random
  * variables.
  * @ingroup internal */
-class MaximumObj: public VarObj
+class MaximumObj: public DerivedVarObj
 {
 public:
-  /** Constructor from two random variables.
-   * @throws AssumptionError If these two random variables are not independent. */
-  MaximumObj(const Var &a, const Var &b, const std::string &name="");
   /** Constructor from a vector of random variables.
    * @throws AssumptionError If these random variables are not independent. */
   MaximumObj(const std::vector<Var> &variables, const std::string &name="");
@@ -100,14 +97,7 @@ public:
 
   virtual Density density();
 
-  /** Returns the number of underlying random variables. */
-  inline size_t numVariables() const { return _variables.size(); }
-  /** Returns the i-th underlying random variable. */
-  inline Var variable(size_t i) const { _variables[i]->ref(); return _variables[i]; }
-
 protected:
-  /** The vector of random variables, this RV depends on. */
-  std::vector<VarObj *> _variables;
   /** The density object. */
   MaximumDensityObj *_density;
 };
@@ -116,12 +106,9 @@ protected:
 /** Implements the random variable being the minimum of several independent random
  * variables.
  * @ingroup internal */
-class MinimumObj: public VarObj
+class MinimumObj: public DerivedVarObj
 {
 public:
-  /** Constructor from two random variables.
-   * @throws AssumptionError If these two random variables are not independent. */
-  MinimumObj(const Var &a, const Var &b, const std::string &name="");
   /** Constructor from a vector of random variables.
    * @throws AssumptionError If these random variables are not independent. */
   MinimumObj(const std::vector<Var> &variables, const std::string &name="");
@@ -132,14 +119,7 @@ public:
 
   virtual Density density();
 
-  /** Returns the number of underlying random variables. */
-  inline size_t numVariables() const { return _variables.size(); }
-  /** Returns the i-th underlying random variable. */
-  inline Var variable(size_t i) const { _variables[i]->ref(); return _variables[i]; }
-
 protected:
-  /** The vector of random variables, this RV depends on. */
-  std::vector<VarObj *> _variables;
   /** The density object of this random variable. */
   MinimumDensityObj *_density;
 };

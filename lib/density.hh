@@ -43,9 +43,31 @@ inline std::ostream &operator<<(std::ostream &stream, const DensityObj &density)
   density.print(stream); return stream;
 }
 
+
+/** Implements the base class of all densities of atomic random variables.
+ * As atomic variables do not depend on other random variables, it is possible to sample them
+ * directly. Hence their densities implement a @c sample method.
+ * @ingroup internal */
+class AtomicDensityObj: public DensityObj
+{
+protected:
+  /** Hidden constructor. */
+  AtomicDensityObj();
+
+public:
+  /** Destructor. */
+  virtual ~AtomicDensityObj();
+
+  virtual void mark();
+
+  /** Samples from the density. */
+  virtual void sample(Eigen::VectorXd &out) const = 0;
+};
+
+
 /** Implements the delta distribution.
  * @ingroup internal */
-class DeltaDensityObj: public DensityObj
+class DeltaDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
@@ -56,6 +78,7 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void sample(Eigen::VectorXd &out) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -72,7 +95,7 @@ protected:
 
 /** Implements the uniform distribution on the interval \f$[a,b]\f$.
  * @ingroup internal */
-class UniformDensityObj: public DensityObj
+class UniformDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
@@ -83,6 +106,7 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void sample(Eigen::VectorXd &out) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -103,7 +127,7 @@ protected:
 
 /** Implements the normal distribution.
  * @ingroup internal */
-class NormalDensityObj: public DensityObj
+class NormalDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor with mean and standard deviation. */
@@ -114,6 +138,7 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void sample(Eigen::VectorXd &out) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -134,7 +159,7 @@ protected:
 
 /** Implements the Gamma distribution.
  * @ingroup internal */
-class GammaDensityObj: public DensityObj
+class GammaDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
@@ -145,6 +170,7 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void sample(Eigen::VectorXd &out) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;

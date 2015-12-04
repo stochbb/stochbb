@@ -161,6 +161,7 @@ XmlParser::parse(QDomElement &root) {
     if ("var" == node.tagName()) { parseVarDef(node, sim); }
     else if ("output" == node.tagName()) { parseOutput(node, sim); }
     else if ("define" == node.tagName()) { parseDefine(node, sim); }
+    else if ("param" == node.tagName())  { parseSimParam(node, sim); }
     else if ("load" == node.tagName()) { parseLoad(node, sim); }
     else {
       ParserError err;
@@ -236,7 +237,7 @@ XmlParser::parseDelta(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   std::string name = "";
   if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
   else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
-  return GenericVarObj::delta(params["delay"], name);
+  return AtomicVarObj::delta(params["delay"], name);
 }
 
 Var
@@ -258,7 +259,7 @@ XmlParser::parseUnif(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   std::string name = "";
   if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
   else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
-  return GenericVarObj::unif(params["a"], params["b"], name);
+  return AtomicVarObj::unif(params["a"], params["b"], name);
 }
 
 Var
@@ -280,7 +281,7 @@ XmlParser::parseNorm(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   std::string name = "";
   if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
   else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
-  return GenericVarObj::norm(params["mu"], params["sigma"], name);
+  return AtomicVarObj::norm(params["mu"], params["sigma"], name);
 }
 
 Var
@@ -302,7 +303,7 @@ XmlParser::parseGamma(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   std::string name = "";
   if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
   else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
-  return GenericVarObj::gamma(params["k"], params["theta"], name);
+  return AtomicVarObj::gamma(params["k"], params["theta"], name);
 }
 
 Var
@@ -355,13 +356,22 @@ XmlParser::parseMinimum(QDomElement &node, ContextObj *sim, XmlParser *parser) {
 
 Var
 XmlParser::parseVar(QDomElement &node, ContextObj *sim) {
-  if ("var" == node.tagName()) { return parseVarDef(node, sim); }
-  if ("ref" == node.tagName()) { return parseVarRef(node, sim); }
+  if ("var" == node.tagName()) {
+    if (node.hasAttribute("type") && (! node.hasAttribute("ref"))) {
+      return parseVarDef(node, sim);
+    } else if ( (! node.hasAttribute("type")) && node.hasAttribute("ref")) {
+      return parseVarRef(node, sim);
+    }
+    ParserError err;
+    err << "ParserError @"<< node.lineNumber()
+        << ": <var> element must have either a type or a ref attribute.";
+    throw err;
+  }
 
   ParserError err;
   err << "ParserError @"<< node.lineNumber()
       << ": Unexpected element " << node.tagName().toStdString()
-      << " expected variable definition or reference.";
+      << " expected <var>.";
   throw err;
 }
 
@@ -389,13 +399,7 @@ XmlParser::parseVarDef(QDomElement &node, ContextObj *sim) {
 
 Var
 XmlParser::parseVarRef(QDomElement &node, ContextObj *sim) {
-  QString name = node.text();
-  if (0 == name.size()) {
-    ParserError err;
-    err << "ParserError @" << node.lineNumber()
-        << ": " << node.tagName().toStdString() << " has no content. Expected variable name.";
-    throw err;
-  }
+  QString name = node.attribute("ref");
   if (! sim->hasVar(name.toStdString())) {
     ParserError err;
     err << "ParserError @" << node.lineNumber()
@@ -473,21 +477,24 @@ XmlParser::parseOutput(QDomElement &node, SimulationObj *sim) {
   sim->setSteps(node.attribute("steps").toUInt());
   // Parse output variables
   for (QDomElement p=node.firstChildElement(); !p.isNull(); p=p.nextSiblingElement()) {
-    if ("pdf" != p.tagName()) {
-      ParserError err;
-      err << "ParserError @" << p.lineNumber()
-          << ": unexpected tag '" << p.tagName().toStdString()
-          << "'. Expected 'pdf'.";
-      throw err;
-    }
-    QDomElement cp = p.firstChildElement();
-    Var var = parseVar(cp, sim);
-    sim->addOutputVar(var);
+    sim->addOutputVar(parseVar(p, sim));
   }
 }
 
+void
+XmlParser::parseSimParam(const QDomElement &node, SimulationObj *sim) {
+  if (! node.hasAttribute("id")) {
+    ParserError err;
+    err << "ParserError @" << node.lineNumber()
+        << ": " << node.tagName().toStdString() << " has no 'id' attribute.";
+    throw err;
+  }
+  sim->setParam(node.attribute("id").toStdString(),
+                parseMathML(node.firstChildElement(), sim));
+}
+
 double
-XmlParser::parseMathML(QDomElement &node, ContextObj *ctx) {
+XmlParser::parseMathML(const QDomElement &node, ContextObj *ctx) {
   // Dispatch by tag name
   if ("cn" == node.tagName()) {
     return parseMMLNumber(node, ctx);
@@ -504,7 +511,7 @@ XmlParser::parseMathML(QDomElement &node, ContextObj *ctx) {
 }
 
 double
-XmlParser::parseMMLNumber(QDomElement &node, ContextObj *ctx) {
+XmlParser::parseMMLNumber(const QDomElement &node, ContextObj *ctx) {
   bool ok=true;
   double value = node.text().toDouble(&ok);
   if (!ok) {
@@ -517,7 +524,7 @@ XmlParser::parseMMLNumber(QDomElement &node, ContextObj *ctx) {
 }
 
 double
-XmlParser::parseMMLSymbol(QDomElement &node, ContextObj *ctx) {
+XmlParser::parseMMLSymbol(const QDomElement &node, ContextObj *ctx) {
   std::string name = node.text().toStdString();
   if (! ctx->hasParam(name)) {
     ParserError err;
@@ -529,7 +536,7 @@ XmlParser::parseMMLSymbol(QDomElement &node, ContextObj *ctx) {
 }
 
 double
-XmlParser::parseMMLApply(QDomElement &node, ContextObj *ctx) {
+XmlParser::parseMMLApply(const QDomElement &node, ContextObj *ctx) {
   if (! node.hasChildNodes()) {
     ParserError err;
     err << "ParserError @" << node.lineNumber()

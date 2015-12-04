@@ -7,9 +7,8 @@
  * random variable. StochBB can be used to describe and analyze complex stationary random processes
  * in time by combining simple processes (described by a known waiting-time distribution) to
  * complex processes.
- *
- *
  */
+
 #ifndef __SBB_STOCHBB_HH__
 #define __SBB_STOCHBB_HH__
 

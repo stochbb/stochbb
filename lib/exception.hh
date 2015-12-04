@@ -50,6 +50,18 @@ public:
   virtual ~AssumptionError() throw ();
 };
 
+
+class TypeError: public Error
+{
+public:
+  /** Constructor. */
+  TypeError();
+  /** Copy constructor. */
+  TypeError(const TypeError &other);
+  /** Destructor. */
+  virtual ~TypeError() throw ();
+};
+
 }
 
 #endif

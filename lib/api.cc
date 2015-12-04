@@ -112,50 +112,50 @@ Var::setName(const std::string &name) {
 /* ********************************************************************************************* *
  * Implementation of GenericRandomVariable container
  * ********************************************************************************************* */
-GenericVar::GenericVar(GenericVarObj *obj)
+AtomicVar::AtomicVar(AtomicVarObj *obj)
   : Var(obj), _genericRV(obj)
 {
   // pass...
 }
 
-GenericVar::GenericVar(const Density &density, const std::string &name)
-  : Var(new GenericVarObj(*density, name)),
-    _genericRV(static_cast<GenericVarObj *>(_randomVariable))
+AtomicVar::AtomicVar(const AtomicDensity &density, const std::string &name)
+  : Var(new AtomicVarObj(*density, name)),
+    _genericRV(static_cast<AtomicVarObj *>(_randomVariable))
 {
   // pass...
 }
 
-GenericVar::GenericVar(const GenericVar &other)
+AtomicVar::AtomicVar(const AtomicVar &other)
   : Var(other), _genericRV(other._genericRV)
 {
   // pass...
 }
 
-GenericVar &
-GenericVar::operator =(const GenericVar &other) {
+AtomicVar &
+AtomicVar::operator =(const AtomicVar &other) {
   Var::operator =(other);
   _genericRV = other._genericRV;
   return *this;
 }
 
-GenericVar
-GenericVar::delta(double delay) {
-  return GenericVarObj::delta(delay);
+AtomicVar
+AtomicVar::delta(double delay) {
+  return AtomicVarObj::delta(delay);
 }
 
-GenericVar
-GenericVar::unif(double a, double b) {
-  return GenericVarObj::unif(a,b);
+AtomicVar
+AtomicVar::unif(double a, double b) {
+  return AtomicVarObj::unif(a,b);
 }
 
-GenericVar
-GenericVar::norm(double mu, double sigma) {
-  return GenericVarObj::norm(mu, sigma);
+AtomicVar
+AtomicVar::norm(double mu, double sigma) {
+  return AtomicVarObj::norm(mu, sigma);
 }
 
-GenericVar
-GenericVar::gamma(double k, double theta) {
-  return GenericVarObj::gamma(k, theta);
+AtomicVar
+AtomicVar::gamma(double k, double theta) {
+  return AtomicVarObj::gamma(k, theta);
 }
 
 
@@ -193,16 +193,77 @@ Density::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 
 
 /* ********************************************************************************************* *
- * Implementation of Chain container
+ * Implementation of AtomicDensity container
  * ********************************************************************************************* */
-Chain::Chain(ChainObj *obj)
-  : Var(obj), _chain(obj)
+AtomicDensity::AtomicDensity(AtomicDensityObj *obj)
+  : Density(obj), _atomic_density(obj)
 {
   // pass...
 }
 
-Chain::Chain(const Var &a, const Var &b, const std::string &name)
-  : Var(new ChainObj(*a, *b, name)), _chain(static_cast<ChainObj *>(_randomVariable))
+AtomicDensity::AtomicDensity(const AtomicDensity &other)
+  : Density(other), _atomic_density(other._atomic_density)
+{
+  // pass...
+}
+
+AtomicDensity &
+AtomicDensity::operator =(const AtomicDensity &other) {
+  Density::operator =(other);
+  _atomic_density = other._atomic_density;
+  return *this;
+}
+
+void
+AtomicDensity::sample(Eigen::VectorXd &out) const {
+  _atomic_density->sample(out);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DerivedVar container
+ * ********************************************************************************************* */
+DerivedVar::DerivedVar(DerivedVarObj *obj)
+  : Var(obj), _derived_var(obj)
+{
+  // pass...
+}
+
+DerivedVar::DerivedVar(const DerivedVar &other)
+  : Var(other), _derived_var(other._derived_var)
+{
+  // pass...
+}
+
+DerivedVar &
+DerivedVar::operator =(const DerivedVar &other) {
+  Var::operator =(other);
+  _derived_var = other._derived_var;
+  return *this;
+}
+
+size_t
+DerivedVar::numVariables() const {
+  return _derived_var->numVariables();
+}
+
+Var
+DerivedVar::variable(size_t idx) const {
+  return _derived_var->variable(idx);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of Chain container
+ * ********************************************************************************************* */
+Chain::Chain(ChainObj *obj)
+  : DerivedVar(obj), _chain(obj)
+{
+  // pass...
+}
+
+Chain::Chain(const std::vector<Var> &variables, const std::string &name)
+  : DerivedVar(new ChainObj(variables, name)), _chain(static_cast<ChainObj *>(_randomVariable))
 {
   // pass...
 }
@@ -214,34 +275,24 @@ Chain::operator=(const Chain &other) {
   return *this;
 }
 
-size_t
-Chain::numVariables() const {
-  return _chain->numVariables();
-}
-
-Var
-Chain::variable(size_t idx) const {
-  return _chain->variable(idx);
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of Maximum container
  * ********************************************************************************************* */
 Maximum::Maximum(MaximumObj *obj)
-  : Var(obj), _maximum(obj)
+  : DerivedVar(obj), _maximum(obj)
 {
   // pass...
 }
 
-Maximum::Maximum(const Var &a, const Var &b, const std::string &name)
-  : Var(new MaximumObj(*a, *b, name)), _maximum(static_cast<MaximumObj *>(_randomVariable))
+Maximum::Maximum(const std::vector<Var> &variables, const std::string &name)
+  : DerivedVar(new MaximumObj(variables, name)), _maximum(static_cast<MaximumObj *>(_randomVariable))
 {
   // pass...
 }
 
 Maximum::Maximum(const Maximum &other)
-  : Var(other), _maximum(other._maximum)
+  : DerivedVar(other), _maximum(other._maximum)
 {
   // pass...
 }
@@ -253,34 +304,24 @@ Maximum::operator =(const Maximum &other) {
   return *this;
 }
 
-size_t
-Maximum::numVariables() const {
-  return _maximum->numVariables();
-}
-
-Var
-Maximum::variable(size_t idx) const {
-  return _maximum->variable(idx);
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of Minimum container
  * ********************************************************************************************* */
 Minimum::Minimum(MinimumObj *obj)
-  : Var(obj), _minimum(obj)
+  : DerivedVar(obj), _minimum(obj)
 {
   // pass...
 }
 
-Minimum::Minimum(const Var &a, const Var &b)
-  : Var(new MinimumObj(*a, *b)), _minimum(static_cast<MinimumObj *>(_randomVariable))
+Minimum::Minimum(const std::vector<Var> &variables)
+  : DerivedVar(new MinimumObj(variables)), _minimum(static_cast<MinimumObj *>(_randomVariable))
 {
   // pass...
 }
 
 Minimum::Minimum(const Minimum &other)
-  : Var(other), _minimum(other._minimum)
+  : DerivedVar(other), _minimum(other._minimum)
 {
   // pass...
 }
@@ -290,16 +331,6 @@ Minimum::operator =(const Minimum &other) {
   Var::operator =(other);
   _minimum = other._minimum;
   return *this;
-}
-
-size_t
-Minimum::numVariables() const {
-  return _minimum->numVariables();
-}
-
-Var
-Minimum::variable(size_t idx) const {
-  return _minimum->variable(idx);
 }
 
 

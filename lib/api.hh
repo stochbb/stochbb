@@ -13,22 +13,20 @@
 #ifndef __SBB_API_HH__
 #define __SBB_API_HH__
 
+#include <vector>
 #include <Eigen/Eigen>
 #include "exception.hh"
 #include "object.hh"
-//#include "randomvariable.hh"
-//#include "density.hh"
-//#include "chain.hh"
-//#include "minmax.hh"
-//#include "simulation.hh"
 
 
 namespace sbb {
 
 // Forward declarations
 class DensityObj;
+class AtomicDensityObj;
 class VarObj;
-class GenericVarObj;
+class AtomicVarObj;
+class DerivedVarObj;
 class ChainObj;
 class MaximumObj;
 class MinimumObj;
@@ -127,6 +125,40 @@ protected:
 };
 
 
+/** The densities of @c AtomicVar.
+ * This is the base class of all densities of atomic random variables, that is a random variable
+ * that does not depend on others.
+ * @ingroup api */
+class AtomicDensity: public Density
+{
+public:
+  /** The object type of the container. */
+  typedef AtomicDensityObj ObjectType;
+
+public:
+  /** Packs the density object and takes the reference. */
+  AtomicDensity(AtomicDensityObj *obj);
+  /** Copy constructor. */
+  AtomicDensity(const AtomicDensity &other);
+  /** Assignment operator. */
+  AtomicDensity &operator =(const AtomicDensity &other);
+
+  /** Retruns a weak reference to the @c AtomicDensityObj. */
+  inline AtomicDensityObj *operator *() const { return _atomic_density; }
+  /** Retruns a weak reference to the @c AtomicDensityObj. */
+  inline AtomicDensityObj *operator ->() const { return _atomic_density; }
+  /** Retruns a new reference to the @c AtomicDensityObj. */
+  inline AtomicDensityObj *ref() const { _object->ref(); return _atomic_density; }
+
+  /** Samples from the random variable. */
+  void sample(Eigen::VectorXd &out) const;
+
+protected:
+  /** Holds the reference to the object instance. */
+  AtomicDensityObj *_atomic_density;
+};
+
+
 /** Base class of all random variables.
  * @ingroup api */
 class Var: public Container
@@ -188,35 +220,57 @@ protected:
 
 /** A generic random variable derived from a chosen density.
  * @ingroup api */
-class GenericVar: public Var
+class AtomicVar: public Var
 {
 public:
   /** The object type of the container. */
-  typedef GenericVarObj ObjectType;
+  typedef AtomicVarObj ObjectType;
 
 public:
   /** Packs the given @c GenericVarObj. */
-  GenericVar(GenericVarObj *obj);
+  AtomicVar(AtomicVarObj *obj);
   /** Constructs a generic random variable from distribution. */
-  GenericVar(const Density &density, const std::string &name="");
+  AtomicVar(const AtomicDensity &density, const std::string &name="");
   /** Copy constructor. */
-  GenericVar(const GenericVar &other);
+  AtomicVar(const AtomicVar &other);
   /** Assignement operator. */
-  GenericVar &operator=(const GenericVar &other);
+  AtomicVar &operator=(const AtomicVar &other);
 
 public:
   /** Constructs a delta-distributed "random" variable. */
-  static GenericVar delta(double delay);
+  static AtomicVar delta(double delay);
   /** Constructs a uniformly distributed random variable. */
-  static GenericVar unif(double a, double b);
+  static AtomicVar unif(double a, double b);
   /** Constructs a normal distributed random variable. */
-  static GenericVar norm(double mu, double sigma);
+  static AtomicVar norm(double mu, double sigma);
   /** Constructs a gamma distributed random variable. */
-  static GenericVar gamma(double k, double theta);
+  static AtomicVar gamma(double k, double theta);
 
 protected:
   /** Holds the @c GenericVarObj. */
-  GenericVarObj *_genericRV;
+  AtomicVarObj *_genericRV;
+};
+
+
+class DerivedVar: public Var
+{
+public:
+  typedef DerivedVarObj ObjectType;
+
+protected:
+  DerivedVar(DerivedVarObj *obj);
+
+public:
+  DerivedVar(const DerivedVar &other);
+  DerivedVar &operator =(const DerivedVar &other);
+
+  /** Returns the number of random variables the variable depends on directly. */
+  size_t numVariables() const;
+  /** Returns the i-th random variable the chain depends on directly. */
+  Var variable(size_t idx) const;
+
+protected:
+  DerivedVarObj *_derived_var;
 };
 
 
@@ -229,7 +283,7 @@ protected:
  * of both processes.
  *
  * @ingroup api */
-class Chain: public Var
+class Chain: public DerivedVar
 {
 public:
   /** The object type of the container. */
@@ -239,14 +293,9 @@ public:
   /** Packs the given @c ChainObj. */
   Chain(ChainObj *obj);
   /** Constructs a chain of two random variables. */
-  Chain(const Var &a, const Var &b, const std::string &name="");
+  Chain(const std::vector<Var> &variables, const std::string &name="");
   /** Assignment operator. */
   Chain &operator =(const Chain &other);
-
-  /** Returns the number of random variables the chain depends on. */
-  size_t numVariables() const;
-  /** Returns the i-th random variable the chain depends on. */
-  Var variable(size_t idx) const;
 
 protected:
   /** Holds the @c ChainObj. */
@@ -261,7 +310,7 @@ protected:
  * this class will represent the random variable of the waiting time of the last process.
  *
  * @ingroup api */
-class Maximum: public Var
+class Maximum: public DerivedVar
 {
 public:
   /** Object type of the container. */
@@ -271,16 +320,11 @@ public:
   /** Packs the given @c MaximumObj. */
   Maximum(MaximumObj *obj);
   /** Constructs a maximum random variable from the given ones. */
-  Maximum(const Var &a, const Var &b, const std::string &name="");
+  Maximum(const std::vector<Var> &variables, const std::string &name="");
   /** Copy constructor. */
   Maximum(const Maximum &other);
   /** Assignment operator. */
   Maximum &operator=(const Maximum &other);
-
-  /** Returns the number of random variables the maximum depends on. */
-  size_t numVariables() const;
-  /** Returns the i-th random variable the maximum depends on. */
-  Var variable(size_t idx) const;
 
 protected:
   /** Holds the @c MaximumObj. */
@@ -295,7 +339,7 @@ protected:
  * this class will represent the random variable of the waiting time of the first process completed.
  *
  * @ingroup api */
-class Minimum: public Var
+class Minimum: public DerivedVar
 {
 public:
   /** The object type of the container. */
@@ -305,16 +349,11 @@ public:
   /** Packs the given @c MinimumObj. */
   Minimum(MinimumObj *obj);
   /** Constructs a minimum random variable from the given ones. */
-  Minimum(const Var &a, const Var &b);
+  Minimum(const std::vector<Var> &variables);
   /** Copy constructor. */
   Minimum(const Minimum &other);
   /** Assignment operator. */
   Minimum &operator=(const Minimum &other);
-
-  /** Returns the number of random variables the minimum depends on. */
-  size_t numVariables() const;
-  /** Returns the i-th random variable the minimum depends on. */
-  Var variable(size_t idx) const;
 
 protected:
   /** Holds the @c MinimumObj. */

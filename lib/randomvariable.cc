@@ -42,48 +42,82 @@ VarObj::mark() {
 /* ********************************************************************************************* *
  * Implementation of GenericRandomVariableObj
  * ********************************************************************************************* */
-GenericVarObj::GenericVarObj(DensityObj *density, const std::string &name)
+AtomicVarObj::AtomicVarObj(AtomicDensityObj *density, const std::string &name)
   : VarObj(name), _density(density)
 {
   // pass...
 }
 
-GenericVarObj::~GenericVarObj() {
+AtomicVarObj::~AtomicVarObj() {
   // pass...
 }
 
 void
-GenericVarObj::mark() {
+AtomicVarObj::mark() {
   if (isMarked()) { return; }
   VarObj::mark();
   _density->mark();
 }
 
-Density GenericVarObj::density() {
+Density AtomicVarObj::density() {
   _density->ref();
   return _density;
 }
 
-GenericVarObj *
-GenericVarObj::delta(double delay, const std::string &name) {
-  return new GenericVarObj(new DeltaDensityObj(delay), name);
+AtomicVarObj *
+AtomicVarObj::delta(double delay, const std::string &name) {
+  return new AtomicVarObj(new DeltaDensityObj(delay), name);
 }
 
-GenericVarObj *
-GenericVarObj::unif(double a, double b, const std::string &name) {
-  return new GenericVarObj(new UniformDensityObj(a, b), name);
+AtomicVarObj *
+AtomicVarObj::unif(double a, double b, const std::string &name) {
+  return new AtomicVarObj(new UniformDensityObj(a, b), name);
 }
 
-GenericVarObj *
-GenericVarObj::norm(double mu, double sigma, const std::string &name) {
-  return new GenericVarObj(new NormalDensityObj(mu, sigma), name);
+AtomicVarObj *
+AtomicVarObj::norm(double mu, double sigma, const std::string &name) {
+  return new AtomicVarObj(new NormalDensityObj(mu, sigma), name);
 }
 
-GenericVarObj *
-GenericVarObj::gamma(double k, double theta, const std::string &name) {
-  return new GenericVarObj(new GammaDensityObj(k, theta), name);
+AtomicVarObj *
+AtomicVarObj::gamma(double k, double theta, const std::string &name) {
+  return new AtomicVarObj(new GammaDensityObj(k, theta), name);
 }
 
+
+/* ********************************************************************************************* *
+ * Implementation of DerivedVarObj
+ * ********************************************************************************************* */
+DerivedVarObj::DerivedVarObj(const std::vector<Var> &variables, const std::string &name)
+  : VarObj(name), _variables()
+{
+  // Get & store variable objects
+  _variables.reserve(variables.size());
+  for (size_t i=0; i<variables.size(); i++) {
+    _variables.push_back(*variables[i]);
+  }
+
+  // Collect dependencies
+  for (size_t i=0; i<_variables.size(); i++) {
+    if (! this->mutuallyIndep(_variables[i])) {
+      AssumptionError err;
+      err << "Cannot assemble chain variable, arguments are not mutually independent.";
+      throw err;
+    }
+    // Add implicit dependencies
+    _dependencies.insert(_variables[i]->dependencies().begin(),
+                         _variables[i]->dependencies().end());
+    // add variable itself
+    _dependencies.insert(_variables[i]);
+  }
+}
+
+void
+DerivedVarObj::mark() {
+  if (isMarked()) { return; }
+  VarObj::mark();
+  // all dependent variable objects are marked by VarObj::mark() through _dependencies
+}
 
 
 /* ********************************************************************************************* *

@@ -5,31 +5,29 @@
 
  <!-- Get 3 iid. Gamma(3,10) distributed RV -->
  <var id="X1" type="gamma">
-  <param name="k"><m:cn>5</m:cn></param>
+  <param name="k"><m:cn>2</m:cn></param>
   <param name="theta"><m:cn>10</m:cn></param>
  </var>
  <var id="X2" type="gamma">
-  <param name="k"><m:cn>5</m:cn></param>
+  <param name="k"><m:cn>3</m:cn></param>
   <param name="theta"><m:cn>10</m:cn></param>
  </var>
  <var id="X3" type="gamma">
-  <param name="k"><m:cn>5</m:cn></param>
+  <param name="k"><m:cn>4</m:cn></param>
   <param name="theta"><m:cn>10</m:cn></param>
  </var>
 
  <!-- Minimum distribution of X1, X2 and X3 -->
  <var id="min" type="minimum">
-  <ref>X1</ref> <ref>X2</ref> <ref>X3</ref>
+  <var ref="X1"/> <var ref="X2"/> <var ref="X3"/>
  </var>
 
  <!-- Maximum distribution of X1, X2 and X3 -->
  <var id="max" type="maximum">
-  <ref>X1</ref> <ref>X2</ref> <ref>X3</ref>
+ <var ref="X1"/> <var ref="X2"/> <var ref="X3"/>
  </var>
 
- <output from="0" to="50" steps="1000">
-  <pdf><ref>X1</ref></pdf>
-  <pdf><ref>min</ref></pdf>
-  <pdf><ref>max</ref></pdf>
+ <output from="0" to="200" steps="1000">
+  <var ref="X1"/> <var ref="X2"/> <var ref="X3"/> <var ref="min"/> <var ref="max"/>
  </output>
 </simulation>

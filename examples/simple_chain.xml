@@ -18,14 +18,14 @@
 
  <!-- Assemble the processing chain, result is "response" RV -->
  <var type="chain" id="response">
-  <ref>delay</ref>  <!-- delay triggers process //-->
-  <ref>process</ref>
+  <var ref="delay"/>  <!-- delay triggers process //-->
+  <var ref="process"/>
  </var>
 
  <!-- Evaluate the PDF of the response as the output -->
  <output from="0" to="700" steps="1000">
- <pdf><ref>process</ref></pdf>
-  <pdf><ref>response</ref></pdf>
+  <var ref="process"/>
+  <var ref="response"/>
  </output>
 
 </simulation>

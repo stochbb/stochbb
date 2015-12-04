@@ -57,11 +57,9 @@ protected:
 
 /** Represetns the sum of several independent random variables.
  * @ingroup internal */
-class ChainObj : public VarObj
+class ChainObj : public DerivedVarObj
 {
 public:
-  /** Constructs the sum of the given random variables. */
-  ChainObj(const Var &a, const Var &b, const std::string &name="");
   /** Constructs the sum of the given random variables. */
   ChainObj(const std::vector<Var> &variables, const std::string &name="");
   /** Destructor. */
@@ -70,14 +68,8 @@ public:
 
   virtual Density density();
 
-  /** Returns the number of underlying random variables. */
-  inline size_t numVariables() const { return _variables.size(); }
-  /** Returns the i-th underlying random variable. */
-  inline Var variable(size_t i) { _variables[i]->ref(); return _variables[i]; }
 
 protected:
-  /** References to the underlaying random variables. */
-  std::vector<VarObj *> _variables;
   /** The density of the sum, the convolution of all PDFs of the underlaying random variables. */
   ConvolutionDensityObj *_density;
 };

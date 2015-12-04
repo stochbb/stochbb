@@ -57,3 +57,20 @@ AssumptionError::AssumptionError(const AssumptionError &other)
 AssumptionError::~AssumptionError() throw () {
   // pass...
 }
+
+
+TypeError::TypeError()
+  : Error()
+{
+  // pass...
+}
+
+TypeError::TypeError(const TypeError &other)
+  : Error(other)
+{
+  // pass...
+}
+
+TypeError::~TypeError() throw () {
+  // pass...
+}

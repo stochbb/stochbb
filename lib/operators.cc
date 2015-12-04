@@ -97,8 +97,10 @@ sbb::maximum(const std::vector<Var> &variables) {
     AssumptionError err;
     err << "Cannot construct the maximum of no variable.";
     throw err;
-  } else if (1 == variables.size()) {
-    // If only one variable is given -> return it
+  }
+
+  // If only one variable is given -> return it
+  if (1 == variables.size()) {
     return variables[0];
   }
 
@@ -127,15 +129,18 @@ sbb::maximum(const std::vector<Var> &variables) {
       indepvars.back().add(vars[i]);
     }
   }
+
   // Get the intersection of all variable sets
   VarSet common = indepvars[0].intersect(indepvars[1]);
   for (size_t j=2; j<indepvars.size(); j++) {
     common = common.intersect(indepvars[j]);
   }
+
   // Remove common part from all sets
   for (size_t i=0; i<indepvars.size(); i++) {
     indepvars[i] = indepvars[i].difference(common);
   }
+
   // Assemble result
   VarObj *result = 0;
   std::vector<Var> args; args.reserve(indepvars.size());

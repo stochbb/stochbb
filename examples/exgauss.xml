@@ -21,7 +21,7 @@
   </var>
 
   <var type="chain" id="exgauss">
-   <ref>X1</ref> <ref>X2</ref>
+   <var ref="X1"/> <var ref="X2"/>
   </var>
  </define>
 

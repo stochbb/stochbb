@@ -1,6 +1,7 @@
 #ifndef __SBB_RANDOMVARIABLE_HH__
 #define __SBB_RANDOMVARIABLE_HH__
 
+#include <Eigen/Eigen>
 #include "api.hh"
 #include "density.hh"
 #include <set>
@@ -64,32 +65,66 @@ protected:
 };
 
 
-/** Implements a generic RV defined through its density.
+/** Implements a generic RV defined only through its density and does not depend on other
+ * random variables.
  * @ingroup internal */
-class GenericVarObj: public VarObj
+class AtomicVarObj: public VarObj
 {
 public:
   /** Constructor from density. */
-  GenericVarObj(DensityObj *density, const std::string &name="");
+  AtomicVarObj(AtomicDensityObj *density, const std::string &name="");
   /** Destructor. */
-  virtual ~GenericVarObj();
+  virtual ~AtomicVarObj();
 
   virtual void mark();
   virtual Density density();
 
+  /** Samples from the random variable. The number of samples is specified through the number
+   * of rows of the @c out vector. */
+  inline void sample(Eigen::VectorXd &out) const {
+    return _density->sample(out);
+  }
+
 public:
   /** Constructs a delta distributed random variable. */
-  static GenericVarObj *delta(double delay, const std::string &name="");
+  static AtomicVarObj *delta(double delay, const std::string &name="");
   /** Constructs a unifor distributed random variable. */
-  static GenericVarObj *unif(double a, double b, const std::string &name="");
+  static AtomicVarObj *unif(double a, double b, const std::string &name="");
   /** Constructs a normal distributed random variable. */
-  static GenericVarObj *norm(double mu, double sigma, const std::string &name="");
+  static AtomicVarObj *norm(double mu, double sigma, const std::string &name="");
   /** Constructs a gamma distributed random variable. */
-  static GenericVarObj *gamma(double k, double theta, const std::string &name="");
+  static AtomicVarObj *gamma(double k, double theta, const std::string &name="");
 
 protected:
   /** The density object. */
-  DensityObj *_density;
+  AtomicDensityObj *_density;
+};
+
+
+/** Implements the base class of all derived random variable.
+ * Derived random variables are defined as a function of other random variables, hence they
+ * cannot be sampled independently from others. Use the @c ExactSampler class to sample
+ * from one or more dependent random variables.
+ * @ingroup internal */
+class DerivedVarObj: public VarObj
+{
+protected:
+  /** Hidden constructor.
+   * @param variables Specifies the variables, this random variable depends on.
+   * @param name Specifies the optional name of the random variable. */
+  DerivedVarObj(const std::vector<Var> &variables, const std::string &name);
+
+public:
+  virtual void mark();
+
+  /** Returns the number of underlying random variables. */
+  inline size_t numVariables() const { return _variables.size(); }
+  /** Returns the i-th underlying random variable. */
+  inline Var variable(size_t i) { _variables[i]->ref(); return _variables[i]; }
+
+protected:
+  /** References to the underlaying random variables. */
+  std::vector<VarObj *> _variables;
 };
 
 
