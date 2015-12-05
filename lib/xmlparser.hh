@@ -245,6 +245,10 @@ protected:
   Var parseVarRef(QDomElement &node, ContextObj *sim);
   /** Parses a list of 'param' statements. */
   QHash<QString, double> parseParams(QDomElement &node, ContextObj *sim);
+  /** Parses a list of weight-variable pairs. */
+  std::vector< std::pair<double, Var> > parseWeights(QDomElement &node, ContextObj *sim);
+  /** Parses a weight-variable pair. */
+  std::pair<double, Var> parseWeight(QDomElement &node, ContextObj *sim);
 
   /** Parses and evaluates MathML expressions. */
   double parseMathML(const QDomElement &node, ContextObj *ctx);
@@ -269,6 +273,8 @@ protected:
   static Var parseMaximum(QDomElement &node, ContextObj *sim, XmlParser *parser);
   /** Instantiates a minimum of random variables. */
   static Var parseMinimum(QDomElement &node, ContextObj *sim, XmlParser *parser);
+  /** Instantiates a mixture of random variables. */
+  static Var parseMixture(QDomElement &node, ContextObj *sim, XmlParser *parser);
 
 protected:
   /** Abstract class of known random variable types.

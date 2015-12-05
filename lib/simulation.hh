@@ -82,8 +82,12 @@ public:
   /** Adds an output variable to the simulation. */
   void addOutputVar(const Var &var);
 
-  /** Performs the analysis. */
-  void run(Eigen::MatrixXd &out) const;
+  /** Evaluates the PDF of the selected output variables. */
+  void evalPDF(Eigen::MatrixXd &out) const;
+  /** Evaluates the CDF of the selected output variables. */
+  void evalCDF(Eigen::MatrixXd &out) const;
+  /** Samples from the selected output variables. */
+  void sample(Eigen::MatrixXd &out) const;
 
 protected:
   /** Start time. */

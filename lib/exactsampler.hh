@@ -42,6 +42,8 @@ protected:
   static void _sample_minimum(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
   /** Samples from a minimum of random variables. */
   static void _sample_maximum(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
+  /** Samples from a mixture of random variables. */
+  static void _sample_mixture(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
 
 protected:
   /** The variables selected for output. */

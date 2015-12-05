@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
       = parser.Flag("version");
   opt::RuleInterface &cmd_run =
       (parser.opt(parser.Flag("log-debug")),
+       parser.opt(parser.Flag("pdf") | parser.Flag("cdf") | parser.Flag("sample")),
        parser.Value("filename"),
        parser.opt(parser.Flag("plot") | parser.Option("csv")));
   parser.setGrammar( cmd_help | cmd_version | cmd_run );
@@ -64,7 +65,20 @@ int main(int argc, char *argv[])
 
   // run simulation
   size_t N = sim.steps(), M = sim.numOutputVars();
-  Eigen::MatrixXd out(N, M+1); sim.run(out);
+  Eigen::MatrixXd out(N, M+1);
+  if (parser.has_flag("pdf")) {
+    logDebug() << "Eval PDF ...";
+    sim.evalPDF(out);
+  } else if (parser.has_flag("cdf")) {
+    logDebug() << "Eval CDF ...";
+    sim.evalCDF(out);
+  } else if (parser.has_flag("sample")) {
+    logDebug() << "Sample ...";
+    sim.sample(out);
+  } else {
+    logDebug() << "Eval PDF ...";
+    sim.evalPDF(out);
+  }
 
   // assemble vector of output variable names
   std::vector<std::string> names; names.reserve(M);

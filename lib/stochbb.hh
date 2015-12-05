@@ -31,7 +31,9 @@
  * SochBB determines the probability density function (PDF) or cummulative probability function
  * (CDF) of the waiting-time distribution of the process \f$Y\f$ analytically (as far as
  * possible) or numerically (where an analytic method fails). More over it provides an efficient
- * and correct sampler for the random variable. As the summands commute and the distribution of the
+ * and correct sampler for the random variables.
+ *
+ * As the summands commute and the distribution of the
  * sum of \f$X_1\f$ and \f$X_3\f$ can be determined analytically as
  * \f$X' = (X_1+X_3)\sim\Gamma(11,100)\f$, the random variable \f$Y\f$ can now be expressed as
  * \f$Y = X_2 + X'\f$ and only a single numeric convolution is necessary to obtain the PDF of the
@@ -67,6 +69,7 @@
  * \subsection cliex Examples
  *
  */
+
 #ifndef __SBB_STOCHBB_HH__
 #define __SBB_STOCHBB_HH__
 

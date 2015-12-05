@@ -31,8 +31,12 @@ RNG::unif(double a, double b) {
 
 double
 RNG::norm() {
-  double u = unif(-1,1), v = unif(-1,1);
-  double s = u*u + v*v;
+  double u, v, s;
+  do {
+    u = unif(-1,1);
+    v = unif(-1,1);
+    s = u*u + v*v;
+  } while (s>=1);
   return u*std::sqrt(-2*std::log(s)/s);
 }
 

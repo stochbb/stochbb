@@ -1,6 +1,7 @@
 #include "xmlparser.hh"
 #include "chain.hh"
 #include "minmax.hh"
+#include "mixture.hh"
 #include "exception.hh"
 #include <iostream>
 #include <QFile>
@@ -116,6 +117,7 @@ XmlParser::XmlParser() {
   _factories["chain"] = new GenericVariableDefinition(&XmlParser::parseChain);
   _factories["maximum"] = new GenericVariableDefinition(&XmlParser::parseMaximum);
   _factories["minimum"] = new GenericVariableDefinition(&XmlParser::parseMinimum);
+  _factories["mixture"] = new GenericVariableDefinition(&XmlParser::parseMixture);
 }
 
 XmlParser::~XmlParser() {
@@ -355,6 +357,30 @@ XmlParser::parseMinimum(QDomElement &node, ContextObj *sim, XmlParser *parser) {
 }
 
 Var
+XmlParser::parseMixture(QDomElement &node, ContextObj *sim, XmlParser *parser) {
+  std::vector< std::pair<double, Var> > vars = parser->parseWeights(node, sim);
+  if (0 == vars.size()) {
+    ParserError err;
+    err << "ParserError @" << node.lineNumber()
+        << ": " << node.tagName().toStdString() << " has no variables.";
+    throw err;
+  }
+
+  std::string name = "";
+  if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
+  else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
+  // Get weights and variables
+  std::vector<double> weights; weights.reserve(vars.size());
+  std::vector<Var> variables; variables.reserve(vars.size());
+  for (size_t i=0; i<vars.size(); i++) {
+    weights.push_back(vars[i].first);
+    variables.push_back(vars[i].second);
+  }
+  // done
+  return new MixtureObj(weights, variables, name);
+}
+
+Var
 XmlParser::parseVar(QDomElement &node, ContextObj *sim) {
   if ("var" == node.tagName()) {
     if (node.hasAttribute("type") && (! node.hasAttribute("ref"))) {
@@ -432,6 +458,33 @@ QVector<Var> XmlParser::parseVars(QDomElement &node, ContextObj *sim) {
     vars.push_back(parseVar(p, sim));
   }
   return vars;
+}
+
+std::vector< std::pair<double, Var> >
+XmlParser::parseWeights(QDomElement &node, ContextObj *sim) {
+  std::vector< std::pair<double, Var> > weights;
+  for (QDomElement p=node.firstChildElement(); !p.isNull(); p=p.nextSiblingElement()) {
+    weights.push_back(parseWeight(p, sim));
+  }
+  return weights;
+}
+
+std::pair<double, Var>
+XmlParser::parseWeight(QDomElement &node, ContextObj *sim) {
+  if ("weight" != node.tagName()) {
+    ParserError err;
+    err << "ParserError @"<< node.lineNumber()
+        << ": Unexpected element <" << node.tagName().toStdString()
+        << ">. Expected <weight>.";
+    throw err;
+  }
+  // get weight
+  QDomElement wnode = node.firstChildElement();
+  double w = parseMathML(wnode, sim);
+  // get variable
+  QDomElement vnode = wnode.nextSiblingElement();
+  Var var = parseVar(vnode, sim);
+  return std::pair<double, Var>(w, var);
 }
 
 void

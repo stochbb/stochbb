@@ -1,5 +1,6 @@
 #include "simulation.hh"
 #include "exception.hh"
+#include "api.hh"
 
 
 using namespace sbb;
@@ -129,7 +130,7 @@ SimulationObj::addOutputVar(const Var &var) {
 }
 
 void
-SimulationObj::run(Eigen::MatrixXd &out) const {
+SimulationObj::evalPDF(Eigen::MatrixXd &out) const {
   size_t N = steps();
   size_t M = _outputVariables.size();
   out.resize(N, M+1);
@@ -150,3 +151,41 @@ SimulationObj::run(Eigen::MatrixXd &out) const {
   }
 }
 
+
+void
+SimulationObj::evalCDF(Eigen::MatrixXd &out) const {
+  size_t N = steps();
+  size_t M = _outputVariables.size();
+  out.resize(N, M+1);
+
+  double Tmin = tMin(), Tmax = tMax(), dt = (Tmax-Tmin)/N;
+  double t=Tmin;
+
+  // Get all CDFs and store them into out at column j+1
+  for (size_t j=0; j<M; j++) {
+    Eigen::VectorXd cdf(N);
+    _outputVariables[j]->density()->evalCDF(Tmin, Tmax, cdf);
+    out.col(j+1) = cdf;
+  }
+
+  // Store time column
+  for (size_t i=0; i<N; i++, t+=dt) {
+    out(i,0) = t;
+  }
+}
+
+void
+SimulationObj::sample(Eigen::MatrixXd &out) const {
+  size_t N = steps();
+  size_t M = _outputVariables.size();
+  out.resize(N, M);
+
+  std::vector<Var> vars; vars.reserve(M);
+  for (size_t i=0; i<M; i++) {
+    _outputVariables[i]->ref();
+    vars.push_back(_outputVariables[i]);
+  }
+
+  ExactSampler sampler(vars);
+  sampler.sample(out);
+}

@@ -280,9 +280,8 @@ GammaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 void
 GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
-  double c = std::tgamma(_k);
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = sbb::gamma_li(_k, t/_theta) / c;
+    out[i] = sbb::gamma_li(_k, t/_theta);
   }
 }
 

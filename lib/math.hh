@@ -9,9 +9,9 @@ namespace sbb {
 double lgamma(double z);
 /** The error function. */
 double erfc(double x);
-/** The lower-incomplete gamma function. */
+/** The regularized lower-incomplete gamma function. */
 double gamma_li(double s, double z);
-/** The upper-incomplete gamma function. */
+/** The regularized upper-incomplete gamma function. */
 double gamma_ui(double s, double z);
 /** The beta function. */
 double betai(double a, double b, double x);

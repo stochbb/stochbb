@@ -27,7 +27,7 @@
  <var ref="X1"/> <var ref="X2"/> <var ref="X3"/>
  </var>
 
- <output from="0" to="200" steps="1000">
+ <output from="0" to="150" steps="1000">
   <var ref="X1"/> <var ref="X2"/> <var ref="X3"/> <var ref="min"/> <var ref="max"/>
  </output>
 </simulation>

@@ -2,10 +2,22 @@
 #include "randomvariable.hh"
 #include "chain.hh"
 #include "minmax.hh"
+#include "mixture.hh"
 #include "exception.hh"
-#include <algorithm>
+#include "rng.hh"
 
+#include <algorithm>
 using namespace sbb;
+
+
+inline size_t _find_index(double p, size_t a, size_t b, const std::vector<double> &cdf) {
+  while (1 < (b-a)) {
+    size_t mid = a+(b-a)/2;
+    if (p < cdf[mid]) { b = mid; }
+    else { a = mid; }
+  }
+  return b;
+}
 
 
 ExactSamplerObj::ExactSamplerObj(const std::vector<Var> &variables)
@@ -71,6 +83,8 @@ ExactSamplerObj::_choose_sampler(VarObj *var) {
     return ExactSamplerObj::_sample_minimum;
   } else if (dynamic_cast<MaximumObj *>(var)) {
     return ExactSamplerObj::_sample_minimum;
+  } else if (dynamic_cast<MixtureObj *>(var)) {
+    return ExactSamplerObj::_sample_mixture;
   }
 
   TypeError err;
@@ -120,5 +134,30 @@ ExactSamplerObj::_sample_maximum(ExactSamplerObj *self, VarObj *var, Eigen::Matr
     for (int j=0; j<out.rows(); j++) {
       out(j, var_idx) = std::max(out(j, var_idx), out(j, idx));
     }
+  }
+}
+
+void
+ExactSamplerObj::_sample_mixture(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
+  MixtureObj *mix = static_cast<MixtureObj *>(var);
+
+  // compute cummulative distribution of weights
+  std::vector<double> cum; cum.reserve(mix->numVariables());
+  for (size_t i=0; i<mix->numVariables(); i++) {
+    cum[i] = (i>0) ? (cum[i-1]+mix->weight(i)) : mix->weight(i);
+  }
+  // normalize cdf
+  for (size_t i=0; i<mix->numVariables(); i++) {
+    cum[i] /= cum[mix->numVariables()-1];
+  }
+
+  // get output column
+  size_t var_idx = self->_varmap[var];
+  for (int i=0; i<out.rows(); i++) {
+    // select a variable randomly
+    double p = RNG::unif();
+    size_t idx = (p < cum[0]) ? 0 : _find_index(p, 0, mix->numVariables()-1, cum);
+    // select sample
+    out(i, var_idx) = out(i, self->_varmap[*mix->variable(idx)]);
   }
 }

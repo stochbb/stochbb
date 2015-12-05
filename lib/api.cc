@@ -4,6 +4,7 @@
 #include "randomvariable.hh"
 #include "chain.hh"
 #include "minmax.hh"
+#include "mixture.hh"
 #include "simulation.hh"
 #include "exactsampler.hh"
 #include "marginalsampler.hh"
@@ -338,6 +339,40 @@ Minimum::operator =(const Minimum &other) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of Mixture container
+ * ********************************************************************************************* */
+Mixture::Mixture(MixtureObj *obj)
+  : DerivedVar(obj), _mixture(obj)
+{
+  // pass...
+}
+
+Mixture::Mixture(const std::vector<double> &weights, const std::vector<Var> &variables, const std::string &name)
+  : DerivedVar(new MixtureObj(weights, variables, name)), _mixture(static_cast<MixtureObj *>(_object))
+{
+  // pass...
+}
+
+Mixture::Mixture(const Mixture &other)
+  : DerivedVar(other), _mixture(other._mixture)
+{
+  // pass...
+}
+
+Mixture &
+Mixture::operator =(const Mixture &other) {
+  DerivedVar::operator =(other);
+  _mixture = other._mixture;
+  return *this;
+}
+
+double
+Mixture::weight(size_t i) const {
+  return _mixture->weight(i);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of Simulation container
  * ********************************************************************************************* */
 Simulation::Simulation()
@@ -434,8 +469,18 @@ Simulation::addOutputVar(const Var &var) {
 
 
 void
-Simulation::run(Eigen::MatrixXd &out) const {
-  return _simulation->run(out);
+Simulation::evalPDF(Eigen::MatrixXd &out) const {
+  return _simulation->evalPDF(out);
+}
+
+void
+Simulation::evalCDF(Eigen::MatrixXd &out) const {
+  return _simulation->evalCDF(out);
+}
+
+void
+Simulation::sample(Eigen::MatrixXd &out) const {
+  return _simulation->sample(out);
 }
 
 

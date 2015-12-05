@@ -30,6 +30,7 @@ class DerivedVarObj;
 class ChainObj;
 class MaximumObj;
 class MinimumObj;
+class MixtureObj;
 class SimulationObj;
 class ExactSamplerObj;
 class MarginalSamplerObj;
@@ -44,14 +45,17 @@ public:
   typedef Object ObjectType;
 
 protected:
-  /** Hidden constructor. */
-  Container();
   /** Packs the given objects. Takes the reference of the object. */
   explicit Container(Object *obj);
-  /** Copy constructor. */
-  Container(const Container &other);
+  //! @endcond
 
 public:
+  /** Empty constructor. */
+  Container();
+
+  //! @cond internal
+  /** Copy constructor. */
+  Container(const Container &other);
   /** Destructor. */
   virtual ~Container();
 
@@ -406,6 +410,41 @@ protected:
 };
 
 
+/** This class implements a mixture of random variables.
+ * A mixture is a random process that selects one of its children with a certain probability. */
+class Mixture: public DerivedVar
+{
+public:
+  //! @cond internal
+  /** Object type of the container.*/
+  typedef MixtureObj ObjectType;
+
+public:
+  /** Packs the given @c MixtureObj instance. */
+  Mixture(MixtureObj *obj);
+  //! @endcond
+
+  /** Constructs a mixture from the given weights and variables. */
+  Mixture(const std::vector<double> &weights, const std::vector<Var> &variables, const std::string &name="");
+
+  //! @cond internal
+  /** Copy constructor. */
+  Mixture(const Mixture &other);
+  /** Assignment operator. */
+  Mixture &operator =(const Mixture &other);
+  //! @endcond
+
+  /** Retruns the weight of the i-th variable. */
+  double weight(size_t i) const;
+
+protected:
+  //! @cond internal
+  /** The reference to the @c MixtureObj instance. */
+  MixtureObj *_mixture;
+  //! @endcond
+};
+
+
 /** Collects several variable definitions and which PDFs are evaluated.
  *
  * The simplest way to construct a @c Simulation is to parse a simulation specification from xml
@@ -459,10 +498,18 @@ public:
   /** Adds a output variable to the simulation. */
   void addOutputVar(const Var &var);
 
-  /** Performs the simulation and stores the results into the given matrix.
-   * The matrix gets resized. Each column represents a output variable where the first
+  /** Evaluates the PDF of the selected output variables and stores the results into the given
+   * matrix. The matrix gets resized. Each column represents a output variable where the first
    * column is time. Each row represetns a time-point at which the PDFs are evaluated. */
-  void run(Eigen::MatrixXd &out) const;
+  void evalPDF(Eigen::MatrixXd &out) const;
+  /** Evaluates the CDF of the selected output variables and stores the results into the given
+   * matrix. The matrix gets resized. Each column represents a output variable where the first
+   * column is time. Each row represetns a time-point at which the CDFs are evaluated. */
+  void evalCDF(Eigen::MatrixXd &out) const;
+  /** Samples from the selected output variables and stores the results into the given
+   * matrix. The matrix gets resized. Each column represents a output variable and each row
+   * represetns a sample of the variables. */
+  void sample(Eigen::MatrixXd &out) const;
 
 public:  
   /** Parses the simulation specification from XML.

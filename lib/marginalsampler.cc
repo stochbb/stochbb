@@ -6,7 +6,7 @@
 using namespace sbb;
 
 // log(N) binary search algorithm for the index at which p must be inserted to maintain order
-size_t _find_index(double p, size_t a, size_t b, const Eigen::VectorXd &cdf) {
+inline size_t _find_index(double p, size_t a, size_t b, const Eigen::VectorXd &cdf) {
   while (1 < (b-a)) {
     size_t mid = a+(b-a)/2;
     if (p < cdf[mid]) { b = mid; }
