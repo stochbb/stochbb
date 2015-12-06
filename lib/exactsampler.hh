@@ -44,6 +44,10 @@ protected:
   static void _sample_maximum(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
   /** Samples from a mixture of random variables. */
   static void _sample_mixture(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
+  /** Samples from a compound-normal random variable. */
+  static void _sample_comp_normal(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
+  /** Samples from a compound-gamma random variable. */
+  static void _sample_comp_gamma(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
 
 protected:
   /** The variables selected for output. */

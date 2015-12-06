@@ -3,6 +3,7 @@
 #include "chain.hh"
 #include "minmax.hh"
 #include "mixture.hh"
+#include "compound.hh"
 #include "exception.hh"
 #include "rng.hh"
 
@@ -85,6 +86,10 @@ ExactSamplerObj::_choose_sampler(VarObj *var) {
     return ExactSamplerObj::_sample_minimum;
   } else if (dynamic_cast<MixtureObj *>(var)) {
     return ExactSamplerObj::_sample_mixture;
+  } else if (dynamic_cast<NormalCompoundObj *>(var)) {
+    return ExactSamplerObj::_sample_comp_normal;
+  } else if (dynamic_cast<GammaCompoundObj *>(var)) {
+    return ExactSamplerObj::_sample_comp_gamma;
   }
 
   TypeError err;
@@ -159,5 +164,27 @@ ExactSamplerObj::_sample_mixture(ExactSamplerObj *self, VarObj *var, Eigen::Matr
     size_t idx = (p < cum[0]) ? 0 : _find_index(p, 0, mix->numVariables()-1, cum);
     // select sample
     out(i, var_idx) = out(i, self->_varmap[*mix->variable(idx)]);
+  }
+}
+
+void
+ExactSamplerObj::_sample_comp_normal(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
+  NormalCompoundObj *cnorm = static_cast<NormalCompoundObj *>(var);
+  size_t out_idx = self->_varmap[var];
+  for (int i=0; i<out.rows(); i++) {
+    double mu = out(i, self->_varmap[*cnorm->variable(0)]);
+    double sigma = out(i, self->_varmap[*cnorm->variable(1)]);
+    out(i, out_idx) = RNG::norm(mu, sigma);
+  }
+}
+
+void
+ExactSamplerObj::_sample_comp_gamma(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
+  NormalCompoundObj *cnorm = static_cast<NormalCompoundObj *>(var);
+  size_t out_idx = self->_varmap[var];
+  for (int i=0; i<out.rows(); i++) {
+    double k = out(i, self->_varmap[*cnorm->variable(0)]);
+    double theta = out(i, self->_varmap[*cnorm->variable(1)]);
+    out(i, out_idx) = RNG::gamma(k, theta);
   }
 }
