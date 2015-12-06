@@ -8,9 +8,11 @@
 
 namespace sbb {
 
+/** Implements a mixture density. */
 class MixtureDensityObj: public DensityObj
 {
 public:
+  /** Constructs a mixture density from the given weights and variables. */
   MixtureDensityObj(const std::vector<double> &weights, const std::vector<VarObj *> &variables);
 
   virtual void mark();
@@ -18,24 +20,31 @@ public:
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
 
 protected:
+  /** The vector of weights (normalized). */
   std::vector<double> _weights;
+  /** The vector of densities of the random variables being mixed. */
   std::vector<DensityObj *> _densities;
 };
 
 
+/** Represents a random variable being a mixture of other random variables. */
 class MixtureObj : public DerivedVarObj
 {
 public:
+  /** Constructs a mixture of the given @c variables and @c weights. */
   MixtureObj(const std::vector<double> &weights, const std::vector<Var> &variables,
              const std::string &name="");
 
   virtual void mark();
   virtual Density density();
 
+  /** Returns the weight of the i-th random variable. */
   inline double weight(size_t i) const { return _weights[i]; }
 
 protected:
+  /** The vector of weights. */
   std::vector<double> _weights;
+  /** The density of the mixture. */
   MixtureDensityObj *_density;
 };
 

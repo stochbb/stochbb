@@ -9,9 +9,9 @@ namespace sbb {
 
 /** Implements an exact sampler for a system of random varaibles.
  * Proper sampling from a system of potentially dependent random variables is not trivial. First,
- * it must be ensured that every atomic random variable, that is a random variable that does not
+ * it must be ensured that every atomic random variable, a random variable that does not
  * depend on others, is sampled only once. Moreover, the samples of derived random variables need
- * to be cached for performance. Upon construction, this class first determines in which and in
+ * to be cached for performance. Upon construction, this class first determines which and in
  * which order the random variables must be sampled. By calling @c sample, a sample is drawn from
  * the system. */
 class ExactSamplerObj : public Object

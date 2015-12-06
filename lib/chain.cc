@@ -94,7 +94,7 @@ DensityObj *convolution_combine(DensityObj *a, DensityObj *b) {
     } else if (NormalDensityObj *norm_b = dynamic_cast<NormalDensityObj *>(b)) {
       // If RHS is a normal density too
       return new NormalDensityObj(norm_a->mu()+norm_b->mu(),
-                                  std::sqrt(norm_a->sigma()*norm_a->sigma()*
+                                  std::sqrt(norm_a->sigma()*norm_a->sigma()
                                             + norm_b->sigma()*norm_b->sigma()));
     }
   } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(a)) {

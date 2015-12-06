@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
       = parser.Flag("version");
   opt::RuleInterface &cmd_run =
       (parser.opt(parser.Flag("log-debug")),
-       parser.opt(parser.Flag("pdf") | parser.Flag("cdf") | parser.Flag("sample")),
+       parser.opt(parser.Keyword("pdf") | parser.Keyword("cdf") | parser.Keyword("sample")),
        parser.Value("filename"),
        parser.opt(parser.Flag("plot") | parser.Option("csv")));
   parser.setGrammar( cmd_help | cmd_version | cmd_run );
@@ -66,13 +66,13 @@ int main(int argc, char *argv[])
   // run simulation
   size_t N = sim.steps(), M = sim.numOutputVars();
   Eigen::MatrixXd out(N, M+1);
-  if (parser.has_flag("pdf")) {
+  if (parser.has_keyword("pdf")) {
     logDebug() << "Eval PDF ...";
     sim.evalPDF(out);
-  } else if (parser.has_flag("cdf")) {
+  } else if (parser.has_keyword("cdf")) {
     logDebug() << "Eval CDF ...";
     sim.evalCDF(out);
-  } else if (parser.has_flag("sample")) {
+  } else if (parser.has_keyword("sample")) {
     logDebug() << "Sample ...";
     sim.sample(out);
   } else {
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
   }
 
   // if plot flag is specified -> plot results
-  if (parser.has_flag("plot")) {
+  if (parser.has_flag("plot") && (!parser.has_keyword("sample"))) {
     return do_plot(argc, argv, out, names);
   }
 

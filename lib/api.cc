@@ -5,6 +5,7 @@
 #include "chain.hh"
 #include "minmax.hh"
 #include "mixture.hh"
+#include "compound.hh"
 #include "simulation.hh"
 #include "exactsampler.hh"
 #include "marginalsampler.hh"
@@ -369,6 +370,39 @@ Mixture::operator =(const Mixture &other) {
 double
 Mixture::weight(size_t i) const {
   return _mixture->weight(i);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of Compound container
+ * ********************************************************************************************* */
+Compound::Compound(CompoundObj *obj)
+  : DerivedVar(obj), _compound(obj)
+{
+  // pass...
+}
+
+Compound::Compound(const Compound &other)
+  : DerivedVar(other), _compound(other._compound)
+{
+  // pass...
+}
+
+Compound &
+Compound::operator =(const Compound &other) {
+  DerivedVar::operator =(other);
+  _compound = other._compound;
+  return *this;
+}
+
+Compound
+Compound::norm(const Var &mu, const Var &sigma, const std::string &name) {
+  return CompoundObj::norm(mu, sigma, name);
+}
+
+Compound
+Compound::gamma(const Var &k, const Var &theta, const std::string &name) {
+  return CompoundObj::gamma(k, theta, name);
 }
 
 

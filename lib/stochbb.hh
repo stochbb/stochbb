@@ -40,34 +40,50 @@
  * random variable \f$Y\f$.
  *
  *
- * \section cli Command line interface
+ * \page cli Command line interface
  * The StochBB installation comes with a command line tool. With this tool, a process definition
  * in @ref xml "XML" can be analyzed. The results are returned as CSV or they can be plotted
  * directly.
  *
- * \subsection clisyn Synopsis
+ * \section clisyn Synopsis
  * \code
- *  stochbb [OPTIONS] INPUTFILE [OUTPUT OPTIONS]
+ *  stochbb [OPTIONS] [CMD] INPUTFILE [OUTPUT OPTIONS]
  * \endcode
  *
- * \subsubsection cliops Options
+ * \subsection cliops Options
  *  - `--help` Prints a short help string and exits.
  *  - `--version` Prints the version string and exits.
  *  - `--log-debug` Prints debug messages to stderr. By default, only warnings and error messages
  *    are printed to stderr.
  *
- * \subsubsection clioops Output options
- *  - `--pdf` Specifies to evaluate the PDF of the variables selected in the `INPUTFILE` (default).
- *  - `--cdf` Specifies to evaluate the CDF instead of the PDF of the variables selected in the
+ * \subsection clicmd Commands
+ *  - `pdf` Specifies to evaluate the PDF of the variables selected in the `INPUTFILE` (default).
+ *  - `cdf` Specifies to evaluate the CDF instead of the PDF of the variables selected in the
  *    `INPUTFILE`.
+ *  - `sample` Samples from the variables selected in the `INPUTFILE`.
+ *
+ * \subsection clioops Output options
  *  - `--plot` Plots the PDF or CDF of the output variables specified in the file `INPUTFILE`.
  *  - `--csv=FILENAME` Writes the PDF or CDF of the output variables specified in the `INPUTFILE`
  *    to `FILENAME`.
  *
- * \subsection cliuse Usage
+ * \section cliex Examples
+ * For example, to plot the PDF of the selected random variables specified in the "example.xml"
+ * process description file
+ * \code
+ *  stochbb pdf example.xml --plot
+ * \endcode
  *
- * \subsection cliex Examples
+ * The same PDF can be stored as CSV in "output.csv" by calling
+ * \code
+ *  sotchbb pdf example.xml --csv=output.csv
+ * \endcode
  *
+ * The call
+ * \code
+ *  sotchbb pdf example.xml
+ * \endcode
+ * will print the CSV data to stdout.
  */
 
 #ifndef __SBB_STOCHBB_HH__

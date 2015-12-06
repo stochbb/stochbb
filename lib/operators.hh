@@ -6,7 +6,16 @@
 
 namespace sbb {
 
-/** Constructs a random variable \f$Y\f$, as the minimum of the given random variables.
+/** Tests if the vector of variables are mutually independent.
+ * @param vars The vector of variables.
+ * @returns @c true If the given variables are mutually independent. */
+bool independent(const std::vector<Var> &vars);
+
+/** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
+ * @param vars */
+Var chain(const std::vector<Var> &vars);
+
+/** Constructs a random variable \f$Y\f$ as the minimum of the given random variables.
  * In contrast to the @c MinimumObj, it handles partial dependency between the random variables
  * if they are formed as sums of independent random variables by first separating the common
  * part. For example
@@ -28,15 +37,17 @@ Var maximum(const std::vector<Var> &variables);
 
 }
 
-/** Overloads the +-operator to construct a @c Chain. */
-inline sbb::Chain operator+(const sbb::Var &a, const sbb::Var &b) {
+/** Overloads the +-operator to construct a @c Chain.
+ * See also @c sbb::chain() function. */
+inline sbb::Var operator+(const sbb::Var &a, const sbb::Var &b) {
   std::vector<sbb::Var> args; args.reserve(2);
   args.push_back(a); args.push_back(b);
-  return sbb::Chain(args);
+  return sbb::chain(args);
 }
 
 
 namespace std {
+
 /** Overloads the standard library @c max function to construct a @c Maximum RV. */
 inline  sbb::Var min(const sbb::Var &a, const sbb::Var &b) {
   std::vector<sbb::Var> args; args.reserve(2); args.push_back(a); args.push_back(b);
@@ -48,6 +59,7 @@ inline  sbb::Var max(const sbb::Var &a, const sbb::Var &b) {
   std::vector<sbb::Var> args; args.reserve(2); args.push_back(a); args.push_back(b);
   return sbb::maximum(args);
 }
+
 }
 
 #endif // __SSB_OPERATORS_HH__

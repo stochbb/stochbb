@@ -174,3 +174,48 @@ sbb::maximum(const std::vector<Var> &variables) {
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of independent
+ * ********************************************************************************************* */
+bool
+sbb::independent(const std::vector<Var> &vars) {
+  for (size_t i=0; i<vars.size(); i++) {
+    for (size_t j=(i+1); j<vars.size(); j++) {
+      if (! vars[i].mutuallyIndep(vars[j])) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of chain
+ * ********************************************************************************************* */
+Var
+sbb::chain(const std::vector<Var> &vars) {
+  std::vector<Var> variables;
+  variables.reserve(2*vars.size());
+
+  // Flatten chains
+  for (size_t i=0; i<vars.size(); i++) {
+    if (vars[i].is<Chain>()) {
+      Chain chain = vars[i].as<Chain>();
+      for (size_t j=0; j<chain.numVariables(); j++) {
+        variables.push_back(chain.variable(j));
+      }
+    } else {
+      variables.push_back(vars[i]);
+    }
+  }
+
+  // Check for mutual independence
+  if (! independent(variables)) {
+    AssumptionError err;
+    err << "Cannot construct chain from mutually depending random variables.";
+    throw err;
+  }
+
+  return Chain(variables);
+}

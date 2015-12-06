@@ -1,8 +1,8 @@
 /** \page xml Process & simulation description in XML
- * The @c XmlParser class implements a paser that allows to specifiy process descriptions in XML.
- *
- * A simulation is a simple collection of random variables together with the specification which
- * variables as used for the output. For example the XML code
+ * In constrast to the @ref api, complex processes can also be defined in XML and analyzed using the
+ * StochBB command line tool (see @ref cli). A single XML file defines a @c sbb::Simulation, a
+ * simple collection of random variables together with the specification which variables as used
+ * for the output. For example the XML code
  * \code
  *  <?xml version="1.0"?>
  *  <simulation xmlns="http://hmatuschek.github.io/stochbb/simulation-0.0.dtd"
@@ -97,6 +97,17 @@
  *  </var>
  * \endcode
  *
+ * \subsection xmlmix Mixture of processes
+ * The mixuture of random variables is defined using the "mixture" variable type with a list of
+ * weight-variable paris. For example
+ * \code
+ *  <var type="mixture">
+ *   <weight> <m:cn>1</m:cn> <var ref="X1"/> </weight>
+ *   <weight> <m:cn>2</m:cn> <var ref="X2"/> </weight>
+ *   <weight> <m:cn>1</m:cn> <var ref="X3"/> </weight>
+ *  </var>
+ * \endcode
+
  * \section xmluserrv User defined random variable types
  * The limited build-in random variable type would turn the definition of complex stationary random
  * processess difficult. Hence it is possible to define new typed derived from the build-in ones.
@@ -249,6 +260,8 @@ protected:
   std::vector< std::pair<double, Var> > parseWeights(QDomElement &node, ContextObj *sim);
   /** Parses a weight-variable pair. */
   std::pair<double, Var> parseWeight(QDomElement &node, ContextObj *sim);
+  /** Parses a list of 'param' statements of a compound. */
+  QHash<QString, Var> parseParamVars(QDomElement &node, ContextObj *sim);
 
   /** Parses and evaluates MathML expressions. */
   double parseMathML(const QDomElement &node, ContextObj *ctx);
@@ -275,6 +288,8 @@ protected:
   static Var parseMinimum(QDomElement &node, ContextObj *sim, XmlParser *parser);
   /** Instantiates a mixture of random variables. */
   static Var parseMixture(QDomElement &node, ContextObj *sim, XmlParser *parser);
+  /** Instantiates a compound random variable. */
+  static Var parseCompound(QDomElement &node, ContextObj *sim, XmlParser *parser);
 
 protected:
   /** Abstract class of known random variable types.

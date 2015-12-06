@@ -2,6 +2,7 @@
 #include "chain.hh"
 #include "minmax.hh"
 #include "mixture.hh"
+#include "compound.hh"
 #include "exception.hh"
 #include <iostream>
 #include <QFile>
@@ -118,6 +119,7 @@ XmlParser::XmlParser() {
   _factories["maximum"] = new GenericVariableDefinition(&XmlParser::parseMaximum);
   _factories["minimum"] = new GenericVariableDefinition(&XmlParser::parseMinimum);
   _factories["mixture"] = new GenericVariableDefinition(&XmlParser::parseMixture);
+  _factories["compound"] = new GenericVariableDefinition(&XmlParser::parseCompound);
 }
 
 XmlParser::~XmlParser() {
@@ -380,6 +382,63 @@ XmlParser::parseMixture(QDomElement &node, ContextObj *sim, XmlParser *parser) {
   return new MixtureObj(weights, variables, name);
 }
 
+
+Var
+XmlParser::parseCompound(QDomElement &node, ContextObj *sim, XmlParser *parser) {
+  // Get base type
+  if (! node.hasAttribute("base")) {
+    ParserError err;
+    err << "@" << node.lineNumber()
+        << ": Cannot create compound random variable: base type not specified.";
+    throw err;
+  }
+
+  // Get parameter variables
+  QHash<QString, Var> vars = parser->parseParamVars(node, sim);
+
+  // Get optional name
+  std::string name = "";
+  if (node.hasAttribute("name")) { name = node.attribute("name").toStdString(); }
+  else if (node.hasAttribute("id")) { name = node.attribute("id").toStdString(); }
+
+  // Dispatch by base type
+  if ("normal" == node.attribute("base")) {
+    if (! vars.contains("mu")) {
+      ParserError err;
+      err << "@" << node.lineNumber()
+          << ": Cannot create normal compound: mu variable missing.";
+      throw err;
+    }
+    if (! vars.contains("sigma")) {
+      ParserError err;
+      err << "@" << node.lineNumber()
+          << ": Cannot create normal compound: sigma variable missing.";
+      throw err;
+    }
+    return Compound::norm(vars["mu"], vars["sigma"], name);
+  } else if ("gamma" == node.attribute("base")) {
+    if (! vars.contains("k")) {
+      ParserError err;
+      err << "@" << node.lineNumber()
+          << ": Cannot create gamma compound: k variable missing.";
+      throw err;
+    }
+    if (! vars.contains("theta")) {
+      ParserError err;
+      err << "@" << node.lineNumber()
+          << ": Cannot create gamma compound: theta variable missing.";
+      throw err;
+    }
+    return Compound::gamma(vars["k"], vars["theta"], name);
+  }
+
+  ParserError err;
+  err << "@" << node.lineNumber()
+      << ": Cannot create compound of base type '" << node.attribute("base").toStdString()
+      << "': Unknown compound type.";
+  throw err;
+}
+
 Var
 XmlParser::parseVar(QDomElement &node, ContextObj *sim) {
   if ("var" == node.tagName()) {
@@ -448,6 +507,22 @@ XmlParser::parseParams(QDomElement &node, ContextObj *sim) {
     }
     QDomElement mml = p.firstChildElement();
     params.insert(p.attribute("name"), parseMathML(mml, sim));
+  }
+  return params;
+}
+
+QHash<QString, Var>
+XmlParser::parseParamVars(QDomElement &node, ContextObj *sim) {
+  QHash<QString, Var> params;
+  for (QDomElement p=node.firstChildElement("param"); !p.isNull(); p=p.nextSiblingElement("param")) {
+    if (! p.hasAttribute("name")) {
+      ParserError err;
+      err << "ParserError @" << p.lineNumber()
+          << ": " << node.tagName().toStdString() << " has no 'name' attribute.";
+      throw err;
+    }
+    QDomElement var = p.firstChildElement();
+    params.insert(p.attribute("name"), parseVar(var, sim));
   }
   return params;
 }

@@ -11,10 +11,9 @@ namespace sbb {
  * its inverse to implement a generic sampler for a specified variable.
  *
  * This sampler uses the so-called "golden rule" to construct an approximative sampler
- * from an piece-wise linear CDF:
- * Assume that probability function of a random variable \f$X\f$ is \f$F_X(x)\f$, then
- * \f$Y = F_X(X)\f$ is uniformly distributed on the interval \f$[0,1]\f$. Consquently will
- *  \f$F_X^{-1}(Y)\f$ be distributed like \f$X\f$. */
+ * from an piece-wise linear CDF: Assume that probability function of a random variable
+ * \f$X\f$ is \f$F_X(x)\f$, then \f$Y = F_X(X)\f$ is uniformly distributed on the interval
+ * \f$[0,1]\f$. Consquently will \f$F_X^{-1}(Y)\f$ be distributed like \f$X\f$. */
 class MarginalSamplerObj : public Object
 {
 public:
