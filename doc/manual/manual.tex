@@ -1,0 +1,699 @@
+\documentclass[a4paper, 10pt]{paper}
+
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{color}
+\usepackage{natbib}
+
+\title{StochBB -- Stochastic Building Blocks Manual}
+\subtitle{Analyzing complex systems of dependent random variables}
+\author{Hannes Matuschek}
+\institution{Focus area \emph{Dynamics of complex systems},\\ University of Potdsam, Germany}
+
+
+% Tiny macro to handle editorial notes as highligted text.
+\newcommand{\todo}[1]{{\color{red}[TODO: #1]}}
+% just highlight
+\newcommand{\marked}[1]{{\color{red}#1}}
+% highlight with comment
+\newcommand{\comment}[2]{{\color{red}#1}\footnote{{\color{red}#2}}}
+% to be removed
+\newcommand{\remove}[1]{\color{red}\cancel{#1}}
+% to be removed with comment
+\newcommand{\removec}[2]{{\color{red}\cancel{#1}}\footnote{{\color{red}#2}}}
+% typeset as code
+\newcommand{\code}[1]{\texttt{#1}}
+% typeset class names
+\newcommand{\class}[1]{\code{#1}}
+% typeset method names
+\newcommand{\method}[2]{\code{#1}::\code{#2}}
+% typeset function names
+\newcommand{\function}[1]{\code{#1}}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{.8em}
+
+% configure code display
+\lstset{ %
+  backgroundcolor=\color{white},         % choose the background color
+  basicstyle=\footnotesize,              % size of fonts used for the code
+  breaklines=true,                       % automatic line breaking only at whitespace
+  captionpos=b,                          % sets the caption-position to bottom
+  commentstyle=\color[rgb]{0.5,0.5,0.5}, % comment style
+  keywordstyle=\color{blue},             % keyword style
+  stringstyle=\color[rgb]{0.58,0,0.82}   % string literal style
+}
+
+
+\begin{document}
+
+\maketitle
+ 
+\section{Introduction} \label{sec:intro}
+Frequently, complex systems are described in terms of stochastic processes. Either as the
+underlying deterministic process is too complex to be modeled exactly or as the
+process is indeed random. Frequently, however, not the random process itself is of 
+interest but a derived quantity. For example the distribution of waiting times until the
+process reaches a certain state. In the field of cognition, a random process is used to
+describe a specific processing stage in a chain of stages that leads to a response. The state of
+the random process itself is not measurable but the total response time of all processing 
+stages involved. Although each processing stage is modeled as a random process, the waiting-time
+of the stage is just a random variable and the complete system is a system of dependent random 
+variables.
+
+StochBB can be used to describe and analyze complex systems of dependent random variables
+by combining simple random variables (describing stages with a known waiting-time distribution) to
+a complex system. For example, consider the following independent random variables
+\begin{equation}
+  X_1 \sim \Gamma(10, 100)\,,\quad X_2 \sim \Gamma(20, 50)\,, X_3 \sim \text{Exp}(0.01)\,,\nonumber
+\end{equation}
+which are described completely by their distribution. This means that the time, the
+processing stage $X_1$ needs to complete is gamma-distributed with shape $k=10$ and scale
+$\theta=100$. Analogously, the stages $X_2$ and $X_3$ are defined by their own waiting-time 
+distribution.
+
+From these basic building blocks, a more complex system can be assembled by
+combining these blocks. Using the example above, one may define a new processing stage that is a chain of
+the stages $X_1,\dots,X_3$. Such a simple chain can be used to describe the successive
+processing of information entering at time $t=0$ at the first stage described by $X_1$.
+Once the first processing stage finished, its result gets forwarded to the second stage described
+by $X_2$ and finally to the last stage described by $X_3$. The waiting time of the
+complete chain is again a random variable that is the sum of all random variables,
+or expressed mathematically
+\begin{equation}
+ Y = X_1 + X_2 + X_3\,. \nonumber
+\end{equation}
+
+SochBB determines the probability density function (PDF) or cumulative probability function
+(CDF) of the waiting-time distribution of the process $Y$ analytically (as far as
+possible) or numerically (where an analytic method fails). More over it provides an efficient
+and correct sampler for the random variables.
+
+\subsection{Representation and reductions of random variables}
+Continuing the example above, please note that the sum of random variables commutes. Hence the
+random variable $Y$ remains the same if defined as $Y = X_1 + X_3 + X_2$. Moreover, the 
+distribution of the sum of $X_1$ and $X_3$ can be determined analytically as 
+$X' = (X_1+X_3)\sim\Gamma(11,100)$. Hence the random variable $Y$ can now be expressed as 
+$Y = X_2 + X'$, and only a single numeric convolution is necessary to obtain the PDF of the
+random variable $Y$. 
+
+StochBB implements several reductions of the system of random variables,
+exploiting mathematical identities of random variables. This allows to obtain the PDFs and CDFs
+of random variables efficiently.
+
+\subsubsection{Sums of random variables}
+Sums of random variables have been introduced briefly above and may represent a chain of processing
+stages being triggered sequentially. The sum itself is a derived random variable that depends on all
+mutually dependent variables being summed. The PDF of the sum is then simply the convolution of all
+PDFs of the summed variables. That is
+\begin{align}
+ Y &= \sum_{i=0}^NX_i\text{ where } X_i \sim f_i(x)\text{ mutually independent} \nonumber \\
+ Y &\sim f_1(x) \ast \cdots \ast f_N(x)\,. \nonumber
+\end{align}
+
+The direct numerical convolution of the underlying distributions can be computationally expensive if the
+number of PDFs is large. Assuming that all distributions are well supported on a common interval, however, 
+allows for a fast numerical convolution by means of the FFT convolution. For the FFT convolution, all 
+densities $f_i(x)$ are evaluated on a common regular gird and the evaluation of the convolution on that gird
+can then be computed easily. This, however, requires that the grid is chosen such that all densities being
+convoluted as well as the result are well supported on the chosen interval. Moreover, the grid must be fine 
+enough to capture the details of all distributions. 
+
+The numerical convolution is like any numerical approach only an approximation. Hence StochBB tries to perform
+the convolutions analytically before resorting to the numerical approach. 
+
+First all sums of random variables are flattened. That is, 
+\begin{equation}
+ \begin{array}{l}
+  Y_1 = X_1 + X_2\\
+  Y_2 = Y_1 + X_3 
+ \end{array} \longrightarrow 
+ \begin{array}{l}
+  Y_1 = X_1 + X_2\\
+  Y_2 = X_1 + X_2 + X_3 
+ \end{array}\,. \nonumber
+\end{equation}
+
+Then, the distribution of the sum is derived. Here the following reductions are performed.
+\begin{align}
+ \delta(x-x_0)\ast U[a,b](x) &\longrightarrow U[a+x_0,b+x_0](x)\,, \nonumber \\
+ \delta(x-x_0)\ast \phi(x; \mu, \sigma) &\longrightarrow \phi(x; \mu+x_0, \sigma)\,, \nonumber \\
+ \phi(x; \mu_1, \sigma_1)\ast \phi(x; \mu_2, \sigma_2) &\longrightarrow 
+   \phi(x; \mu_1+\mu_2, \sqrt{\sigma_1^2+\sigma_2^2}) \nonumber\,, \\
+ \Gamma(x; k_1, \theta)\ast \Gamma(x; k_2, \theta) &\longrightarrow 
+   \Gamma(x; k_1+k_2, \theta)\,, \nonumber
+\end{align}
+where $\delta(\cdot-x_0)$ is the delta distribution located at $x_0$, $U[a,b](\cdot)$ the uniform
+distribution on the interval $[a,b]$, $\phi(\cdot; \mu, \sigma)$ the normal distribution with mean 
+$\mu$ and standard deviation $\sigma$ and $\Gamma(\cdot; k, \theta)$ the gamma distribution with
+shape $k$ and scale $\theta$.
+
+\subsubsection{Maximum and Minimum of random variables}
+The maximum or the minimum of some given random variables, e.g. $Y=\min\{X_1,X_2\}$ or 
+$Y=\max\{X_1,X_2\}$ are them self random variables. These derived random variables can be used to
+express the waiting time of a processing stage that consists of several independent processes being
+performed in parallel (in contrast to sequential processes described by sums of random variables). 
+If the processing stage is finished, once the first of the parallel processes is finished, the 
+resulting waiting time is expressed by the minimum of the underlying random variables. If the stage
+is finished only if all underlying processes are finished, the resulting waiting time is described
+by the maximum. 
+
+If the two random variables $X_1$ and $X_2$ are distributed according to the (cumulative) distribution
+functions $F_1(x)$ and $F_2(x)$, then the maximum of these two random variables $Y=\max\{X_1,X_2\}$
+is distributed according to the probability function $F_Y(y)=F_1(y)\cdot F_2(y)$. Consequently, its PDF
+is $f_Y(y)=f_1(y)\cdot F_2(y) + f_2(y)\cdot F_1(y)$, where $f_1(\cdot)$ and $f_2(\cdot)$ are the PDFs
+of the random variables $X_1$ and $X_2$. Likewise, the CDF and PDF of the minimum can be expressed as
+$F_Y(y)=1-(1-F_1(y))\cdot(1-F_2(y))$ and therefore $f_Y(y) = f_1(y)(1-F_2(y)) + f_2(y)(1-F_1(y))$.
+
+For applying these equations to derive the CDF and PDFs of the minimum and maximum random variables, the 
+underlying random variables must be independent. To achieve independence, where possible the following 
+reductions are performed on maximum as well as minimum random variables.
+
+Again, first maximum and minimum structures were flattened, for example
+\begin{equation}
+ \begin{array}{l}
+  Y_1 = \max\{X_1,X_2\}\\
+  Y_2 = \max\{Y_1,X_3\}
+ \end{array} \longrightarrow
+ \begin{array}{l}
+  Y_1 = \max\{X_1,X_2\}\\
+  Y_2 = \max\{X_1,X_2,X_3\}
+ \end{array}\,, \nonumber
+\end{equation}
+then, possible common terms are collected like
+\begin{equation}
+ \max\{X_1 + X_2, X_3 + X_2\} \longrightarrow \max\{X_1,X_3\}+X_2\,. \nonumber
+\end{equation}
+
+This does not ensure independence of random variables, but decreases the complexity of
+setting-up a complex system of random variables by resolving simple-structured 
+dependencies between random variables.
+
+\subsubsection{Mixture of random variables}
+A mixture is the weighted sum of random variables
+\begin{equation}
+ Y = \frac{w_1X_1+\cdots+x_NX_N}{w_1+\cdots+w_N}\,, \nonumber
+\end{equation}
+where $w_i$ are positive weights, is also a random variable with the PDF
+\begin{equation}
+ f_Y(y) = \frac{w_1f_1(x)+\cdots+w_Nf_N(x)}{w_1+\cdots+w_N}\,,\nonumber
+\end{equation}
+where $f_i(\cdot)$ is the PDF of the i-th random variable $X_i$. The CDF of the
+mixture is obtained analogously. A mixture can be used to describe a random 
+path-selection in a system of processing stages. 
+
+\subsubsection{Compound random variables}
+The most complex derived random variable type is the compound random variable. That is a random variable
+$X$ distributed according to a parametric distribution $X\sim f_{X|A}(x;A)$ with parameter $A$. $A$, however, 
+is a random variable by itself with its own distribution $A\sim g(a)$. The distribution of the compound 
+random variable $X$ is then obtained by marginalizing the parameter of the PDF $f(\cdot;a)$ as 
+\begin{equation}
+ f_X(x) = \int f_{X|A}(x;a)\,g(a)\,da\,,\nonumber
+\end{equation}
+and the CDF is obtained analogously as
+\begin{equation}
+ F_X(x) = \int F_{X|A}(x;a)\,g(a)\,da\,.\nonumber
+\end{equation}
+
+StochBB determines the PDF and CDF of $X$ by performing the integral numerically using a similar \emph{trick}
+as for the convolution of PDFs. Here the parameter distribution is evaluated on the same grid as the distribution
+of the random variable $X$ itself, allowing to determine the approximate PDF of the compound. This, however, requires 
+that both distributions, the distribution of the parameter and the distribution of the variable itself have similar 
+scales. This assumption is not always met. If violated, the resulting approximation might be bad.
+
+\section{Application programming interface} \label{sec:api}
+The application programming interface (API, see also \cite{stochbbapi}) allows to assemble processes
+programmatically in C++.
+All API classes are derived from the \class{Container} class which is an essential part of the
+memory management system used by StochBB. Usually the C++ programmer needs to keep track of all
+objects still in use and is responsible to free unneeded objects to avoid memory leaks. This can
+be a difficult takes when dealing with complex structured objects cross referencing each other.
+To ease the usage of StochBB, a mark and sweep garbage collector is implemented which keeps track
+of all objects being directly or indirectly reachable and freeing all unreachable objects. For
+this memory management system to work, it is necessary to treat all container like values
+although they represent references to objects allocated on the heap.
+
+The central class of StochBB is \class{Var}, representing a random variable. This could be a
+simple random variable having a specified distribution (see \class{AtomicVar}) or a random
+variable that is derived from others like \class{Chain}, \class{Minimum}, \class{Maximum} or
+\class{Mixture}. All random variables have probability density function attached. They can be accessed
+using the \method{Var}{density} method which returns a \class{Density} object.
+
+All \class{Density} objects have two methods, \method{Density}{eval} evaluating the probability
+density function and \method{Density}{evalCDF} evaluating the cumulative density or probability
+function. Assembling a system of random variables and evaluate their PDFs or CDFs is straight
+forward. Sampling, however, is not that trivial and is described below in some detail.
+
+\subsection{Assembling random processes}
+In a first step, one may define a new gamma-distributed random variable with shape $k=10$
+and scale $\theta=100$ as
+\begin{lstlisting}[language=C++]
+ #include <stochbb/api.h>
+ using namespace sbb;
+ 
+ // [...]
+ 
+ Var X1 = AtomicVar::gamma(10, 100);
+\end{lstlisting}
+
+Its PDF can then be evaluated as on a regular grid in $[0,1000)$ with $1000$ grid points with
+\begin{lstlisting}[language=C++]
+ // [...]
+ 
+ Eigen::VectorXd pdf(1000);
+ X1.density().eval(0, 1000, pdf);
+\end{lstlisting}
+
+The result of the evaluation is stored into the vector @c pdf. There are only very few basic
+or atomic random variable types defined in StochBB:
+
+\begin{tabular}{l|l|l}
+ Constructor & Parameters & Process description \\ \hline
+ \method{AtomicVar}{delta} & \code{delay} & A constant delay or a process with a fixed waiting time. \\
+ \method{AtomicVar}{unif} & \code{a}, \code{b} & A process with a uniform-distributed waiting time. \\
+ \method{AtomicVar}{norm} & \code{mu}, \code{sigma} & A process with a normal-distributed waiting. \\
+ \method{AtomicVar}{gamma} & \code{k}, \code{theta} & A process with a gamma-distributed waiting time. \\
+\end{tabular}
+
+More complex processes can be derived by combining atomic random variables.
+
+\subsubsection{Sums of random variables}
+The most basic derived random variable is a \class{Chain}. This type represents the \emph{chaining} of
+random processes. For example, given two random variables $X_1$ and $X_2$ and the random
+process $X_1$ should trigger the next process $X_2$, the resulting random process $Y$
+can be described by the simple sum of the processes $X_1$ and $X_2$ as $Y=X_1+X_2$.
+That is, the time needed to complete both processes sequentially is simply the sum of the times
+needed for each process. Such a chain can be constructed using the overloaded \code{+} operator
+or the \function{chain} function. For example
+\begin{lstlisting}[language=C++]
+ #include <stochbb/api.hh>
+ using namespace sbb;
+
+ // [...]
+
+ Var X1 = AtomicVar::gamma(10,100);
+ Var X2 = AtomicVar::gamma(20, 50);
+ Var Y = X1 + X2;
+\end{lstlisting}
+
+\subsubsection{Minimum and Maximum of random variables}
+Another simple derived random variable is the \class{Maximum} or \class{Minimum} class. As the
+names suggest, they represent the maximum or minimum of a set of random variables. They can be
+created using the overloaded standard library function \function{std::min} and \function{std::max} or the
+\function{minimum} and \function{maximum} functions. The latter take a vector of random variables.
+\begin{lstlisting}[language=C++]
+ #include <stochbb/api.hh>
+ using namespace sbb;
+
+ // [...]
+
+ Var X1 = AtomicVar::gamma(10,100);
+ Var X2 = AtomicVar::gamma(20, 50);
+ Var Y = std::max(X1, X2);
+\end{lstlisting}
+
+\subsubsection{Mixtures of random variables}
+Similar to the \class{Minimum} or \class{Maximum}, a mixture of random variables can be
+constructed using the \function{mix} function. This function takes a vector of weights and a vector
+of corresponding random variables. Such a mixture can be considered as a random process which
+randomly selects the outcome of a set of other random processes, where the probability of
+selecting a specific process is given by the weight assigned to each process.
+\begin{lstlisting}[language=C++]
+ #include <stochbb/api.hh>
+ using namespace sbb;
+
+ // [...]
+
+ Var X1 = AtomicVar::gamma(10,100);
+ Var X2 = AtomicVar::gamma(20, 50);
+ // Assemble vector of variables
+ std::vector<Var> vars; var.push_back(X1), vars.push_back(X2);
+ // Assemble vector of weights
+ std::vector<double> weights; var.push_back(1), vars.push_back(2);
+ // Construct mixture
+ Var Y = sbb::mix(weights, vars);
+\end{lstlisting}
+
+In the example above, the random process $Y$ will select the outcome of $X_1$ with
+a probability of $\frac{1}{3}$ and the outcome of $X_2$ with probability
+$\frac{2}{3}$.
+
+\subsubsection{Compound random variables}
+An important class of derived random processes are compound processes. There the parameters of the
+distribution of a random variable are themselves random variables. That is
+\begin{equation}
+ X \sim f(x|A)\,,\quad A \sim g(a|\theta)\,, \nonumber
+\end{equation}
+where the random variable $X$ is distributed as $f(x|A)$, parametrized by $A$,
+where $A$ itself is a random variable distributed as $g(a|\theta)$, parametrized by
+$\theta$. 
+
+Compound random variables are created using factory methods provided by the
+\class{Compound} class. For example, the \method{Compound}{norm} factory method constructs
+a compound-normal distributed random variable, where both the mean and the standard deviation
+can by any other random variable. For example
+\begin{lstlisting}[language=C++]
+ #include <stochbb/api.hh>
+ using namespace sbb;
+ 
+ // [...]
+ 
+ Var mu = AtomicVar::gamma(10,100);
+ Var sigma = AtomicVar::delta(10);
+ Var cnorm = Compound::norm(mu, sigma);
+\end{lstlisting}
+instantiates a compound-normal distributed random variable, where the mean is gamma distributed
+while the standard deviation is fixed (implemented by a delta distribution).
+
+\subsection{Sample random variables}
+As mentioned above, sampling from a complex process efficiently is not trivial. First of all, is
+must be ensured that all atomic random variables are samples only once. Otherwise, two dependent
+random variables may be sampled as independent. Moreover, the results of derived random variables
+should be cached for efficiency. StochBB provides a separate class that implements a proper
+sampler for a system of random processes, the \class{ExactSampler} class. This class allows to
+sample from several possibly dependent random variables simultaneously. Upon construction, the
+set of random variables to sample is specified. A sample from these random variables can then be
+obtained by the \method{ExactSampler}{sample} method.
+\begin{lstlisting}[language=C++]
+ #include <stochbb/api.hh>
+ using namespace sbb;
+
+ // [...]
+
+ Var X1 = AtomicVar::gamma(10,100);
+ Var X2 = AtomicVar::gamma(20, 50);
+ Var Y = std::min(X1, X2);
+ // Assemble vector of variables
+ std::vector<Var> vars; vars.push_back(X1); 
+ vars.push_back(X2); vars.push_back(Y);
+ // Construct sampler
+ ExactSampler sampler(vars);
+ // Get 1000 samples
+ Eigen::MatrixXd samples(3, 1000);
+ sampler.sample(samples);
+\end{lstlisting}
+
+The \method{ExactSampler}{sample} method takes a single \class{Eigen::Matrix} where each column
+represents the random variable given to the constructor and each row an independent sample.
+
+For very large systems, sampling may become pretty slow. Particularly if one is only interested
+in the marginal distribution of single random variables. For these cases a approximate sampler
+for single random variables is provided, the \class{MarginalSampler}. This sampler uses an
+approximation of the inverse of the cumulative distribution function of a random variable
+to draw samples.
+\begin{lstlisting}[language=C++]
+ #include <stochbb/api.hh>
+ using namespace sbb;
+
+ // [...]
+
+ Var X1 = AtomicVar::gamma(10,100);
+ Var X2 = AtomicVar::gamma(20, 50);
+ Var Y = std::min(X1, X2);
+ // Sample from Y on [0,500] in 1000 steps
+ MarginalSampler sampler(Y, 0, 500, 1000);
+ // Get 1000 samples
+ Eigen::VectorXd samples(1000);
+ sampler.sample(samples);
+\end{lstlisting}
+
+In this example, a \class{MarginalSampler} is constructed for the random variable \code{Y}. Using an
+approximation of its CDF on the interval $[0,500)$ using $1000$ steps. Then, the
+\method{MarginalSampler}{sample} method is used to obtain a sample.
+
+
+\section{Process \& simulation description in XML} \label{sec:xml}
+In contrast to the application programming interface (see Section \ref{sec:api}, above), 
+complex processes can also be defined in XML and analyzed using the
+StochBB command line tool (see Section \ref{sec:cli}, below). A single XML file defines a 
+\class{Simulation}, a simple collection of random variables together with the specification which
+variables as used for the output. For example the XML code
+\begin{lstlisting}[language=XML]
+ <?xml version="1.0"?>
+ <simulation xmlns="http://hmatuschek.github.io/stochbb/simulation-0.0.dtd"
+             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
+  <var type="gamma" id="gamma">
+   <param name="k"> <m:cn>5</m:cn> </param>
+   <param name="theta"> <m:cn>30</m:cn> </param>
+  </var>
+
+  <output from="0" to="100">
+   <var ref="gamma"/>
+  </output>
+
+ </simulation>
+\end{lstlisting}
+specifies a trivial simulation.
+
+Here a single gamma-distributed random variable is defined.
+It gets the identifier "gamma". With this identifier, it is possible to refer to the random
+variable later. The \code{type} attribute specifies the type of the random variable. Here the
+build-in type \code{gamma} is used, specifying a gamma-distributed random variable. The shape and
+scale parameters, \code{k} and \code{theta}, are specified using the \code{param} elements. 
+The \code{name} attribute of each \code{param} element specified the name of the parameter while 
+its value is given as an MathML child element of the \code{param} element.
+
+Finally, the \code{output} element specifies which random variables are used for output. Each child
+element of the \code{output} element specifies one variable. Either by referencing a previously defined
+random variable or by specifying the random variable directly. For example,
+\begin{lstlisting}[language=XML]
+ <?xml version="1.0"?>
+ <simulation xmlns="http://hmatuschek.github.io/stochbb/simulation-0.0.dtd"
+             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
+  <output from="0" to="100">
+   <var type="gamma">
+    <param name="k"> <m:cn>5</m:cn> </param>
+    <param name="theta"> <m:cn>30</m:cn> </param>
+   </var>
+  </output>
+
+ </simulation>
+\end{lstlisting}
+is fully equivalent to the previous example.
+
+\subsection{Build-in random variables}
+There are only very few build-in random variable types. They can be divided into two groups:
+\emph{atomic} and \emph{derived} random variables.
+
+\subsubsection{Atomic random variables}
+Atomic random variables are random variables which follow a specific
+distribution and are independent from any other RV defined.
+
+\begin{tabular}{l|l|l}
+ Type & Parameters & Process description \\ \hline
+ \code{delta} & \code{delay} & A constant delay or a process with a fixed waiting time. \\
+ \code{uniform} & \code{a}, \code{b} & A process with a uniform-distributed waiting time. \\
+ \code{normal} & \code{mu}, \code{sigma} & A process with a normal-distributed waiting. \\
+ \code{gamma} & \code{k}, \code{theta} & A process with a gamma-distributed waiting time.
+\end{tabular}
+
+Beside these atomic random variables, there are derived random variables which depend on other
+random variables. Hence they usually to not takes simple parameters as arguments but other 
+random variables.
+
+\subsubsection{Chains of random variables}
+One of the most important derived random variable is a chain. A chain can be defined as
+\begin{lstlisting}[language=XML]
+ <var type="chain">
+  <var ref="X1"/> <var ref="X2"/> <var ref="X2"/>
+ </var>
+\end{lstlisting}
+
+Here the random variable \code{X1}, \code{X2} and \code{X3} are chained. This means, for example,
+that \code{X1} triggers \code{X2} and \code{X2} then triggers the process \code{X3}. Mathematically,
+the waiting time of the chain is simply the sum of the waiting times of the processes \code{X1}--\code{X3}.
+
+\subsubsection{Maximum of parallel processes}
+Another derived random variable is the \code{maximum} type. This type can be interpreted as a
+processes that waits until all referred parallel processes are completed hence the waiting time
+of
+\begin{lstlisting}[language=XML]
+ <var type="maximum">
+  <var ref="X1"/> <var ref="X2"/> <var ref="X2"/>
+ </var>
+\end{lstlisting}
+is just the maximum of the random variables \code{X1}--\code{X3}.
+
+\subsubsection{Minimum of parallel processes}
+Likewise, the \code{minimum} derived random variable is simply the minimum of the referred random
+variables and represents the waiting time of the fastest parallel processes \code{X1}--\code{X3}:
+\begin{lstlisting}[language=XML]
+ <var type="minimum">
+  <var ref="X1"/> <var ref="X2"/> <var ref="X2"/>
+ </var>
+\end{lstlisting}
+
+\subsubsection{Mixture of processes}
+The mixture of random variables is defined using the \code{mixture} variable type with a list of
+weight-variable pairs. For example
+\begin{lstlisting}[language=XML]
+ <var type="mixture">
+  <weight> <m:cn>1</m:cn> <var ref="X1"/> </weight>
+  <weight> <m:cn>2</m:cn> <var ref="X2"/> </weight>
+  <weight> <m:cn>1</m:cn> <var ref="X3"/> </weight>
+ </var>
+\end{lstlisting}
+
+\subsubsection{Compound random variables} 
+\todo{Write it.}
+
+\subsection{User defined random variable types}
+The limited build-in random variable type would turn the definition of complex stationary random
+processes difficult. Hence it is possible to define new typed derived from the build-in ones.
+
+For example
+\begin{lstlisting}[language=XML]
+ <define id="exp">
+  <param id="lambda"/>
+
+  <var type="gamma" id="exp">
+   <param name="k"><m:cn>1</m:cn></param>
+   <param name="theta">
+    <m:apply>
+     <m:divide/>
+     <m:cn>1</m:cn>
+     <m:ci>lambda</m:ci>
+    </m:apply>
+   </param>
+  </var>
+ </define>
+\end{lstlisting}
+defines a new type \code{exp} as a special case of the Gamma distribution as
+$\text{Exp}(\lambda) = \Gamma(1,\lambda^{-1})$. The \code{define} tag takes an \code{id} 
+attribute specifying the new type ID. Then one ore more \code{param} elements are
+used to define the parameters of the new type. 
+Here only one parameter named \code{lambda} is defined. Finally a random variable with the same
+identifier as the type name is defined which implements the derived random variable type.
+
+A more complex example might by
+\begin{lstlisting}[language=XML]
+ <define id="exgauss">
+  <param id="lambda">
+  <param id="mu"/>
+  <param id="sigma"/>
+
+  <var type="gamma" id="ex">
+   <param name="k"><m:cn>1</m:cn></param>
+   <param name="theta">
+    <m:apply>
+     <m:divide/>
+     <m:cn>1</m:cn>
+     <m:ci>lambda</m:ci>
+    </m:apply>
+   </param>
+  </var>
+
+  <var type="normal" id="gauss">
+   <param name="mu"> <m:ci>mu</m:ci> </param>
+   <param name="sigma"> <m:ci>sigma</m:ci> </param>
+  </var>
+
+  <var type="chain" id="exgauss">
+    <var ref="ex"/> <var ref="gauss"/>
+  </var>
+ </define>
+\end{lstlisting}
+
+This defines a new random variable type with an Ex-Gauss distribution by chaining a
+exponential (defined as a special case of the Gamma distribution) and a Gaussian distributed
+random process. This new type can then be used to instantiate Ex-Gauss distributed random
+variables.
+\begin{lstlisting}[language=XML]
+ <var type="exgauss">
+  <param name="lambda"> <m:cn>10</m:cn> </param>
+  <param name="mu"> <m:cn>20</m:cn> </param>
+  <param name="sigma"> <m:cn>10</m:cn> </param>
+ </var>
+\end{lstlisting}
+
+\subsection{Modules}
+Some of the aforementioned user defined random variable types may be reused in several
+simulations. For these cases it is convenient to export these definitions into separate files
+and load them when needed. These files are called modules and form simple collections of
+variable type definitions. For example a module could look like
+\begin{lstlisting}[language=XML]
+ <?xml version="1.0"?>
+ <module xmlns="http://hmatuschek.github.io/stochbb/module-0.0.dtd"
+             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
+  <define id="type">
+    [ ... ]
+  </define>
+ </module>
+\end{lstlisting}
+
+Within the body of the module, the user-defined types can be specified. Such a module can then
+be loaded using the \code{load} tag within a simulation. Please note that it is also possible to
+load other modules from within a module.
+
+\begin{lstlisting}[language=XML]
+ <simulation xmlns="http://hmatuschek.github.io/stochbb/simulation-0.0.dtd"
+             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
+  <load>FILENAME_W/O_EXTENSION</load>
+
+  <output ...>
+   [ ... ]
+  </output>
+ </simulation>
+\end{lstlisting}
+
+
+\section{Command line interface} \label{sec:cli}
+The StochBB installation comes with a command line tool. With this tool, a process definition
+in XML (see Section \ref{sec:xml}) can be analyzed. The results are returned as CSV or they can be plotted
+directly.
+
+\subsection{Synopsis}
+\begin{lstlisting}
+ stochbb [OPTIONS] [CMD] INPUTFILE [OUTPUT OPTIONS]
+\end{lstlisting}
+
+\subsubsection{Options}
+\begin{tabular}{p{.3\textwidth}p{.6\textwidth}}
+ \code{--help} & Prints a short help string and exits. \\
+ \code{--version} & Prints the version string and exits. \\
+ \code{--log-debug} &Prints debug messages to stderr. By default, only warnings and error messages
+  are printed to stderr. 
+\end{tabular}
+
+\subsubsection{Commands}
+\begin{tabular}{p{.3\textwidth}p{.6\textwidth}}
+ \code{pdf} & Specifies to evaluate the PDF of the variables selected in the \code{INPUTFILE} (default). \\
+ \code{cdf} & Specifies to evaluate the CDF instead of the PDF of the variables selected in the
+  \code{INPUTFILE}. \\
+ \code{sample} & Samples from the variables selected in the \code{INPUTFILE}.
+\end{tabular}
+
+\subsubsection{Output options}
+\begin{tabular}{p{.3\textwidth}p{.6\textwidth}}
+ \code{--plot} & Plots the PDF or CDF of the output variables specified in the file \code{INPUTFILE}.
+ \code{--csv=FILENAME} Writes the PDF or CDF of the output variables specified in the \code{INPUTFILE}
+  to \code{FILENAME}.
+\end{tabular}
+
+\subsection{Examples}
+For example, to plot the PDF of the selected random variables specified in the \code{example.xml}
+process description file
+\begin{lstlisting}
+ stochbb pdf example.xml --plot
+\end{lstlisting}
+
+The same PDF can be stored as CSV in \code{output.csv} by calling
+\begin{lstlisting}
+ stochbb pdf example.xml --csv=output.csv
+\end{lstlisting}
+
+The call
+\begin{lstlisting}
+ sotchbb pdf example.xml
+\end{lstlisting}
+will print the CSV data to stdout.
+ 
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
