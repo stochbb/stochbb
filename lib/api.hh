@@ -29,20 +29,17 @@ class MarginalSamplerObj;
 class Container
 {
 public:
-  /** @cond internal
-   * The object type of the container. */
+  /** The object type of the container. */
   typedef Object ObjectType;
 
 protected:
   /** Packs the given objects. Takes the reference of the object. */
   explicit Container(Object *obj);
-  //! @endcond
 
 public:
   /** Empty constructor. */
   Container();
 
-  //! @cond internal
   /** Copy constructor. */
   Container(const Container &other);
   /** Destructor. */
@@ -57,7 +54,6 @@ public:
   Object *operator ->() const { return _object; }
   /** Returns a new reference to the object. */
   Object *ref() const { _object->ref(); return _object; }
-  //! @endcond
 
   /** Returns @c true if the container is empty. */
   bool isNull() const;
@@ -77,11 +73,8 @@ public:
   }
 
 protected:
-  /** @cond internal
-   * Holds the object. */
+  /** Holds the object. */
   Object *_object;
-  //! @endcond
-
 };
 
 
@@ -89,8 +82,7 @@ protected:
 class Density: public Container
 {
 public:
-  /** @cond internal
-   * The object type of the container. */
+  /** The object type of the container. */
   typedef DensityObj ObjectType;
 
 public:
@@ -100,7 +92,6 @@ public:
   Density(const Density &other);
   /** Assigment operator. */
   Density &operator=(const Density &other);
-  //! @endcond
 
   /** Evaluates the density (PDF) on a regular grid \f$[Tmin, Tmax)\f$ where the number
    * of grid points is specified via the length of the output vector @c out. The results are
@@ -112,7 +103,6 @@ public:
    * stored into the output vector. */
   void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
 
-  //! @cond internal
   /** Retruns a weak reference to the @c DensityObj. */
   inline DensityObj *operator *() const { return _density; }
   /** Retruns a weak reference to the @c DensityObj. */
@@ -123,7 +113,6 @@ public:
 protected:
   /** Holds the density object. */
   DensityObj *_density;
-  //! @endcond
 };
 
 
@@ -133,7 +122,6 @@ protected:
 class AtomicDensity: public Density
 {
 public:
-  //! @cond internal
   /** The object type of the container. */
   typedef AtomicDensityObj ObjectType;
 
@@ -151,16 +139,13 @@ public:
   inline AtomicDensityObj *operator ->() const { return _atomic_density; }
   /** Retruns a new reference to the @c AtomicDensityObj. */
   inline AtomicDensityObj *ref() const { _object->ref(); return _atomic_density; }
-  //! @endcond
 
   /** Samples from the random variable. */
   void sample(Eigen::VectorXd &out) const;
 
 protected:
-  //! @cond internal
   /** Holds the reference to the object instance. */
   AtomicDensityObj *_atomic_density;
-  //! @endcond
 };
 
 
@@ -168,15 +153,12 @@ protected:
 class Var: public Container
 {
 public:
-  //! @cond internal
   /** The object type of the container. */
   typedef VarObj ObjectType;
-  //! @endcond
 public:
   /** Empty constructor. */
   Var();
 
-  //! @cond internal
   /** Packs the given random variable object and takes the reference. */
   Var(VarObj *obj);
   /** Copy constructor. */
@@ -205,7 +187,6 @@ public:
   inline bool operator<(const Var &other) const {
     return _randomVariable < other._randomVariable;
   }
-  //! @endcond
 
   /** Returns a reference to the density associated with this random variable. */
   Density density() const;
@@ -221,10 +202,8 @@ public:
   void setName(const std::string &name);
 
 protected:
-  //! @cond internal
   /** Holds the pointer to the random variable object. */
   VarObj *_randomVariable;
-  //! @endcond
 };
 
 
@@ -232,24 +211,20 @@ protected:
 class AtomicVar: public Var
 {
 public:
-  //! @cond internal
   /** The object type of the container. */
   typedef AtomicVarObj ObjectType;
 
 public:
   /** Packs the given @c GenericVarObj. */
   AtomicVar(AtomicVarObj *obj);
-  //! @endcond
 
   /** Constructs a generic random variable from distribution. */
   AtomicVar(const AtomicDensity &density, const std::string &name="");
 
-  //! @cond internal
   /** Copy constructor. */
   AtomicVar(const AtomicVar &other);
   /** Assignement operator. */
   AtomicVar &operator=(const AtomicVar &other);
-  //! @endcond
 
   /** Constructs a delta-distributed "random" variable. */
   static AtomicVar delta(double delay, const std::string &name="");
@@ -261,10 +236,8 @@ public:
   static AtomicVar gamma(double k, double theta, const std::string &name="");
 
 protected:
-  //! @cond internal
   /** Holds the @c GenericVarObj. */
   AtomicVarObj *_genericRV;
-  //! @endcond
 };
 
 
@@ -272,7 +245,6 @@ protected:
 class DerivedVar: public Var
 {
 public:
-  //! @cond internal
   /** The object type of the container. */
   typedef DerivedVarObj ObjectType;
 
@@ -285,7 +257,6 @@ public:
   DerivedVar(const DerivedVar &other);
   /** Assignment operator. */
   DerivedVar &operator =(const DerivedVar &other);
-  //! @endcond
 
   /** Returns the number of random variables the variable depends on directly. */
   size_t numVariables() const;
@@ -293,10 +264,8 @@ public:
   Var variable(size_t idx) const;
 
 protected:
-  //! @cond internal
   /** Holds a reference to the @c DerivedVarObj instance. */
   DerivedVarObj *_derived_var;
-  //! @endcond
 };
 
 
@@ -310,26 +279,22 @@ protected:
 class Chain: public DerivedVar
 {
 public:
-  //! @cond internal
   /** The object type of the container. */
   typedef ChainObj ObjectType;
 
 public:
   /** Packs the given @c ChainObj. */
   Chain(ChainObj *obj);
-  //! @endcond
 
   /** Constructs a chain of two random variables. */
   Chain(const std::vector<Var> &variables, const std::string &name="");
 
-  //! @cond internal
   /** Assignment operator. */
   Chain &operator =(const Chain &other);
 
 protected:
   /** Holds the @c ChainObj. */
   ChainObj *_chain;
-  //! @endcond
 };
 
 
@@ -341,19 +306,14 @@ protected:
 class Maximum: public DerivedVar
 {
 public:
-  //! @cond internal
   /** Object type of the container. */
   typedef MaximumObj ObjectType;
 
 public:
   /** Packs the given @c MaximumObj. */
   Maximum(MaximumObj *obj);
-  //! @endcond
-
   /** Constructs a maximum random variable from the given ones. */
   Maximum(const std::vector<Var> &variables, const std::string &name="");
-
-  //! @cond internal
   /** Copy constructor. */
   Maximum(const Maximum &other);
   /** Assignment operator. */
@@ -362,7 +322,6 @@ public:
 protected:
   /** Holds the @c MaximumObj. */
   MaximumObj *_maximum;
-  //! @endcond
 };
 
 
@@ -374,19 +333,16 @@ protected:
 class Minimum: public DerivedVar
 {
 public:
-  //! @cond internal
   /** The object type of the container. */
   typedef MinimumObj ObjectType;
 
 public:
   /** Packs the given @c MinimumObj. */
   Minimum(MinimumObj *obj);
-  //! @endcond
 
   /** Constructs a minimum random variable from the given ones. */
   Minimum(const std::vector<Var> &variables);
 
-  //! @cond internal
   /** Copy constructor. */
   Minimum(const Minimum &other);
   /** Assignment operator. */
@@ -395,7 +351,6 @@ public:
 protected:
   /** Holds the @c MinimumObj. */
   MinimumObj *_minimum;
-  //! @endcond
 };
 
 
@@ -404,33 +359,25 @@ protected:
 class Mixture: public DerivedVar
 {
 public:
-  //! @cond internal
   /** Object type of the container.*/
   typedef MixtureObj ObjectType;
 
 public:
   /** Packs the given @c MixtureObj instance. */
   Mixture(MixtureObj *obj);
-  //! @endcond
-
   /** Constructs a mixture from the given weights and variables. */
   Mixture(const std::vector<double> &weights, const std::vector<Var> &variables, const std::string &name="");
-
-  //! @cond internal
   /** Copy constructor. */
   Mixture(const Mixture &other);
   /** Assignment operator. */
   Mixture &operator =(const Mixture &other);
-  //! @endcond
 
   /** Retruns the weight of the i-th variable. */
   double weight(size_t i) const;
 
 protected:
-  //! @cond internal
   /** The reference to the @c MixtureObj instance. */
   MixtureObj *_mixture;
-  //! @endcond
 };
 
 
@@ -442,7 +389,6 @@ protected:
 class Compound: public DerivedVar
 {
 public:
-  //! @cond internal
   /** The object type of the container. */
   typedef CompoundObj ObjectType;
 
@@ -453,7 +399,6 @@ public:
   Compound(const Compound &other);
   /** Assignment operator. */
   Compound &operator =(const Compound &other);
-  //! @endcond
 
   /** Constructs a compound random variable from a normal distribution where
    * \f$\mu\f$ and \f$\sigma\f$ are given by the specified random variables. */
@@ -463,10 +408,8 @@ public:
   static Compound gamma(const Var &k, const Var &theta, const std::string &name="");
 
 protected:
-  //! @cond internal
   /** The reference to the @c CompoundObj instance. */
   CompoundObj *_compound;
-  //! @endcond
 };
 
 
@@ -481,7 +424,6 @@ protected:
 class Simulation: public Container
 {
 public:
-  //! @cond internal
   /** The object type of the container. */
   typedef SimulationObj ObjectType;
 
@@ -492,8 +434,6 @@ public:
   Simulation(const Simulation &other);
   /** Assignment operator. */
   Simulation &operator= (const Simulation &other);
-  //! @endcond
-
   /** Empty constructor. */
   Simulation();
 
@@ -543,10 +483,8 @@ public:
   static Simulation fromXml(const std::string &filename);
 
 protected:
-  //! @cond internal
   /** Holds the SimulationObj instance. */
   SimulationObj *_simulation;
-  //! @endcond
 };
 
 
@@ -557,21 +495,17 @@ protected:
 class ExactSampler: public Container
 {
 public:
-  //! @cond internal
   /** Object type of the container. */
   typedef ExactSamplerObj ObjectType;
-  //! @endcond
 
 public:
   /** Constructs a sampler for the given random variables. */
   ExactSampler(const std::vector<Var> &variables);
 
-  //! @cond internal
   /** Copy constructor. */
   ExactSampler(const ExactSampler &other);
   /** Assignment operator. */
   ExactSampler &operator =(const ExactSampler &other);
-  //! @endcond
 
   /** Samples from the random variables passed to the constructor.
    * The number of row of @c out specify the number of samples to draw. The number of columns
@@ -580,10 +514,8 @@ public:
   void sample(Eigen::MatrixXd &out) const;
 
 protected:
-  //! @cond internal
   /** A reference to the sampler object. */
   ExactSamplerObj *_sampler;
-  //! @endcond
 };
 
 
@@ -600,10 +532,8 @@ protected:
 class MarginalSampler: public Container
 {
 public:
-  //! @cond internal
   /** Object type of the container. */
   typedef MarginalSamplerObj ObjectType;
-  //! @endcond
 
 public:
   /** Constructs a sampler for the specified variable.
@@ -613,22 +543,18 @@ public:
    * @param steps Specifies the number of grid points. */
   MarginalSampler(const Var &var, double Tmin, double Tmax, size_t steps);
 
-  //! @cond internal
   /** Copy constructor. */
   MarginalSampler(const MarginalSampler &other);
   /** Assignment operator. */
   MarginalSampler &operator =(const MarginalSampler &other);
-  //! @endcond
 
   /** Samples from the marginal. The number of samples is specified by the number of elements
    * in the vector @c out. */
   void sample(Eigen::VectorXd &out) const;
 
 protected:
-  //! @cond internal
   /** Holds a reference to the sampler object. */
   MarginalSamplerObj *_sampler;
-  //! @endcond
 };
 
 }
