@@ -11,6 +11,30 @@ namespace sbb {
  * @returns @c true If the given variables are mutually independent. */
 bool independent(const std::vector<Var> &vars);
 
+/** Constructs a normal-distributed random variable for the given mean and standard deviation. */
+Var normal(double mu, double sigma, const std::string &name="");
+/** Constructs a compound-normal distributed random variable for the given mean and
+ * standard deviation. Where the mean is a random variable too. */
+Var normal(const Var &mu, double sigma, const std::string &name="");
+/** Constructs a compound-normal distributed random variable for the given mean and
+ * standard deviation. Where the standard deviation is a random variable too. */
+Var normal(double mu, const Var &sigma, const std::string &name="");
+/** Constructs a compound-normal distributed random variable for the given mean and
+ * standard deviation. Where both, the mean and standard deviation are a random variables. */
+Var normal(const Var& mu, const Var &sigma, const std::string &name="");
+
+/** Constructs a gamma-distributed random variable for the given shape and scale parameters. */
+Var gamma(double k, double theta, const std::string &name="");
+/** Constructs a compound-gamma distributed random variable for the given shape and scale parameters.
+ * Where the shape parameter is a random variable too. */
+Var gamma(const Var &k, double theta, const std::string &name="");
+/** Constructs a compound-gamma distributed random variable for the given shape and scale parameters.
+ * Where the scale parameter is a random variable too. */
+Var gamma(double k, const Var &theta, const std::string &name="");
+/** Constructs a compound-gamma distributed random variable for the given shape and scale parameters.
+ * Where both, the shape and scale parameter are random variables. */
+Var gamma(const Var& k, const Var &theta, const std::string &name="");
+
 /** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
  * @param vars */
 Var chain(const std::vector<Var> &vars);

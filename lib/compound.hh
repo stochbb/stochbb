@@ -35,7 +35,9 @@ public:
 class NormalCompoundDensityObj: public DensityObj
 {
 public:
-  /** Constructs the density from the given parameter random variables. */
+  /** Constructs the density from the given parameter random variables.
+   * @param mu Specifies the mean random variable.
+   * @param sigma Specifies the standard deviation random variable. */
   NormalCompoundDensityObj(const Var &mu, const Var &sigma);
 
   virtual void mark();
@@ -51,11 +53,15 @@ protected:
 };
 
 
-/** Implements a compound-normal distribution. */
+/** Implements a compound-normal distribution.
+ * That is a normal-distributed random variable where the mean and standard deviation are random
+ * variables too. */
 class NormalCompoundObj: public CompoundObj
 {
 public:
-  /** Constructs a compound-normal distribution from the given parameter random variables. */
+  /** Constructs a compound-normal distribution from the given parameter random variables.
+   * @param mu Specifies the mean random variable.
+   * @param sigma Specifies the standard deviation random variable. */
   NormalCompoundObj(const Var &mu, const Var &sigma, const std::string &name="");
 
   void mark();
@@ -75,7 +81,9 @@ protected:
 class GammaCompoundDensityObj: public DensityObj
 {
 public:
-  /** Constructs the density from the given parameter distributions. */
+  /** Constructs the density from the given parameter distributions.
+   * @param k Specifies the shape parameter random variable.
+   * @param theta Specifies the scale parameter random variable. */
   GammaCompoundDensityObj(const Var &k, const Var &theta);
 
   virtual void mark();
@@ -91,7 +99,9 @@ protected:
 };
 
 
-/** Implements a compound-gamma random variable. */
+/** Implements a compound-gamma random variable.
+ * That is a gamma-distributed random variable where the shape and scale parameters are random
+ * variables too. */
 class GammaCompoundObj: public CompoundObj
 {
 public:

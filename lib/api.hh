@@ -111,6 +111,32 @@
  * a probability of \f$\frac{1}{3}\f$ and the outcome of \f$X_2\f$ with probability
  * \f$\frac{2}{3}\f$.
  *
+ * \subsection apicomp Compound random variables
+ * An important class of derived random processes are compound proceses. There the parameters of the
+ * distribution of a random variable are themselfs random variables. That is
+ * \f[
+ *  X \sim f(x|A)\,,\quad A \sim g(a|\theta)\,,
+ * \f]
+ * where the random variable \f$X\f$ is distributed as \f$f(x|A)\f$, parametrized by \f$A\f$,
+ * where \f$A\f$ itself is a random variable distributed as \f$g(a|\theta)\f$, parametrized by
+ * \f$\theta\f$. Compound random variables are created using factory methods provided by the
+ * @c sbb::Compound class. For example, the @c sbb::Compound::norm factory method constructs
+ * a compount-normal distributed random variable, where both the mean and the standard deviation
+ * can by any other random variable. For example
+ * \code
+ *  *  #include <stochbb/api.hh>
+ *  using namespace sbb;
+ *
+ *  // [...]
+ *
+ *  Var mu = AtomicVar::gamma(10,100);
+ *  Var sigma = AtomicVar::delta(10);
+ *  Var cnorm = Compound::norm(mu, sigma);
+ * \endcode
+ * instantiates a compound-normal distributed random variable, where the mean is gamma-distributed
+ * while the standard deviation is fixed (implemented by a delta distribution).
+ *
+ *
  * \section apisample Sample random variables
  * As mentioned above, sampling from a complex process efficiently is not trivial. First of all, is
  * must be ensured that all atomic random variables are samples only once. Otherwise, two dependent
@@ -419,13 +445,13 @@ public:
   //! @endcond
 
   /** Constructs a delta-distributed "random" variable. */
-  static AtomicVar delta(double delay);
+  static AtomicVar delta(double delay, const std::string &name="");
   /** Constructs a uniformly distributed random variable. */
-  static AtomicVar unif(double a, double b);
+  static AtomicVar unif(double a, double b, const std::string &name="");
   /** Constructs a normal distributed random variable. */
-  static AtomicVar norm(double mu, double sigma);
+  static AtomicVar norm(double mu, double sigma, const std::string &name="");
   /** Constructs a gamma distributed random variable. */
-  static AtomicVar gamma(double k, double theta);
+  static AtomicVar gamma(double k, double theta, const std::string &name="");
 
 protected:
   //! @cond internal

@@ -144,23 +144,23 @@ AtomicVar::operator =(const AtomicVar &other) {
 }
 
 AtomicVar
-AtomicVar::delta(double delay) {
-  return AtomicVarObj::delta(delay);
+AtomicVar::delta(double delay, const std::string &name) {
+  return AtomicVarObj::delta(delay, name);
 }
 
 AtomicVar
-AtomicVar::unif(double a, double b) {
-  return AtomicVarObj::unif(a,b);
+AtomicVar::unif(double a, double b, const std::string &name) {
+  return AtomicVarObj::unif(a,b, name);
 }
 
 AtomicVar
-AtomicVar::norm(double mu, double sigma) {
-  return AtomicVarObj::norm(mu, sigma);
+AtomicVar::norm(double mu, double sigma, const std::string &name) {
+  return AtomicVarObj::norm(mu, sigma, name);
 }
 
 AtomicVar
-AtomicVar::gamma(double k, double theta) {
-  return AtomicVarObj::gamma(k, theta);
+AtomicVar::gamma(double k, double theta, const std::string &name) {
+  return AtomicVarObj::gamma(k, theta, name);
 }
 
 

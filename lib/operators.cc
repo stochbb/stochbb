@@ -1,8 +1,95 @@
 #include "operators.hh"
 #include "minmax.hh"
 #include "chain.hh"
+#include "randomvariable.hh"
 
 using namespace sbb;
+
+
+/* ********************************************************************************************* *
+ * Implementation of sbb::normal()
+ * ********************************************************************************************* */
+Var
+sbb::normal(double mu, double sigma, const std::string &name) {
+  return AtomicVar::norm(mu, sigma, name);
+}
+
+Var
+sbb::normal(const Var &mu, double sigma, const std::string &name) {
+  // If mu is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*mu.density())) {
+    return sbb::normal(delta->delay(), sigma, name);
+  }
+  // Otherwise assemble CompoundVar
+  return Compound::norm(mu, AtomicVar::delta(sigma), name);
+}
+
+Var
+sbb::normal(double mu, const Var &sigma, const std::string &name) {
+  // If sigma is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*sigma.density())) {
+    return sbb::normal(mu, delta->delay(), name);
+  }
+  // Otherwise assemble CompoundVar
+  return Compound::norm(AtomicVar::delta(mu), sigma, name);
+}
+
+Var
+sbb::normal(const Var &mu, const Var &sigma, const std::string &name) {
+  // If mu is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*mu.density())) {
+    return sbb::normal(delta->delay(), sigma, name);
+  }
+  // else if sigma is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*sigma.density())) {
+    return sbb::normal(mu, delta->delay(), name);
+  }
+  // Otherwise assemble CompoundVar
+  return Compound::norm(mu, sigma, name);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of sbb::gamma()
+ * ********************************************************************************************* */
+Var
+sbb::gamma(double k, double theta, const std::string &name) {
+  return AtomicVar::gamma(k, theta, name);
+}
+
+Var
+sbb::gamma(const Var &k, double theta, const std::string &name) {
+  // If mu is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*k.density())) {
+    return sbb::gamma(delta->delay(), theta, name);
+  }
+  // Otherwise assemble CompoundVar
+  return Compound::gamma(k, AtomicVar::delta(theta), name);
+}
+
+Var
+sbb::gamma(double k, const Var &theta, const std::string &name) {
+  // If sigma is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*theta.density())) {
+    return sbb::gamma(k, delta->delay(), name);
+  }
+  // Otherwise assemble CompoundVar
+  return Compound::gamma(AtomicVar::delta(k), theta, name);
+}
+
+Var
+sbb::gamma(const Var &k, const Var &theta, const std::string &name) {
+  // If mu is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*k.density())) {
+    return sbb::gamma(delta->delay(), theta, name);
+  }
+  // else if sigma is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*theta.density())) {
+    return sbb::gamma(k, delta->delay(), name);
+  }
+  // Otherwise assemble CompoundVar
+  return Compound::gamma(k, theta, name);
+}
 
 
 /* ********************************************************************************************* *
