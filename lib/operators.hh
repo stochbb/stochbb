@@ -59,14 +59,33 @@ Var minimum(const std::vector<Var> &variables);
  * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables. */
 Var maximum(const std::vector<Var> &variables);
 
+/** Constructs an affine transform of the given variable. */
+Var affine(const Var &var, double scale, double shift);
 }
 
 /** Overloads the +-operator to construct a @c Chain.
  * See also @c sbb::chain() function. */
-inline sbb::Var operator+(const sbb::Var &a, const sbb::Var &b) {
+inline sbb::Var operator +(const sbb::Var &a, const sbb::Var &b) {
   std::vector<sbb::Var> args; args.reserve(2);
   args.push_back(a); args.push_back(b);
   return sbb::chain(args);
+}
+
+/** Overloads the +-operator to construct an affine transform of the variable. */
+inline sbb::Var operator +(const sbb::Var &var, double b) {
+  return sbb::affine(var, 1, b);
+}
+/** Overloads the +-operator to construct an affine transform of the variable. */
+inline sbb::Var operator +(double b, const sbb::Var &var) {
+  return sbb::affine(var, 1, b);
+}
+/** Overloads the *-operator to construct an affine transform of the variable. */
+inline sbb::Var operator *(double a, const sbb::Var &var) {
+  return sbb::affine(var, a, 0);
+}
+/** Overloads the *-operator to construct an affine transform of the variable. */
+inline sbb::Var operator *(const sbb::Var &var, double a) {
+  return sbb::affine(var, a, 0);
 }
 
 

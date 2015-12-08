@@ -8,8 +8,14 @@ using namespace sbb;
 /* ********************************************************************************************* *
  * Implementation of MaximumDensityObj
  * ********************************************************************************************* */
-MaximumDensityObj::MaximumDensityObj(const std::vector<VarObj *> &variables)
-  : DensityObj(), _densities()
+MaximumDensityObj::MaximumDensityObj(const std::vector<DensityObj *> &densities, double scale, double shift)
+  : DensityObj(), _densities(densities), _scale(scale), _shift(shift)
+{
+  // pass...
+}
+
+MaximumDensityObj::MaximumDensityObj(const std::vector<VarObj *> &variables, double scale, double shift)
+  : DensityObj(), _densities(), _scale(scale), _shift(shift)
 {
   _densities.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
@@ -17,8 +23,8 @@ MaximumDensityObj::MaximumDensityObj(const std::vector<VarObj *> &variables)
   }
 }
 
-MaximumDensityObj::MaximumDensityObj(const std::vector<Var> &variables)
-  : DensityObj(), _densities()
+MaximumDensityObj::MaximumDensityObj(const std::vector<Var> &variables, double scale, double shift)
+  : DensityObj(), _densities(), _scale(scale), _shift(shift)
 {
   _densities.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
@@ -41,6 +47,10 @@ MaximumDensityObj::mark() {
 
 void
 MaximumDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
+
   Eigen::VectorXd tmp(out.size());
   Eigen::MatrixXd pdfs(out.size(), _densities.size());
   Eigen::MatrixXd cdfs(out.size(), _densities.size());
@@ -67,11 +77,20 @@ void
 MaximumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   Eigen::VectorXd tmp(out.size());
 
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
+
   out.setOnes();
   for (size_t i=0; i<_densities.size(); i++) {
     _densities[i]->evalCDF(Tmin, Tmax, tmp);
     out.array() *= tmp.array();
   }
+}
+
+Density
+MaximumDensityObj::affine(double scale, double shift) const {
+  return new MaximumDensityObj(_densities, _scale*scale, scale*_shift+shift);
 }
 
 int
@@ -104,8 +123,14 @@ MaximumDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of MinimumDensityObj
  * ********************************************************************************************* */
-MinimumDensityObj::MinimumDensityObj(const std::vector<VarObj *> &variables)
-  : DensityObj(), _densities()
+MinimumDensityObj::MinimumDensityObj(const std::vector<DensityObj *> &densities, double scale, double shift)
+  : DensityObj(), _densities(densities), _scale(scale), _shift(shift)
+{
+  // pass...
+}
+
+MinimumDensityObj::MinimumDensityObj(const std::vector<VarObj *> &variables, double scale, double shift)
+  : DensityObj(), _densities(), _scale(scale), _shift(shift)
 {
   _densities.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
@@ -113,8 +138,8 @@ MinimumDensityObj::MinimumDensityObj(const std::vector<VarObj *> &variables)
   }
 }
 
-MinimumDensityObj::MinimumDensityObj(const std::vector<Var> &variables)
-  : DensityObj(), _densities()
+MinimumDensityObj::MinimumDensityObj(const std::vector<Var> &variables, double scale, double shift)
+  : DensityObj(), _densities(), _scale(scale), _shift(shift)
 {
   _densities.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
@@ -137,6 +162,10 @@ MinimumDensityObj::mark() {
 
 void
 MinimumDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
+
   double dx = (Tmax-Tmin)/out.size();
   Eigen::VectorXd tmp(out.size());
   Eigen::MatrixXd pdfs(out.size(), _densities.size());
@@ -165,12 +194,21 @@ void
 MinimumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   Eigen::VectorXd tmp(out.size());
 
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
+
   out.setOnes();
   for (size_t i=0; i<_densities.size(); i++) {
     _densities[i]->evalCDF(Tmin, Tmax, tmp);
     out.array() *= (1-tmp.array());
   }
   out.array() = (1-out.array());
+}
+
+Density
+MinimumDensityObj::affine(double scale, double shift) const {
+  return new MinimumDensityObj(_densities, scale*_scale, scale*_shift+shift);
 }
 
 int

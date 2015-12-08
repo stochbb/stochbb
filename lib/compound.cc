@@ -42,8 +42,14 @@ CompoundObj::gamma(const Var &k, const Var &theta, const std::string &name) {
 /* ********************************************************************************************* *
  * Implementation of NormalCompoundDensityObj
  * ********************************************************************************************* */
-NormalCompoundDensityObj::NormalCompoundDensityObj(const Var &mu, const Var &sigma)
-  : DensityObj(), _mu(*mu->density()), _sigma(*sigma->density())
+NormalCompoundDensityObj::NormalCompoundDensityObj(DensityObj *mu, DensityObj *sigma, double scale, double shift)
+  : DensityObj(), _mu(mu), _sigma(sigma), _scale(scale), _shift(shift)
+{
+  // pass...
+}
+
+NormalCompoundDensityObj::NormalCompoundDensityObj(const Var &mu, const Var &sigma, double scale, double shift)
+  : DensityObj(), _mu(*mu->density()), _sigma(*sigma->density()), _scale(scale), _shift(shift)
 {
   // Test for independence
   if (! mu.mutuallyIndep(sigma)) {
@@ -68,6 +74,9 @@ NormalCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) c
   _mu->eval(Tmin, Tmax, dmu); _sigma->eval(Tmin, Tmax, dsigma);
 
   out.setZero();
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
@@ -91,6 +100,9 @@ NormalCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out
   _mu->eval(Tmin, Tmax, dmu); _sigma->eval(Tmin, Tmax, dsigma);
 
   out.setZero();
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
@@ -104,6 +116,11 @@ NormalCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out
       }
     }
   }
+}
+
+Density
+NormalCompoundDensityObj::affine(double scale, double shift) const {
+  return new NormalCompoundDensityObj(_mu, _sigma, scale*_scale, scale*_shift+shift);
 }
 
 
@@ -140,8 +157,14 @@ NormalCompoundObj::density() {
 /* ********************************************************************************************* *
  * Implementation of GammaCompoundDensityObj
  * ********************************************************************************************* */
-GammaCompoundDensityObj::GammaCompoundDensityObj(const Var &k, const Var &theta)
-  : DensityObj(), _k(*k->density()), _theta(*theta->density())
+GammaCompoundDensityObj::GammaCompoundDensityObj(DensityObj *k, DensityObj *theta, double scale, double shift)
+  : DensityObj(), _k(k), _theta(theta), _scale(scale), _shift(shift)
+{
+  // pass...
+}
+
+GammaCompoundDensityObj::GammaCompoundDensityObj(const Var &k, const Var &theta, double scale, double shift)
+  : DensityObj(), _k(*k->density()), _theta(*theta->density()), _scale(scale), _shift(shift)
 {
   // Test for independence
   if (! k.mutuallyIndep(theta)) {
@@ -166,6 +189,9 @@ GammaCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) co
   _k->eval(Tmin, Tmax, dk); _theta->eval(Tmin, Tmax, dtheta);
 
   out.setZero();
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
@@ -189,6 +215,9 @@ GammaCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out)
   _k->eval(Tmin, Tmax, dk); _theta->eval(Tmin, Tmax, dtheta);
 
   out.setZero();
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
@@ -202,6 +231,11 @@ GammaCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out)
       }
     }
   }
+}
+
+Density
+GammaCompoundDensityObj::affine(double scale, double shift) const {
+  return new GammaCompoundDensityObj(_k, _theta, scale*_scale, scale*_shift+shift);
 }
 
 

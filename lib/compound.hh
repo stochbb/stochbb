@@ -34,22 +34,33 @@ public:
  * considerable time. */
 class NormalCompoundDensityObj: public DensityObj
 {
+protected:
+  /** Constructs the density from the given parameter random variables.
+   * @param mu Specifies the mean random variable.
+   * @param sigma Specifies the standard deviation random variable. */
+  NormalCompoundDensityObj(DensityObj *mu, DensityObj *sigma, double scale=1, double shift=0);
+
 public:
   /** Constructs the density from the given parameter random variables.
    * @param mu Specifies the mean random variable.
    * @param sigma Specifies the standard deviation random variable. */
-  NormalCompoundDensityObj(const Var &mu, const Var &sigma);
+  NormalCompoundDensityObj(const Var &mu, const Var &sigma, double scale=1, double shift=0);
 
   virtual void mark();
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
 protected:
   /** A reference to the distribution of the mean parameter. */
   DensityObj *_mu;
   /** A reference to the distribution of the standard deviation parameter. */
   DensityObj *_sigma;
+  /** Scale of the affine transform. */
+  double _scale;
+  /** Shift of the affine transform. */
+  double _shift;
 };
 
 
@@ -80,22 +91,33 @@ protected:
  * considerable time. */
 class GammaCompoundDensityObj: public DensityObj
 {
+protected:
+  /** Constructs the density from the given parameter distributions.
+   * @param k Specifies the shape parameter random variable.
+   * @param theta Specifies the scale parameter random variable. */
+  GammaCompoundDensityObj(DensityObj *k, DensityObj *theta, double scale=1, double shift=0);
+
 public:
   /** Constructs the density from the given parameter distributions.
    * @param k Specifies the shape parameter random variable.
    * @param theta Specifies the scale parameter random variable. */
-  GammaCompoundDensityObj(const Var &k, const Var &theta);
+  GammaCompoundDensityObj(const Var &k, const Var &theta, double scale=1, double shift=0);
 
   virtual void mark();
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
 protected:
   /** The distribution of the shape parameter. */
   DensityObj *_k;
   /** The distribution of the scale parameter. */
   DensityObj *_theta;
+  /** Scale of the affine transform. */
+  double _scale;
+  /** Shift of the affine transform. */
+  double _shift;
 };
 
 

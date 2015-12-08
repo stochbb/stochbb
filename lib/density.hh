@@ -2,6 +2,7 @@
 #define __SBB_DENSITY_HH__
 
 #include "object.hh"
+#include "api.hh"
 #include <Eigen/Eigen>
 
 namespace sbb {
@@ -27,6 +28,9 @@ public:
    * and stores it into the given output vector. The number of grid points is determined
    * by the length of the output vector. */
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const = 0;
+
+  /** Retruns a new density instance being the affine transformed of this density. */
+  virtual Density affine(double scale, double shift) const = 0;
 
   /** Comparison operator between densities. This implementation compares only by type.
    * The specialization needs to compare also densities within types. */
@@ -68,7 +72,7 @@ class DeltaDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
-  DeltaDensityObj(double delay);
+  DeltaDensityObj(double delay, double scale=1, double shift=0);
   /** Destructor. */
   virtual ~DeltaDensityObj();
   virtual void mark();
@@ -76,6 +80,7 @@ public:
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void sample(Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -87,6 +92,10 @@ public:
 protected:
   /** Holds the center of the distribution. */
   double _delay;
+  /** Holds the constants of an affine tranformation of this density. */
+  double _scale;
+  /** Holds the constants of an affine tranformation of this density. */
+  double _shift;
 };
 
 
@@ -95,7 +104,7 @@ class UniformDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
-  UniformDensityObj(double a, double b);
+  UniformDensityObj(double a, double b, double scale=1, double shift=0);
   /** Destructor. */
   virtual ~UniformDensityObj();
   virtual void mark();
@@ -103,6 +112,7 @@ public:
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void sample(Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -118,6 +128,10 @@ protected:
   double _a;
   /** The upper end of the interval. */
   double _b;
+  /** Scaling of the affine transformation. */
+  double _scale;
+  /** Shift of the affine transformation. */
+  double _shift;
 };
 
 
@@ -126,7 +140,7 @@ class NormalDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor with mean and standard deviation. */
-  NormalDensityObj(double mean, double stddev);
+  NormalDensityObj(double mean, double stddev, double scale=1, double shift=0);
   /** Destructor. */
   virtual ~NormalDensityObj();
   virtual void mark();
@@ -134,6 +148,7 @@ public:
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void sample(Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -149,6 +164,10 @@ protected:
   double _mu;
   /** The standard deviation. */
   double _sigma;
+  /** Scale of the affine transformation. */
+  double _scale;
+  /** Shift of the affine transformation. */
+  double _shift;
 };
 
 
@@ -157,7 +176,7 @@ class GammaDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
-  GammaDensityObj(double k, double theta);
+  GammaDensityObj(double k, double theta, double scale=1, double shift=0);
   /** Destructor. */
   virtual ~GammaDensityObj();
   virtual void mark();
@@ -165,6 +184,7 @@ public:
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void sample(Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -180,6 +200,10 @@ protected:
   double _k;
   /** The scale parameter. */
   double _theta;
+  /** Scale of the affine transform. */
+  double _scale;
+  /** Shift of the affine transform. */
+  double _shift;
 };
 
 }

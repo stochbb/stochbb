@@ -12,16 +12,21 @@ namespace sbb {
 class MaximumDensityObj: public DensityObj
 {
 protected:
-  /** Constructor.
+  /** Hidden constructor.
    * @param variables Specifies the vector of independent random variables (weak references).
    * @throws AssumtionError If the given random variables are not mutually independent. */
-  MaximumDensityObj(const std::vector<VarObj *> &variables);
+  MaximumDensityObj(const std::vector<DensityObj *> &densities, double scale=1, double shift=0);
+
+  /** Hidden constructor.
+   * @param variables Specifies the vector of independent random variables (weak references).
+   * @throws AssumtionError If the given random variables are not mutually independent. */
+  MaximumDensityObj(const std::vector<VarObj *> &variables, double scale=1, double shift=0);
 
 public:
   /** Constructor.
    * @param variables Specifies the vector of independent random variables.
    * @throws AssumtionError If the given random variables are not mutually independent. */
-  MaximumDensityObj(const std::vector<Var> &variables);
+  MaximumDensityObj(const std::vector<Var> &variables, double scale=1, double shift=0);
 
   /** Destructor. */
   virtual ~MaximumDensityObj();
@@ -30,6 +35,7 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
   /** Returns a vector of weak references to the underlaying densities. */
   inline const std::vector<DensityObj *> &densities() const { return _densities; }
@@ -40,6 +46,11 @@ public:
 protected:
   /** The vector of densities. */
   std::vector<DensityObj *> _densities;
+  /** Scale of the affine transform. */
+  double _scale;
+  /** Shift of the affine transform. */
+  double _shift;
+
   friend class MaximumObj;
 };
 
@@ -49,16 +60,20 @@ protected:
 class MinimumDensityObj: public DensityObj
 {
 protected:
-  /** Constructor.
+  /** Hidden constructor.
    * @param variables Specifies the vector of independent random variables (weak references).
    * @throws AssumtionError If the given random variables are not mutually independent. */
-  MinimumDensityObj(const std::vector<VarObj *> &variables);
+  MinimumDensityObj(const std::vector<DensityObj *> &densities, double scale=1, double shift=0);
+  /** Hidden constructor.
+   * @param variables Specifies the vector of independent random variables (weak references).
+   * @throws AssumtionError If the given random variables are not mutually independent. */
+  MinimumDensityObj(const std::vector<VarObj *> &variables, double scale=1, double shift=0);
 
 public:
   /** Constructor.
    * @param variables Specifies the vector of independent random variables.
    * @throws AssumtionError If the given random variables are not mutually independent. */
-  MinimumDensityObj(const std::vector<Var> &variables);
+  MinimumDensityObj(const std::vector<Var> &variables, double scale=1, double shift=0);
 
   /** Destructor. */
   virtual ~MinimumDensityObj();
@@ -66,6 +81,7 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
   /** Returns a vector of weak references to the underlaying densities. */
   inline const std::vector<DensityObj *> &densities() const { return _densities; }
@@ -76,6 +92,10 @@ public:
 protected:
   /** The vector of densities. */
   std::vector<DensityObj *> _densities;
+  /** Scale of the affine transform. */
+  double _scale;
+  /** Shift of the affine transform. */
+  double _shift;
   friend class MinimumObj;
 };
 

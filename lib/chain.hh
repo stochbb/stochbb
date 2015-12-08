@@ -13,11 +13,13 @@ class ConvolutionDensityObj: public DensityObj
 protected:
   /** Constructs a new PDF as the convolution of the PDFs of the given variables
    * (weak references). */
-  ConvolutionDensityObj(const std::vector<VarObj *> &variables);
+  ConvolutionDensityObj(const std::vector<VarObj *> &variables, double scale=1, double shift=0);
+  /** Constructs a new PDF as the convolution of the given PDFs (weak references). */
+  ConvolutionDensityObj(const std::vector<DensityObj *> &variables, double scale=1, double shift=0);
 
 public:
   /** Constructs a new PDF as the convolution of the PDFs of the given variables. */
-  ConvolutionDensityObj(const std::vector<Var> &variables);
+  ConvolutionDensityObj(const std::vector<Var> &variables, double scale=1, double shift=0);
   /** Destructor. */
   virtual ~ConvolutionDensityObj();
 
@@ -25,6 +27,7 @@ public:
 
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
   /** Returns the number of underlaying densities. */
   inline size_t numDensities() const { return _densities.size(); }
@@ -50,6 +53,11 @@ protected:
 protected:
   /** The @c DensityObj instances of the underlaying variables. */
   std::vector<DensityObj *> _densities;
+  /** Scale of the affine transform. */
+  double _scale;
+  /** Shift of the affine transform. */
+  double _shift;
+
   friend class ChainObj;
 };
 

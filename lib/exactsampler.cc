@@ -1,5 +1,6 @@
 #include "exactsampler.hh"
 #include "randomvariable.hh"
+#include "affinetrafo.hh"
 #include "chain.hh"
 #include "minmax.hh"
 #include "mixture.hh"
@@ -103,6 +104,14 @@ ExactSamplerObj::_sample_atomic(ExactSamplerObj *self, VarObj *var, Eigen::Matri
   Eigen::VectorXd tmp(out.rows());
   static_cast<AtomicVarObj *>(var)->sample(tmp);
   out.col(self->_varmap[var]) = tmp;
+}
+
+void
+ExactSamplerObj::_sample_affine(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
+  AffineTrafoObj *affine = static_cast<AffineTrafoObj *>(var);
+  // Get samples from untransformed variable and apply affine transform
+  out.col(self->_varmap[var])
+      = affine->scale()*out.col(self->_varmap[*affine->variable(0)]).array()+affine->shift();
 }
 
 void

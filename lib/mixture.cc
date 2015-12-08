@@ -8,8 +8,16 @@ using namespace sbb;
 /* ********************************************************************************************* *
  * Implementation of MixtrueDensityObj
  * ********************************************************************************************* */
-MixtureDensityObj::MixtureDensityObj(const std::vector<double> &weights, const std::vector<VarObj *> &variables)
-  : DensityObj(), _weights(weights), _densities()
+MixtureDensityObj::MixtureDensityObj(const std::vector<double> &weights, const std::vector<DensityObj *> &densities,
+                                     double scale, double shift)
+  : DensityObj(), _weights(weights), _densities(densities), _scale(scale), _shift(shift)
+{
+  // pass...
+}
+
+MixtureDensityObj::MixtureDensityObj(const std::vector<double> &weights, const std::vector<VarObj *> &variables,
+                                     double scale, double shift)
+  : DensityObj(), _weights(weights), _densities(), _scale(scale), _shift(shift)
 {
   // Normalize weights
   double sum = 0;
@@ -33,6 +41,10 @@ MixtureDensityObj::mark() {
 
 void
 MixtureDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  // apply affine transform
+  Tmin = (Tmin - _shift)/_scale;
+  Tmax = (Tmax - _shift)/_scale;
+
   out.setZero();
   Eigen::VectorXd tmp(out.size());
   for (size_t i=0; i<_densities.size(); i++) {
@@ -43,12 +55,21 @@ MixtureDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 
 void
 MixtureDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  // apply affine transform
+  Tmin = (Tmin - _shift)/_scale;
+  Tmax = (Tmax - _shift)/_scale;
+
   out.setZero();
   Eigen::VectorXd tmp(out.size());
   for (size_t i=0; i<_densities.size(); i++) {
     _densities[i]->evalCDF(Tmin, Tmax, tmp);
     out += _weights[i]*tmp;
   }
+}
+
+Density
+MixtureDensityObj::affine(double scale, double shift) const {
+  return new MixtureDensityObj(_weights, _densities, scale*_scale, scale*_shift + shift);
 }
 
 

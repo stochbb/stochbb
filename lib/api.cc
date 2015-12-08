@@ -2,6 +2,7 @@
 #include "xmlparser.hh"
 #include "density.hh"
 #include "randomvariable.hh"
+#include "affinetrafo.hh"
 #include "chain.hh"
 #include "minmax.hh"
 #include "mixture.hh"
@@ -196,6 +197,11 @@ Density::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   _density->evalCDF(Tmin, Tmax, out);
 }
 
+Density
+Density::affine(double scale, double shift) const {
+  return _density->affine(scale, shift);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AtomicDensity container
@@ -255,6 +261,39 @@ DerivedVar::numVariables() const {
 Var
 DerivedVar::variable(size_t idx) const {
   return _derived_var->variable(idx);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AffineTrafo container
+ * ********************************************************************************************* */
+AffineTrafo::AffineTrafo(AffineTrafoObj *obj)
+  : DerivedVar(obj), _affine(obj)
+{
+  // pass...
+}
+
+AffineTrafo::AffineTrafo(const AffineTrafo &other)
+  : DerivedVar(other), _affine(other._affine)
+{
+  // pass...
+}
+
+AffineTrafo &
+AffineTrafo::operator =(const AffineTrafo &other) {
+  DerivedVar::operator =(other);
+  _affine = other._affine;
+  return *this;
+}
+
+double
+AffineTrafo::scale() const {
+  return _affine->scale();
+}
+
+double
+AffineTrafo::shift() const {
+  return _affine->shift();
 }
 
 

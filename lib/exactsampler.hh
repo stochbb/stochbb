@@ -36,6 +36,8 @@ protected:
   sampler_f _choose_sampler(VarObj *var);
   /** Samples from an atomic random variable. */
   static void _sample_atomic(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
+  /** Samples from an affine transformed random variable. */
+  static void _sample_affine(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
   /** Samples from a chain of random variables. */
   static void _sample_chain(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
   /** Samples from a maximum of random variables. */

@@ -1,7 +1,8 @@
 #include "operators.hh"
-#include "minmax.hh"
-#include "chain.hh"
 #include "randomvariable.hh"
+#include "affinetrafo.hh"
+#include "chain.hh"
+#include "minmax.hh"
 
 using namespace sbb;
 
@@ -305,4 +306,19 @@ sbb::chain(const std::vector<Var> &vars) {
   }
 
   return Chain(variables);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of affine
+ * ********************************************************************************************* */
+Var
+sbb::affine(const Var &var, double scale, double shift) {
+  // Flatten affine trafo objects
+  if (var.is<AffineTrafo>()) {
+    AffineTrafo a = var.as<AffineTrafo>();
+    return new AffineTrafoObj(scale*a.scale(), scale*a.shift()+shift, a.variable(0));
+  }
+
+  return new AffineTrafoObj(scale, shift, var);
 }

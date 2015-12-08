@@ -11,19 +11,30 @@ namespace sbb {
 /** Implements a mixture density. */
 class MixtureDensityObj: public DensityObj
 {
+protected:
+  /** Hidden constructor from the given weights and densities. */
+  MixtureDensityObj(const std::vector<double> &weights, const std::vector<DensityObj *> &densities,
+                    double scale=1, double shift=0);
+
 public:
   /** Constructs a mixture density from the given weights and variables. */
-  MixtureDensityObj(const std::vector<double> &weights, const std::vector<VarObj *> &variables);
+  MixtureDensityObj(const std::vector<double> &weights, const std::vector<VarObj *> &variables,
+                    double scale=1, double shift=0);
 
   virtual void mark();
   virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual Density affine(double scale, double shift) const;
 
 protected:
   /** The vector of weights (normalized). */
   std::vector<double> _weights;
   /** The vector of densities of the random variables being mixed. */
   std::vector<DensityObj *> _densities;
+  /** The scale of the affine transform. */
+  double _scale;
+  /** The shift of the affine transform. */
+  double _shift;
 };
 
 

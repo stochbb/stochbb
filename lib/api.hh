@@ -15,6 +15,7 @@ class AtomicDensityObj;
 class VarObj;
 class AtomicVarObj;
 class DerivedVarObj;
+class AffineTrafoObj;
 class ChainObj;
 class MaximumObj;
 class MinimumObj;
@@ -102,6 +103,9 @@ public:
    * of grid points is specified via the length of the output vector @c out. The results are
    * stored into the output vector. */
   void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+
+  /** Returns an affine transform of the density. */
+  Density affine(double scale, double shift) const;
 
   /** Retruns a weak reference to the @c DensityObj. */
   inline DensityObj *operator *() const { return _density; }
@@ -266,6 +270,25 @@ public:
 protected:
   /** Holds a reference to the @c DerivedVarObj instance. */
   DerivedVarObj *_derived_var;
+};
+
+
+class AffineTrafo: public DerivedVar
+{
+public:
+  typedef AffineTrafoObj ObjectType;
+
+public:
+  AffineTrafo(AffineTrafoObj *obj);
+  AffineTrafo(const AffineTrafo &other);
+
+  AffineTrafo &operator =(const AffineTrafo &other);
+
+  double scale() const;
+  double shift() const;
+
+protected:
+  AffineTrafoObj *_affine;
 };
 
 

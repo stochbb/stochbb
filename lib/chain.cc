@@ -119,8 +119,14 @@ DensityObj *convolution_combine(DensityObj *a, DensityObj *b) {
 /* ********************************************************************************************* *
  * Implementation of ConvolutionDensityObj
  * ********************************************************************************************* */
-ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<Var> &variables)
-  : DensityObj(), _densities()
+ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<DensityObj *> &densities, double scale, double shift)
+  : DensityObj(), _densities(densities), _scale(scale), _shift(shift)
+{
+  // pass...
+}
+
+ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<Var> &variables, double scale, double shift)
+  : DensityObj(), _densities(), _scale(scale), _shift(shift)
 {
   // Get & store the densities of all variables, assuming they are mutually independent.
   _densities.reserve(variables.size());
@@ -132,8 +138,8 @@ ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<Var> &variables)
   _combine_densities();
 }
 
-ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<VarObj *> &variables)
-  : DensityObj(), _densities()
+ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<VarObj *> &variables, double scale, double shift)
+  : DensityObj(), _densities(), _scale(scale), _shift(shift)
 {
   // Get & store the densities of all variables, assuming they are mutually independent.
   _densities.reserve(variables.size());
@@ -184,6 +190,10 @@ ConvolutionDensityObj::mark() {
 
 void
 ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
+
   Eigen::FFT<double> fft;
   Eigen::VectorXd tmp1(2*out.size());  tmp1.setZero();
   Eigen::VectorXcd tmp2(2*out.size());
@@ -201,6 +211,10 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) cons
 
 void
 ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+  // Apply affine transform
+  Tmin = (Tmin-_shift)/_scale;
+  Tmax = (Tmax-_shift)/_scale;
+
   Eigen::FFT<double> fft;
   Eigen::VectorXd tmp1(2*out.size());  tmp1.setZero();
   Eigen::VectorXcd tmp2(2*out.size());
@@ -213,6 +227,11 @@ ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) c
   }
   fft.inv(tmp1, prod);
   out = tmp1.head(out.size());
+}
+
+Density
+ConvolutionDensityObj::affine(double scale, double shift) const {
+  return new ConvolutionDensityObj(_densities, _scale*scale, scale*_shift+shift);
 }
 
 int
