@@ -3,7 +3,7 @@
 <simulation xmlns="http://hmatuschek.github.io/stochbb/simulation-0.0.dtd"
             xmlns:m="http://www.w3.org/1998/Math/MathML">
 
- <load>exp</load>
+ <load>exp.xml</load>
 
  <var type="exp" id="X1">
   <param name="lambda"> <m:cn>0.01</m:cn> </param>

@@ -522,6 +522,12 @@ public:
   typedef ExactSamplerObj ObjectType;
 
 public:
+  /** Constructs a sampler for the given random variable. */
+  ExactSampler(const Var &X);
+  /** Constructs a sampler for the given random variables. */
+  ExactSampler(const Var &X1, const Var &X2);
+  /** Constructs a sampler for the given random variables. */
+  ExactSampler(const Var &X1, const Var &X2, const Var &X3);
   /** Constructs a sampler for the given random variables. */
   ExactSampler(const std::vector<Var> &variables);
 

@@ -68,8 +68,8 @@ AtomicDensityObj::mark() {
 /* ********************************************************************************************* *
  * Implementation of DeltaDensityObj
  * ********************************************************************************************* */
-DeltaDensityObj::DeltaDensityObj(double delay, double scale, double shift)
-  : AtomicDensityObj(), _delay(delay), _scale(scale), _shift(shift)
+DeltaDensityObj::DeltaDensityObj(double delay)
+  : AtomicDensityObj(), _delay(delay)
 {
   logDebug() << "Create DeltaDensity with delay=" << _delay << ".";
 }
@@ -86,9 +86,6 @@ DeltaDensityObj::mark() {
 
 void
 DeltaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-  // Apply affine transform on arguments
-  Tmin = (Tmin-_shift)/_scale;
-  Tmax = (Tmax-_shift)/_scale;
   // Evaluate delta PDF
   out.setZero();
   if ((_delay<Tmin) || (_delay>Tmax)) { return; }
@@ -99,9 +96,6 @@ DeltaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 
 void
 DeltaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-  // Apply affine transform on arguments
-  Tmin = (Tmin-_shift)/_scale;
-  Tmax = (Tmax-_shift)/_scale;
   // Eval CDF
   out.setZero();
   if ((_delay<Tmin) || (_delay>Tmax)) { return; }
@@ -112,12 +106,12 @@ DeltaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 
 void
 DeltaDensityObj::sample(Eigen::VectorXd &out) const {
-  out.setConstant(_scale*_delay+_shift);
+  out.setConstant(_delay);
 }
 
 Density
 DeltaDensityObj::affine(double scale, double shift) const {
-  return new DeltaDensityObj(_delay, _scale*scale, scale*_shift+shift);
+  return new DeltaDensityObj(scale*_delay+shift);
 }
 
 int
@@ -140,8 +134,8 @@ DeltaDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of UniformDensityObj
  * ********************************************************************************************* */
-UniformDensityObj::UniformDensityObj(double a, double b, double scale, double shift)
-  : AtomicDensityObj(), _a(a), _b(b), _scale(scale), _shift(shift)
+UniformDensityObj::UniformDensityObj(double a, double b)
+  : AtomicDensityObj(), _a(a), _b(b)
 {
   logDebug() << "Create UniformDensity with a=" << _a << ", b=" << _b << ".";
 }
@@ -158,10 +152,6 @@ UniformDensityObj::mark() {
 
 void
 UniformDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-  // Apply affine transform on arguments
-  Tmin = (Tmin-_shift)/_scale;
-  Tmax = (Tmax-_shift)/_scale;
-
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = ((t >= _a) && (t <= _b)) ? 1./(Tmax-Tmin) : 0.0;
@@ -170,10 +160,6 @@ UniformDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 
 void
 UniformDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-  // Apply affine transform on arguments
-  Tmin = (Tmin-_shift)/_scale;
-  Tmax = (Tmax-_shift)/_scale;
-
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     if (t<_a) { out[i] = 0.0; }
@@ -185,13 +171,13 @@ UniformDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const
 void
 UniformDensityObj::sample(Eigen::VectorXd &out) const {
   for (int i=0; i<out.size(); i++) {
-    out[i] = _scale*RNG::unif(_a, _b)+_shift;
+    out[i] = RNG::unif(_a, _b);
   }
 }
 
 Density
 UniformDensityObj::affine(double scale, double shift) const {
-  return new UniformDensityObj(_a, _b, _scale*scale, scale*_shift+shift);
+  return new UniformDensityObj(scale*_a+shift, scale*_b+shift);
 }
 
 int
@@ -216,8 +202,8 @@ UniformDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of NormalDensityObj
  * ********************************************************************************************* */
-NormalDensityObj::NormalDensityObj(double mean, double stddev, double scale, double shift)
-  : AtomicDensityObj(), _mu(mean), _sigma(stddev), _scale(scale), _shift(shift)
+NormalDensityObj::NormalDensityObj(double mean, double stddev)
+  : AtomicDensityObj(), _mu(mean), _sigma(stddev)
 {
   logDebug() << "Create NormalDensity with mu=" << _mu << ", sigma=" << _sigma << ".";
 }
@@ -234,9 +220,6 @@ NormalDensityObj::mark() {
 
 void
 NormalDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-  // Apply affine transform on arguments
-  Tmin = (Tmin-_shift)/_scale;
-  Tmax = (Tmax-_shift)/_scale;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = std::exp( -(t-_mu)*(t-_mu)/(2*_sigma*_sigma) ) / (_sigma*std::sqrt(2*M_PI));
@@ -245,9 +228,6 @@ NormalDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 
 void
 NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
-  // Apply affine transform on arguments
-  Tmin = (Tmin-_shift)/_scale;
-  Tmax = (Tmax-_shift)/_scale;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = 0.5*(1+std::erf((t-_mu)/(_sigma*std::sqrt(2))));
@@ -257,13 +237,13 @@ NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const 
 void
 NormalDensityObj::sample(Eigen::VectorXd &out) const {
   for (int i=0; i<out.size(); i++) {
-    out[i] = _scale*RNG::norm(_mu, _sigma)+_shift;
+    out[i] = RNG::norm(_mu, _sigma);
   }
 }
 
 Density
 NormalDensityObj::affine(double scale, double shift) const {
-  return new NormalDensityObj(_mu, _sigma, _scale*scale, scale*_shift+shift);
+  return new NormalDensityObj(scale*_mu+shift, scale*_sigma);
 }
 
 int
@@ -289,10 +269,11 @@ NormalDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of GammaDensityObj
  * ********************************************************************************************* */
-GammaDensityObj::GammaDensityObj(double k, double theta, double scale, double shift)
-  : AtomicDensityObj(), _k(k), _theta(theta), _scale(scale), _shift(shift)
+GammaDensityObj::GammaDensityObj(double k, double theta, double shift)
+  : AtomicDensityObj(), _k(k), _theta(theta), _shift(shift)
 {
-  logDebug() << "Create GammaDensity with k=" << _k << ", theta=" << _theta << ".";
+  logDebug() << "Create GammaDensity with k=" << _k << ", theta=" << _theta
+             << ", shift=" << _shift << "." ;
 }
 
 GammaDensityObj::~GammaDensityObj() {
@@ -308,9 +289,7 @@ GammaDensityObj::mark() {
 void
 GammaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   // Apply affine transform on arguments
-  Tmin = (Tmin-_shift)/_scale;
-  Tmax = (Tmax-_shift)/_scale;
-
+  Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     if (t<=0) { out[i] = 0; }
@@ -321,9 +300,7 @@ GammaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 void
 GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   // Apply affine transform on arguments
-  Tmin = (Tmin-_shift)/_scale;
-  Tmax = (Tmax-_shift)/_scale;
-
+  Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = sbb::gamma_li(_k, t/_theta);
@@ -333,13 +310,13 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 void
 GammaDensityObj::sample(Eigen::VectorXd &out) const {
   for (int i=0; i<out.size(); i++) {
-    out[i] = _scale*RNG::gamma(_k, _theta)+_shift;
+    out[i] = RNG::gamma(_k, _theta)+_shift;
   }
 }
 
 Density
 GammaDensityObj::affine(double scale, double shift) const {
-  return new GammaDensityObj(_k, _theta, _scale*scale, scale*_shift+shift);
+  return new GammaDensityObj(_k, scale*_theta, scale*_shift+shift);
 }
 
 int
@@ -348,16 +325,18 @@ GammaDensityObj::compare(const DensityObj &other) const {
   if (int res = DensityObj::compare(other)) { return res; }
   // Compare uniform densities
   const GammaDensityObj *ogamma = dynamic_cast<const GammaDensityObj *>(&other);
-  if (_theta < ogamma->_theta) { return -1; }
-  else if (_theta > ogamma->_theta) { return 1; }
   if (_k < ogamma->_k) { return -1; }
   else if (_k > ogamma->_k) { return 1; }
+  if (_theta < ogamma->_theta) { return -1; }
+  else if (_theta > ogamma->_theta) { return 1; }
+  if (_shift < ogamma->_shift) { return -1; }
+  else if (_shift > ogamma->_shift) { return 1; }
   return 0;
 }
 
 void
 GammaDensityObj::print(std::ostream &stream) const {
   stream << "<GammaDensityObj k=" << _k << ", theta=" << _theta
-         << " #" << (void *)this << ">";
+         << ", shift=" << _shift << " #" << (void *)this << ">";
 }
 

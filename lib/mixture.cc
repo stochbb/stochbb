@@ -49,7 +49,7 @@ MixtureDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
   Eigen::VectorXd tmp(out.size());
   for (size_t i=0; i<_densities.size(); i++) {
     _densities[i]->eval(Tmin, Tmax, tmp);
-    out += _weights[i]*tmp;
+    out += _weights[i]*tmp/_scale;
   }
 }
 

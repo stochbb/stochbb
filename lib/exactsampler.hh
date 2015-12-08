@@ -17,7 +17,13 @@ namespace sbb {
 class ExactSamplerObj : public Object
 {
 public:
-  /** Constructor from the given random variables. */
+  /** Constructor for the given random variable. */
+  ExactSamplerObj(const Var &X);
+  /** Constructor for the given random variables. */
+  ExactSamplerObj(const Var &X1, const Var &X2);
+  /** Constructor for the given random variables. */
+  ExactSamplerObj(const Var &X1, const Var &X2, const Var &X3);
+  /** Constructor for the given random variables. */
   ExactSamplerObj(const std::vector<Var> &variables);
 
   virtual void mark();

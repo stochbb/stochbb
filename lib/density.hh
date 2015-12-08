@@ -72,7 +72,7 @@ class DeltaDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
-  DeltaDensityObj(double delay, double scale=1, double shift=0);
+  DeltaDensityObj(double delay);
   /** Destructor. */
   virtual ~DeltaDensityObj();
   virtual void mark();
@@ -92,10 +92,6 @@ public:
 protected:
   /** Holds the center of the distribution. */
   double _delay;
-  /** Holds the constants of an affine tranformation of this density. */
-  double _scale;
-  /** Holds the constants of an affine tranformation of this density. */
-  double _shift;
 };
 
 
@@ -104,7 +100,7 @@ class UniformDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
-  UniformDensityObj(double a, double b, double scale=1, double shift=0);
+  UniformDensityObj(double a, double b);
   /** Destructor. */
   virtual ~UniformDensityObj();
   virtual void mark();
@@ -128,10 +124,6 @@ protected:
   double _a;
   /** The upper end of the interval. */
   double _b;
-  /** Scaling of the affine transformation. */
-  double _scale;
-  /** Shift of the affine transformation. */
-  double _shift;
 };
 
 
@@ -140,7 +132,7 @@ class NormalDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor with mean and standard deviation. */
-  NormalDensityObj(double mean, double stddev, double scale=1, double shift=0);
+  NormalDensityObj(double mean, double stddev);
   /** Destructor. */
   virtual ~NormalDensityObj();
   virtual void mark();
@@ -164,10 +156,6 @@ protected:
   double _mu;
   /** The standard deviation. */
   double _sigma;
-  /** Scale of the affine transformation. */
-  double _scale;
-  /** Shift of the affine transformation. */
-  double _shift;
 };
 
 
@@ -176,7 +164,7 @@ class GammaDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
-  GammaDensityObj(double k, double theta, double scale=1, double shift=0);
+  GammaDensityObj(double k, double theta, double shift=0);
   /** Destructor. */
   virtual ~GammaDensityObj();
   virtual void mark();

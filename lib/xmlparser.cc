@@ -180,7 +180,7 @@ XmlParser::parse(QDomElement &root) {
 void
 XmlParser::parseLoad(QDomElement &node, ContextObj *ctx) {
   QString name = node.text();
-  QFile file(_pathStack.back() + "/" + name + ".xml");
+  QFile file(_pathStack.back() + "/" + name);
   if (! file.open(QIODevice::ReadOnly)) {
     ParserError err;
     err << "Cannot import file " << file.fileName().toStdString() << ": File not readable.";

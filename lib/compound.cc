@@ -86,7 +86,7 @@ NormalCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) c
       double sigma = Tmin;
       for (int l=0; l<out.size(); l++, sigma+=dt) {
         out(i) += dt*dt * dmu[k] * dsigma[l] *
-            std::exp( -(t-mu)*(t-mu)/(2*sigma*sigma)) / (std::sqrt(2*M_PI)*sigma);
+            std::exp( -(t-mu)*(t-mu)/(2*sigma*sigma)) / (std::sqrt(2*M_PI)*sigma*_scale);
       }
     }
   }
@@ -201,7 +201,7 @@ GammaCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) co
       double theta = Tmin;
       for (int m=0; m<out.size(); m++, theta+=dt) {
         out(i) += dt*dt * dk[l] * dtheta[m] *
-            std::exp((k-1)*std::log(t) - t/theta -std::lgamma(k) -k*std::log(theta));
+            std::exp((k-1)*std::log(t) - t/theta -std::lgamma(k) -k*std::log(theta*_scale));
       }
     }
   }

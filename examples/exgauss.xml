@@ -4,7 +4,7 @@
         xmlns:m="http://www.w3.org/1998/Math/MathML">
 
  <!-- load definition of exp. distr. RV -->
- <load>exp</load>
+ <load>exp.xml</load>
 
  <define name="exgauss">
   <param id="mu"/>

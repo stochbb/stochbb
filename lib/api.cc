@@ -560,6 +560,24 @@ Simulation::sample(Eigen::MatrixXd &out) const {
 /* ********************************************************************************************* *
  * Implementation of ExactSampler container
  * ********************************************************************************************* */
+ExactSampler::ExactSampler(const Var &X)
+  : Container(new ExactSamplerObj(X)), _sampler(static_cast<ExactSamplerObj *>(_object))
+{
+  // pass...
+}
+
+ExactSampler::ExactSampler(const Var &X1, const Var &X2)
+  : Container(new ExactSamplerObj(X1, X2)), _sampler(static_cast<ExactSamplerObj *>(_object))
+{
+  // pass...
+}
+
+ExactSampler::ExactSampler(const Var &X1, const Var &X2, const Var &X3)
+  : Container(new ExactSamplerObj(X1, X2, X3)), _sampler(static_cast<ExactSamplerObj *>(_object))
+{
+  // pass...
+}
+
 ExactSampler::ExactSampler(const std::vector<Var> &variables)
   : Container(new ExactSamplerObj(variables)), _sampler(static_cast<ExactSamplerObj *>(_object))
 {

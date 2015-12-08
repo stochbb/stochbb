@@ -202,7 +202,7 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) cons
   double dt = (Tmax-Tmin)/out.size();
   for (size_t i=0; i<_densities.size(); i++) {
     _densities[i]->eval(Tmin, Tmax, out);
-    tmp1.head(out.size()) = out*dt;
+    tmp1.head(out.size()) = out*dt/_scale;
     fft.fwd(tmp2, tmp1); prod.array() *= tmp2.array();
   }
   fft.inv(tmp1, prod);

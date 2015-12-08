@@ -4,7 +4,7 @@
             xmlns:m="http://www.w3.org/1998/Math/MathML">
 
  <!-- Load definition of exp RV. -->
- <load>exp</load>
+ <load>exp.xml</load>
 
  <var id="X1" type="gamma">
   <param name="k"><m:cn>10</m:cn></param>

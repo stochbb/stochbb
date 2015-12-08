@@ -69,7 +69,7 @@ MaximumDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
         tmp.array() *= cdfs.col(j).array();
       }
     }
-    out += tmp;
+    out += tmp/_scale;
   }
 }
 
@@ -187,7 +187,7 @@ MinimumDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
     }
     out += tmp;
   }
-  out = -out/dx;
+  out = -out/(dx*_scale);
 }
 
 void

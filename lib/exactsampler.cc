@@ -21,6 +21,41 @@ inline size_t _find_index(double p, size_t a, size_t b, const std::vector<double
   return b;
 }
 
+ExactSamplerObj::ExactSamplerObj(const Var &X)
+  : Object(), _outvars(), _queue(), _varmap(), _sampler()
+{
+  _queue.reserve(2);
+  _outvars.reserve(1);
+  // Assemble variable queue
+  _add_to_queue(*X);
+  _outvars.push_back(*X);
+}
+
+ExactSamplerObj::ExactSamplerObj(const Var &X1, const Var &X2)
+  : Object(), _outvars(), _queue(), _varmap(), _sampler()
+{
+  _queue.reserve(4);
+  _outvars.reserve(2);
+  // Assemble variable queue
+  _add_to_queue(*X1);
+  _outvars.push_back(*X1);
+  _add_to_queue(*X2);
+  _outvars.push_back(*X2);
+}
+
+ExactSamplerObj::ExactSamplerObj(const Var &X1, const Var &X2, const Var &X3)
+  : Object(), _outvars(), _queue(), _varmap(), _sampler()
+{
+  _queue.reserve(6);
+  _outvars.reserve(3);
+  // Assemble variable queue
+  _add_to_queue(*X1);
+  _outvars.push_back(*X1);
+  _add_to_queue(*X2);
+  _outvars.push_back(*X2);
+  _add_to_queue(*X3);
+  _outvars.push_back(*X3);
+}
 
 ExactSamplerObj::ExactSamplerObj(const std::vector<Var> &variables)
   : Object(), _outvars(), _queue(), _varmap(), _sampler()
