@@ -11,6 +11,12 @@ namespace sbb {
  * @returns @c true If the given variables are mutually independent. */
 bool independent(const std::vector<Var> &vars);
 
+/** Constructs a delta-distributed random variable (constant) located as the given value. */
+Var delta(double value);
+
+/** Constructs a uniformly-distributed random variable on the interval [a,b]. */
+Var uniform(double a, double b);
+
 /** Constructs a normal-distributed random variable for the given mean and standard deviation. */
 Var normal(double mu, double sigma, const std::string &name="");
 /** Constructs a compound-normal distributed random variable for the given mean and
