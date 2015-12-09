@@ -1,11 +1,11 @@
 %module stochbb
 
 %{
+#define SWIG_FILE_WITH_INIT
 //#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include "lib/api.hh"
 #include "lib/randomvariable.hh"
 #include "lib/density.hh"
-#define SWIG_FILE_WITH_INIT
 %}
 
 %include "numpy.i"
@@ -31,14 +31,16 @@ protected:
   Density();
 };
 
-%numpy_typemaps(double, NPY_DOUBLE, int)
-%apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int len)};
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int len)}
 %extend Density {
   void eval(double Tmin, double Tmax, double* out, int len) {
     Eigen::Map<Eigen::VectorXd> outMap(out, len);
     self->eval(Tmin, Tmax, outMap);
   }
+}
 
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int len)}
+%extend Density {
   void evalCDF(double Tmin, double Tmax, double* out, int len) {
     Eigen::Map<Eigen::VectorXd> outMap(out, len);
     self->evalCDF(Tmin, Tmax, outMap);
@@ -80,10 +82,9 @@ public:
   void sample(Eigen::MatrixXd &out) const;
 };
 
-%numpy_typemaps(double , NPY_DOUBLE, int)
 %apply (double* INPLACE_FARRAY2, int DIM1, int DIM2) {(double* out, int rows, int cols)};
 %extend ExactSampler {
-  void sample(double *out, int rows, int cols) {
+  void sample(double* out, int rows, int cols) {
     Eigen::Map<Eigen::MatrixXd> outMap(out, rows, cols);
     self->sample(outMap);
   }
@@ -96,10 +97,9 @@ public:
   MarginalSampler(const Var &var, double Tmin, double Tmax, size_t steps);
 };
 
-%numpy_typemaps(double , NPY_DOUBLE, int)
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int len)};
 %extend MarginalSampler {
-  void sample(double *out, int len) {
+  void sample(double* out, int len) {
     Eigen::Map<Eigen::VectorXd> outMap(out, len);
     self->sample(outMap);
   }
