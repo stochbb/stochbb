@@ -820,12 +820,12 @@ standard deviation \code{sigma} being random variables too.
 \end{deffunc*}
 
 \begin{deffunc}{sbb::gamma}{\class{Var}}{double k, double theta}
-Constructs a new gamma or compound-gamma-distributed random variable with shape \code{k} and 
+Constructs a new gamma-distributed random variable with shape \code{k} and 
 scale \code{theta} , that is $\Gamma(x; k, \theta)$.
 \end{deffunc}
 
 \begin{deffunc*}{sbb::gamma}{\class{Var}}{const \class{Var}\& k, const \class{Var}\& theta}
-Constructs a new gamma or compound-gamma-distributed random variable with shape \code{k} and 
+Constructs a new compound-gamma-distributed random variable with shape \code{k} and 
 scale \code{theta} begin random variables too.
 \end{deffunc*}
 
@@ -846,16 +846,16 @@ Constructs a minimum random variable, a variable that represents the minimum of 
 \end{deffunc}
 
 
-\defclass{Container}
+\begin{defclass}{Container}
 Base class of all container object holding references to managed objects. This class is an essential part of the internal memory 
 management system. All classes of the API are derived from this class.
 
-\begin{classsyn}{Container}{}
+\begin{classsyn}{}
 Constructs an empty container.
 \end{classsyn}
 
 \begin{defmeth}{Container}{isNull}{bool}{}
-Returns \code{true} if the container is empty, that is if the container does not refer to an actual object.
+Returns \code{true} if the container is empty. That is, if the container does not refer to an actual object.
 \end{defmeth}
 
 \begin{defmeth}{Container}{is<Type>}{bool}{}
@@ -863,13 +863,14 @@ Returns \code{true} if the container holds a reference to an object of type \cod
 This template method can be used to test a container before casting it with \method{Container}{as<Type>}.
 \end{defmeth}
 
-\begin{defmeth}{Container}{is<Type>}{Type}{}
+\begin{defmeth}{Container}{as<Type>}{Type}{}
 Casts the container to the type \code{Type}. Returns an empty container if cast fails, e.g. if the reference held by the 
-container cannot be casted to the given type.
+container cannot be casted to the given type or is empty.
 \end{defmeth}
+\end{defclass}
 
 
-\defclassex{Var}{Container}
+\begin{defclassex}{Var}{Container}
 Base class of all random variables. All random variables have a probability density function assigned which can be accessed
 using \method{Var}{density} method.
 
@@ -888,9 +889,9 @@ Returns \code{true} if the random variable depends on the given variable \code{v
 \begin{defmeth}{Var}{mutuallyIndep}{bool}{const Var\& var}
 Returns \code{true} if the random variable and the given variable are mutually independent.
 \end{defmeth}
+\end{defclassex}
 
-
-\defclassex{Density}{Container}
+\begin{defclassex}{Density}{Container}
 Base class of all probability density functions (PDFs).
 
 \begin{defmeth}{Density}{eval}{void}{double min, double max, Eigen::VectorXd\& out}
@@ -902,9 +903,9 @@ of elements in \code{out}.
 Evaluates the cumulative probability function (CDF) on a regular grid in $[min, max)$ using the same number
 of grid points as the number of elements in \code{out}.
 \end{defmeth}
+\end{defclassex}
 
-
-\defclassex{DerivedVar}{Var}
+\begin{defclassex}{DerivedVar}{Var}
 Base class of all derived random variables, that are random variables which are defined as functions of other random 
 variables.
 
@@ -915,9 +916,9 @@ Returns the number of variables the derived variable depends on.
 \begin{defmeth}{DerivedVar}{numVariables}{\class{Var}}{size\_t i}
 Returns the \code{i}-th random variable the derived variable depends on.
 \end{defmeth}
+\end{defclassex}
 
-
-\defclass{AffineTafo}{DerivedVar}
+\begin{defclassex}{AffineTafo}{DerivedVar}
 This class represents an affine transformed random variable, that is $Y = a\,X+b$. This class does not provide a
 public constructor, use the \function{sbb::affine} function to construct an affine transformation.
 
@@ -928,36 +929,36 @@ public constructor, use the \function{sbb::affine} function to construct an affi
 \begin{defmeth}{AffineTrafo}{shift}{double}{}
  Returns the shift of the transform, a.k.a. $b$.
 \end{defmeth}
+\end{defclassex}
 
-
-\defclass{Chain}{DerivedVar}
+\begin{defclassex}{Chain}{DerivedVar}
 Implements the sum of the independent random variables $X_i, i=1,\dots,N$, $Y = \sum_i X_i$.
 
 \begin{classsyn}{Chain}{std::vector<\class{Var}>\& variables}
 Constructs a random variable being the sum of the given random variables. Although providing a constructor, a chain
 should be constructed using the \function{sbb::chain} function.
 \end{classsyn}
+\end{defclassex}
 
-
-\defclass{Maximum}{DerivedVar}
+\begin{defclassex}{Maximum}{DerivedVar}
 Implements the maximum of the independent random variables $X_i, i=1,\dots,N$, $Y = \max\{X_1,...,X_N\}$.
 
 \begin{classsyn}{Maximum}{std::vector<\class{Var}>\& variables}
 Constructs a random variable being the maximum of the given random variables. Although providing a constructor, a maximum
 should be constructed using the \function{sbb::maximum} function.
 \end{classsyn}
+\end{defclassex}
 
-
-\defclass{Minimum}{DerivedVar}
+\begin{defclassex}{Minimum}{DerivedVar}
 Implements the minimum of the independent random variables $X_i, i=1,\dots,N$, $Y = \min\{X_1,...,X_N\}$.
 
 \begin{classsyn}{Minimum}{std::vector<\class{Var}>\& variables}
 Constructs a random variable being the minimum of the given random variables. Although providing a constructor, a minimum
 should be constructed using the \function{sbb::minimum} function.
 \end{classsyn}
+\end{defclassex}
 
-
-\defclassex{Mixture}{DerivedVar}
+\begin{defclassex}{Mixture}{DerivedVar}
 Implements a weighted mixture of several random variables. A mixture can be seen as a random process that selects one of
 its children with a certain probability.
 
@@ -968,15 +969,16 @@ Constructs a new mixture random variable from the given vectors of weights and v
 \begin{defmeth}{Mixture}{weight}{double}{size\_t i}
 Returns the weight of the i-th variable.
 \end{defmeth}
+\end{defclassex}
 
-
-\defclassex{Compound}{DerivedVar}
+\begin{defclassex}{Compound}{DerivedVar}
 This class represent the base of all compound random variables, a variable which is distributed according to a parametric distribution
 where at least one parameter is a random variable too, that is $Y\sim f_{X|A}(x|A)$ and $A\sim g(a)$. This class does not provide 
 a public constructor, please use the constructor functions like \function{sbb::norm} and \function{sbb::gamma} to construct 
 compound distributions.
+\end{defclassex}
 
-\defclassex{ExactSampler}{Container}
+\begin{defclassex}{ExactSampler}{Container}
 The \code{ExactSampler} class allows to sample simultaneously from several possibly mutually dependent random variables. For large 
 systems of dependent random variables, this sampler can be slow. If only samples from the marginal distributions are needed, consider
 using the \class{MarginalSampler} class.
@@ -1001,9 +1003,9 @@ Constructs a sampler for the given variables.
 Samples from the variables passed to the constructor. Each column in \code{out} corresponds to a 
 selected variable. The number of samples being drawn is specified by the number of rows of \code{out}.
 \end{defmeth}
+\end{defclassex}
 
-
-\defclassex{MarginalSampler}{Container}
+\begin{defclassex}{MarginalSampler}{Container}
 This class implements an approximate marginal sampler. The sampler first obtains the CDF of the selected random variable and 
 uses the inverse of a piece-wise linear interpolation to obtain samples for the random variable. For very large systems of random 
 variables, this approach may outperform the exact sampling as implemented by the \class{ExactSampler} class if only samples 
@@ -1018,5 +1020,6 @@ with \code{steps} grid points.
 Samples from the random variable passed to the constructor. The samples are stored in the \code{out} vector where
 the number of samples is specified by the number of elements of the vector.
 \end{defmeth}
+\end{defclassex}
 
 \end{document}
