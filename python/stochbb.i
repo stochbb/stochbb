@@ -14,6 +14,10 @@
 import_array();
 %}
 
+
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int N)}
+%apply (double* INPLACE_FARRAY2, int DIM1, int DIM2) {(double* out, int Nrow, int Ncol)}
+
 namespace sbb {
 
 class Container
@@ -31,18 +35,16 @@ protected:
   Density();
 };
 
-%apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int len)}
+
 %extend Density {
-  void eval(double Tmin, double Tmax, double* out, int len) {
-    Eigen::Map<Eigen::VectorXd> outMap(out, len);
+  void eval(double Tmin, double Tmax, double* out, int N) const {
+    Eigen::Map<Eigen::VectorXd> outMap(out, N);
     self->eval(Tmin, Tmax, outMap);
   }
 }
-
-%apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int len)}
 %extend Density {
-  void evalCDF(double Tmin, double Tmax, double* out, int len) {
-    Eigen::Map<Eigen::VectorXd> outMap(out, len);
+  void evalCDF(double Tmin, double Tmax, double* out, int N) const {
+    Eigen::Map<Eigen::VectorXd> outMap(out, N);
     self->evalCDF(Tmin, Tmax, outMap);
   }
 }
@@ -59,6 +61,23 @@ public:
   bool mutuallyIndep(const Var &var);
 };
 
+%extend Var {
+  Var __add__(Var *other) {
+    return *self + *other;
+  }
+  Var __add__(double b) {
+    return *self + b;
+  }
+  Var __radd__(double b) {
+    return *self + b;
+  }
+  Var __mul__(double a) {
+    return (*self)*a;
+  }
+  Var __rmul__(double a) {
+    return (*self)*a;
+  }
+}
 
 class DerivedVar: public Var
 {
@@ -82,14 +101,12 @@ public:
   void sample(Eigen::MatrixXd &out) const;
 };
 
-%apply (double* INPLACE_FARRAY2, int DIM1, int DIM2) {(double* out, int rows, int cols)};
 %extend ExactSampler {
-  void sample(double* out, int rows, int cols) {
-    Eigen::Map<Eigen::MatrixXd> outMap(out, rows, cols);
+  void sample(double* out, int Nrow, int Ncol) {
+    Eigen::Map<Eigen::MatrixXd> outMap(out, Nrow, Ncol);
     self->sample(outMap);
   }
 }
-
 
 class MarginalSampler: public Container
 {
@@ -97,13 +114,13 @@ public:
   MarginalSampler(const Var &var, double Tmin, double Tmax, size_t steps);
 };
 
-%apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int len)};
 %extend MarginalSampler {
-  void sample(double* out, int len) {
-    Eigen::Map<Eigen::VectorXd> outMap(out, len);
+  void sample(double* out, int N) {
+    Eigen::Map<Eigen::VectorXd> outMap(out, N);
     self->sample(outMap);
   }
 }
+
 
 Var delta(double value);
 

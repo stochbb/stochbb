@@ -2,13 +2,12 @@ from numpy import *
 import stochbb
 
 # Construct a normal(100, 30) RV
-X = stochbb.normal(100, 30)
-sampler = stochbb.MarginalSampler(X, 0, 200, 1000)
-samples = empty(1000,)
-sampler.sample(samples)
-print(samples)
+t = linspace(0, 200, 1000)
+X = stochbb.normal(50, 10)
+Y = stochbb.normal(X, 10)
+fY = empty(1000,)
+Y.density().eval(0, 200, fY)
 
-fX = empty(1000,)
-X.density().eval(0, 200, fX)
-
-
+from matplotlib import pylab
+pylab.plot(t, fZ)
+pylab.show()
