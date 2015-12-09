@@ -26,7 +26,7 @@ public:
   virtual void mark();
 
   /** Samples from the variable. */
-  void sample(Eigen::VectorXd &out);
+  void sample(Eigen::Ref<Eigen::VectorXd> out);
 
 protected:
   /** The marginal to sample from. */

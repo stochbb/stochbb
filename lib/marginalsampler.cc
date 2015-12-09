@@ -32,7 +32,7 @@ MarginalSamplerObj::mark() {
 }
 
 void
-MarginalSamplerObj::sample(Eigen::VectorXd &out) {
+MarginalSamplerObj::sample(Eigen::Ref<Eigen::VectorXd> out) {
   double dt = (_Tmax-_Tmin)/_cdf.size();
   // First, sample probabilities from unif(0,1)
   for (int i=0; i<out.size(); i++) {

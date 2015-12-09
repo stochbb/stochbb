@@ -40,7 +40,7 @@ MixtureDensityObj::mark() {
 }
 
 void
-MixtureDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+MixtureDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // apply affine transform
   Tmin = (Tmin - _shift)/_scale;
   Tmax = (Tmax - _shift)/_scale;
@@ -54,7 +54,7 @@ MixtureDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 }
 
 void
-MixtureDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+MixtureDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // apply affine transform
   Tmin = (Tmin - _shift)/_scale;
   Tmax = (Tmax - _shift)/_scale;

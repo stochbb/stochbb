@@ -33,8 +33,8 @@ public:
 
   virtual void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
 
   /** Returns a vector of weak references to the underlaying densities. */
@@ -79,8 +79,8 @@ public:
   virtual ~MinimumDensityObj();
   virtual void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
 
   /** Returns a vector of weak references to the underlaying densities. */

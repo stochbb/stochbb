@@ -81,7 +81,7 @@ public:
 
   /** Samples from the random variable. The number of samples is specified through the number
    * of rows of the @c out vector. */
-  inline void sample(Eigen::VectorXd &out) const {
+  inline void sample(Eigen::Ref<Eigen::VectorXd> out) const {
     return _density->sample(out);
   }
 

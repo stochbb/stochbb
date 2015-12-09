@@ -31,7 +31,7 @@ public:
   /** Samples the random variables given to the constructor.
    * The numer of rows of @c out specifies the number of samples, while the number of
    * columns of must match the number of variables passed to the constructor. */
-  void sample(Eigen::MatrixXd &out);
+  void sample(Eigen::Ref<Eigen::MatrixXd> out);
 
 protected:
   /** Internal used fucntion type to sample a specific variable type. */

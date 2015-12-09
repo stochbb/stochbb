@@ -97,12 +97,12 @@ public:
   /** Evaluates the density (PDF) on a regular grid \f$[Tmin, Tmax)\f$ where the number
    * of grid points is specified via the length of the output vector @c out. The results are
    * stored into the output vector. */
-  void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
 
   /** Evaluates the probability function (CDF) on a regular grid \f$[Tmin, Tmax)\f$ where the number
    * of grid points is specified via the length of the output vector @c out. The results are
    * stored into the output vector. */
-  void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
 
   /** Returns an affine transform of the density. */
   Density affine(double scale, double shift) const;
@@ -252,11 +252,9 @@ public:
   /** The object type of the container. */
   typedef DerivedVarObj ObjectType;
 
-protected:
-  /** Hidden constructor. */
-  DerivedVar(DerivedVarObj *obj);
-
 public:
+  /** Packs the @c DerivedVarObj instance. */
+  DerivedVar(DerivedVarObj *obj);
   /** Copy constructor. */
   DerivedVar(const DerivedVar &other);
   /** Assignment operator. */
@@ -540,7 +538,7 @@ public:
    * The number of row of @c out specify the number of samples to draw. The number of columns
    * must match the number of random variables passed to the constructor, i.e. each colum
    * corresponds to a random variable passed to the constructor. */
-  void sample(Eigen::MatrixXd &out) const;
+  void sample(Eigen::Ref<Eigen::MatrixXd> out) const;
 
 protected:
   /** A reference to the sampler object. */
@@ -579,7 +577,7 @@ public:
 
   /** Samples from the marginal. The number of samples is specified by the number of elements
    * in the vector @c out. */
-  void sample(Eigen::VectorXd &out) const;
+  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
 
 protected:
   /** Holds a reference to the sampler object. */

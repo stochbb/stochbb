@@ -68,7 +68,7 @@ NormalCompoundDensityObj::mark() {
 }
 
 void
-NormalCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+NormalCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Eval PDFs of mu & sigma
   Eigen::VectorXd dmu(out.size()), dsigma(out.size());
   _mu->eval(Tmin, Tmax, dmu); _sigma->eval(Tmin, Tmax, dsigma);
@@ -94,7 +94,7 @@ NormalCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) c
 
 
 void
-NormalCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+NormalCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Eval PDFs of mu & sigma
   Eigen::VectorXd dmu(out.size()), dsigma(out.size());
   _mu->eval(Tmin, Tmax, dmu); _sigma->eval(Tmin, Tmax, dsigma);
@@ -183,7 +183,7 @@ GammaCompoundDensityObj::mark() {
 }
 
 void
-GammaCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+GammaCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Eval PDFs of k & theta
   Eigen::VectorXd dk(out.size()), dtheta(out.size());
   _k->eval(Tmin, Tmax, dk); _theta->eval(Tmin, Tmax, dtheta);
@@ -209,7 +209,7 @@ GammaCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) co
 
 
 void
-GammaCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+GammaCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Eval PDFs of k & theta
   Eigen::VectorXd dk(out.size()), dtheta(out.size());
   _k->eval(Tmin, Tmax, dk); _theta->eval(Tmin, Tmax, dtheta);

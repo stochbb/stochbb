@@ -189,7 +189,7 @@ ConvolutionDensityObj::mark() {
 }
 
 void
-ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Apply affine transform
   Tmin = (Tmin-_shift)/_scale;
   Tmax = (Tmax-_shift)/_scale;
@@ -210,7 +210,7 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) cons
 }
 
 void
-ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Apply affine transform
   Tmin = (Tmin-_shift)/_scale;
   Tmax = (Tmax-_shift)/_scale;

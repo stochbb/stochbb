@@ -23,11 +23,11 @@ public:
   /** Evaluates the density at a regular grid on the interval \f$[Tmin, Tmax)\f$ and
    * stores it into the given output vector. The number of grid points is determined
    * by the length of the output vector. */
-  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const = 0;
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const = 0;
   /** Evaluates the probability function (CDF) at a regular grid on the interval \f$[Tmin, Tmax)\f$
    * and stores it into the given output vector. The number of grid points is determined
    * by the length of the output vector. */
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const = 0;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const = 0;
 
   /** Retruns a new density instance being the affine transformed of this density. */
   virtual Density affine(double scale, double shift) const = 0;
@@ -63,7 +63,7 @@ public:
   virtual void mark();
 
   /** Samples from the density. */
-  virtual void sample(Eigen::VectorXd &out) const = 0;
+  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const = 0;
 };
 
 
@@ -77,9 +77,9 @@ public:
   virtual ~DeltaDensityObj();
   virtual void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
 
   /** Compares densities. */
@@ -105,9 +105,9 @@ public:
   virtual ~UniformDensityObj();
   virtual void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
 
   /** Compares densities. */
@@ -137,9 +137,9 @@ public:
   virtual ~NormalDensityObj();
   virtual void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
 
   /** Compares densities. */
@@ -169,9 +169,9 @@ public:
   virtual ~GammaDensityObj();
   virtual void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void sample(Eigen::VectorXd &out) const;
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
 
   /** Compares densities. */

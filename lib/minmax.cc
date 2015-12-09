@@ -46,7 +46,7 @@ MaximumDensityObj::mark() {
 }
 
 void
-MaximumDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+MaximumDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Apply affine transform
   Tmin = (Tmin-_shift)/_scale;
   Tmax = (Tmax-_shift)/_scale;
@@ -74,7 +74,7 @@ MaximumDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 }
 
 void
-MaximumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+MaximumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   Eigen::VectorXd tmp(out.size());
 
   // Apply affine transform
@@ -161,7 +161,7 @@ MinimumDensityObj::mark() {
 }
 
 void
-MinimumDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+MinimumDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Apply affine transform
   Tmin = (Tmin-_shift)/_scale;
   Tmax = (Tmax-_shift)/_scale;
@@ -191,7 +191,7 @@ MinimumDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 }
 
 void
-MinimumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+MinimumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   Eigen::VectorXd tmp(out.size());
 
   // Apply affine transform

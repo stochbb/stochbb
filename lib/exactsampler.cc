@@ -79,7 +79,7 @@ ExactSamplerObj::mark() {
 }
 
 void
-ExactSamplerObj::sample(Eigen::MatrixXd &out) {
+ExactSamplerObj::sample(Eigen::Ref<Eigen::MatrixXd> out) {
   // Allocate sample cache
   Eigen::MatrixXd samples(out.rows(), _queue.size());
   // Sample all variables in reverse order

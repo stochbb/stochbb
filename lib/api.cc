@@ -188,12 +188,12 @@ Density::operator =(const Density &other) {
 }
 
 void
-Density::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+Density::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   _density->eval(Tmin, Tmax, out);
 }
 
 void
-Density::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+Density::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   _density->evalCDF(Tmin, Tmax, out);
 }
 
@@ -598,7 +598,7 @@ ExactSampler::operator =(const ExactSampler &other) {
 }
 
 void
-ExactSampler::sample(Eigen::MatrixXd &out) const {
+ExactSampler::sample(Eigen::Ref<Eigen::MatrixXd> out) const {
   _sampler->sample(out);
 }
 
@@ -627,6 +627,6 @@ MarginalSampler::operator =(const MarginalSampler &other) {
 }
 
 void
-MarginalSampler::sample(Eigen::VectorXd &out) const {
+MarginalSampler::sample(Eigen::Ref<Eigen::VectorXd> out) const {
   _sampler->sample(out);
 }

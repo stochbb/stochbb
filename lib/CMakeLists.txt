@@ -10,7 +10,7 @@ SET(libsbb_HEADERS mersennetwister.hh stochbb.hh
 add_custom_target(sbb_headers SOURCES ${libsbb_HEADERS})
 
 add_library(libsbb SHARED ${libsbb_SOURCES})
-set_target_properties(libsbb PROPERTIES OUTPUT_NAME sbb)
+set_target_properties(libsbb PROPERTIES OUTPUT_NAME stochbb)
 set_target_properties(libsbb PROPERTIES DEPENDS libsbb_HEADERS)
 set_target_properties(libsbb PROPERTIES VERSION
  "${libsbb_VERSION_MAJOR}.${libsbb_VERSION_MINOR}.${libsbb_VERSION_PATCH}")

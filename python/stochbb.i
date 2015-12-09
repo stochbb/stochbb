@@ -1,8 +1,10 @@
 %module stochbb
 
 %{
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+//#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include "lib/api.hh"
+#include "lib/randomvariable.hh"
+#include "lib/density.hh"
 #define SWIG_FILE_WITH_INIT
 %}
 
@@ -18,6 +20,8 @@ class Container
 {
 protected:
   Container();
+
+  bool isNull() const;
 };
 
 
@@ -25,11 +29,21 @@ class Density: public Container
 {
 protected:
   Density();
-
-public:
-  void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
 };
+
+%numpy_typemaps(double, NPY_DOUBLE, int)
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int len)};
+%extend Density {
+  void eval(double Tmin, double Tmax, double* out, int len) {
+    Eigen::Map<Eigen::VectorXd> outMap(out, len);
+    self->eval(Tmin, Tmax, outMap);
+  }
+
+  void evalCDF(double Tmin, double Tmax, double* out, int len) {
+    Eigen::Map<Eigen::VectorXd> outMap(out, len);
+    self->evalCDF(Tmin, Tmax, outMap);
+  }
+}
 
 
 class Var: public Container
@@ -66,6 +80,30 @@ public:
   void sample(Eigen::MatrixXd &out) const;
 };
 
+%numpy_typemaps(double , NPY_DOUBLE, int)
+%apply (double* INPLACE_FARRAY2, int DIM1, int DIM2) {(double* out, int rows, int cols)};
+%extend ExactSampler {
+  void sample(double *out, int rows, int cols) {
+    Eigen::Map<Eigen::MatrixXd> outMap(out, rows, cols);
+    self->sample(outMap);
+  }
+}
+
+
+class MarginalSampler: public Container
+{
+public:
+  MarginalSampler(const Var &var, double Tmin, double Tmax, size_t steps);
+};
+
+%numpy_typemaps(double , NPY_DOUBLE, int)
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int len)};
+%extend MarginalSampler {
+  void sample(double *out, int len) {
+    Eigen::Map<Eigen::VectorXd> outMap(out, len);
+    self->sample(outMap);
+  }
+}
 
 Var delta(double value);
 
@@ -89,4 +127,12 @@ Var minimum(const std::vector<Var> &variables);
 
 Var maximum(const std::vector<Var> &variables);
 
+%extend Container {
+  bool isVar() const { return self->is<sbb::Var>(); }
+  sbb::Var asVar() { return self->as<sbb::Var>(); }
+  bool isDerivedVar() const { return self->is<sbb::DerivedVar>(); }
+  sbb::DerivedVar asDerivedVar() { return self->as<sbb::DerivedVar>(); }
+  bool isDensity() const { return self->is<sbb::Density>(); }
+  sbb::Density asDensity() { return self->as<sbb::Density>(); }
+}
 }

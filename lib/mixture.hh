@@ -22,8 +22,8 @@ public:
                     double scale=1, double shift=0);
 
   virtual void mark();
-  virtual void eval(double Tmin, double Tmax, Eigen::VectorXd &out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const;
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
 
 protected:

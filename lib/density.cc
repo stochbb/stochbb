@@ -85,7 +85,7 @@ DeltaDensityObj::mark() {
 }
 
 void
-DeltaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+DeltaDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Evaluate delta PDF
   out.setZero();
   if ((_delay<Tmin) || (_delay>Tmax)) { return; }
@@ -95,7 +95,7 @@ DeltaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 }
 
 void
-DeltaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+DeltaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Eval CDF
   out.setZero();
   if ((_delay<Tmin) || (_delay>Tmax)) { return; }
@@ -105,7 +105,7 @@ DeltaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 }
 
 void
-DeltaDensityObj::sample(Eigen::VectorXd &out) const {
+DeltaDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
   out.setConstant(_delay);
 }
 
@@ -151,7 +151,7 @@ UniformDensityObj::mark() {
 }
 
 void
-UniformDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+UniformDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = ((t >= _a) && (t <= _b)) ? 1./(Tmax-Tmin) : 0.0;
@@ -159,7 +159,7 @@ UniformDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 }
 
 void
-UniformDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+UniformDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     if (t<_a) { out[i] = 0.0; }
@@ -169,7 +169,7 @@ UniformDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const
 }
 
 void
-UniformDensityObj::sample(Eigen::VectorXd &out) const {
+UniformDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
   for (int i=0; i<out.size(); i++) {
     out[i] = RNG::unif(_a, _b);
   }
@@ -219,7 +219,7 @@ NormalDensityObj::mark() {
 }
 
 void
-NormalDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+NormalDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = std::exp( -(t-_mu)*(t-_mu)/(2*_sigma*_sigma) ) / (_sigma*std::sqrt(2*M_PI));
@@ -227,7 +227,7 @@ NormalDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 }
 
 void
-NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = 0.5*(1+std::erf((t-_mu)/(_sigma*std::sqrt(2))));
@@ -235,7 +235,7 @@ NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const 
 }
 
 void
-NormalDensityObj::sample(Eigen::VectorXd &out) const {
+NormalDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
   for (int i=0; i<out.size(); i++) {
     out[i] = RNG::norm(_mu, _sigma);
   }
@@ -287,7 +287,7 @@ GammaDensityObj::mark() {
 }
 
 void
-GammaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+GammaDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Apply affine transform on arguments
   Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
@@ -298,7 +298,7 @@ GammaDensityObj::eval(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 }
 
 void
-GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
+GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Apply affine transform on arguments
   Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
@@ -308,7 +308,7 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::VectorXd &out) const {
 }
 
 void
-GammaDensityObj::sample(Eigen::VectorXd &out) const {
+GammaDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
   for (int i=0; i<out.size(); i++) {
     out[i] = RNG::gamma(_k, _theta)+_shift;
   }
