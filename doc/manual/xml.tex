@@ -1,0 +1,251 @@
+\section{Process \& simulation description in XML} \label{sec:xml}
+In contrast to the application programming interface (see Section \ref{sec:api}, above), 
+complex processes can also be defined in XML and analyzed using the
+StochBB command line tool (see Section \ref{sec:cli}, below). A single XML file defines a 
+\class{Simulation}, a simple collection of random variables together with the specification which
+variables as used for the output. For example the XML code
+\begin{lstlisting}[language=XML]
+ <?xml version="1.0"?>
+ <simulation xmlns="http://hmatuschek.github.io/stochbb/simulation-0.0.dtd"
+             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
+  <var type="gamma" id="gamma">
+   <param name="k"> <m:cn>5</m:cn> </param>
+   <param name="theta"> <m:cn>30</m:cn> </param>
+  </var>
+
+  <output from="0" to="100">
+   <var ref="gamma"/>
+  </output>
+
+ </simulation>
+\end{lstlisting}
+specifies a trivial simulation.
+
+Here a single gamma-distributed random variable is defined.
+It gets the identifier \code{gamma} assigned. With this identifier, it is possible to refer to the random
+variable later. The \code{type} attribute specifies the type of the random variable. Here the
+build-in type \code{gamma} is used, specifying a gamma-distributed random variable. The shape and
+scale parameters, \code{k} and \code{theta}, are specified using the \code{param} elements. 
+The \code{name} attribute of each \code{param} element specified the name of the parameter while 
+its value is given as an MathML child element of the \code{param} element.
+
+Finally, the \code{output} element specifies which random variables are used for output. Each child
+element of the \code{output} element specifies one variable. Either by referencing a previously defined
+random variable or by specifying the random variable directly. For example,
+\begin{lstlisting}[language=XML]
+ <?xml version="1.0"?>
+ <simulation xmlns="http://hmatuschek.github.io/stochbb/simulation-0.0.dtd"
+             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
+  <output from="0" to="100">
+   <var type="gamma">
+    <param name="k"> <m:cn>5</m:cn> </param>
+    <param name="theta"> <m:cn>30</m:cn> </param>
+   </var>
+  </output>
+
+ </simulation>
+\end{lstlisting}
+is fully equivalent to the previous example.
+
+\subsection{Build-in random variables}
+There are only very few build-in random variable types. They can be divided into two groups:
+\emph{atomic} and \emph{derived} random variables.
+
+\subsubsection{Atomic random variables}
+Atomic random variables are random variables which follow a specific
+distribution and are independent from any other random variable defined.
+
+\begin{tabular}{l|l|l}
+ Type & Parameters & Process description \\ \hline
+ \code{delta} & \code{delay} & A constant delay or a process with a fixed waiting time. \\
+ \code{uniform} & \code{a}, \code{b} & A process with a uniform-distributed waiting time. \\
+ \code{normal} & \code{mu}, \code{sigma} & A process with a normal-distributed waiting. \\
+ \code{gamma} & \code{k}, \code{theta} & A process with a gamma-distributed waiting time.
+\end{tabular}
+
+Beside these atomic random variables, there are derived random variables which depend on other
+random variables. Hence they usually do not take simple parameters as arguments but other 
+random variables.
+
+\subsubsection{Chains of random variables}
+One of the most important derived random variable is a chain. A chain can be defined as
+\begin{lstlisting}[language=XML]
+ <var type="chain">
+  <var ref="X1"/> <var ref="X2"/> <var ref="X2"/>
+ </var>
+\end{lstlisting}
+
+Here the random variable \code{X1}, \code{X2} and \code{X3} are chained. Mathematically,
+the waiting time of the chain is simply the sum of the waiting times of the random variables
+\code{X1}--\code{X3}.
+
+\subsubsection{Maximum of random variables}
+Another derived random variable is the \code{maximum} type. This type can be interpreted as a
+processes that waits until all referred parallel processes are completed hence the waiting time
+of
+\begin{lstlisting}[language=XML]
+ <var type="maximum">
+  <var ref="X1"/> <var ref="X2"/> <var ref="X2"/>
+ </var>
+\end{lstlisting}
+is just the maximum of the random variables \code{X1}--\code{X3}.
+
+\subsubsection{Minimum of random variables}
+Likewise, the \code{minimum} derived random variable is simply the minimum of the referred random
+variables and represents the waiting time of the fastest parallel processes \code{X1}--\code{X3}:
+\begin{lstlisting}[language=XML]
+ <var type="minimum">
+  <var ref="X1"/> <var ref="X2"/> <var ref="X2"/>
+ </var>
+\end{lstlisting}
+
+\subsubsection{Mixture of random variables}
+The mixture of random variables is defined using the \code{mixture} variable type with a list of
+weight-variable pairs. For example
+\begin{lstlisting}[language=XML]
+ <var type="mixture">
+  <weight> <m:cn>1</m:cn> <var ref="X1"/> </weight>
+  <weight> <m:cn>2</m:cn> <var ref="X2"/> </weight>
+  <weight> <m:cn>1</m:cn> <var ref="X3"/> </weight>
+ </var>
+\end{lstlisting}
+
+\subsubsection{Compound random variables} 
+A compound random variable $Y$ has a distribution $f_{Y|A}(y|A)$ where the parameter $A$ is a random
+variable too, with its own distribution $A~g()$. In XML a compound is specified using the 
+\code{compound} type by specifying the base type of the distribution using the \code{base} attribute.
+Instead of simple parameters, the parameters of an compound are specified as random variables. 
+For example, the code
+\begin{lstlisting}[language=XML]
+ <var id="mu" ...>
+  [ ... ]
+ </var>
+ <var id="sigma" ...>
+  [ ... ]
+ </var>
+ 
+ <var type="compound" base="normal">
+  <param name="mu"> <var ref="mu"/> </param>
+  <param name="sigma"> <var ref="sigma"/> </param>
+ </var>
+\end{lstlisting}
+defines a compound-normal distributed random variable where its mean is distributed like the random 
+variable \code{mu} and its standard deviation like \code{sigma}. Of course these parameter random 
+variables have to be defined earlier.
+
+\subsection{User defined random-variable types}
+The limited number of build-in random-variable types would turn the definition of complex stationary random
+processes difficult. Hence it is possible to define new types derived from the build-in ones. For example,
+the code 
+\begin{lstlisting}[language=XML]
+ <define id="exp">
+  <param id="lambda"/>
+
+  <var type="gamma" id="exp">
+   <param name="k"><m:cn>1</m:cn></param>
+   <param name="theta">
+    <m:apply>
+     <m:divide/>
+     <m:cn>1</m:cn>
+     <m:ci>lambda</m:ci>
+    </m:apply>
+   </param>
+  </var>
+ </define>
+\end{lstlisting}
+defines a new type \code{exp} as a special case of the Gamma distribution as
+$\text{Exp}(\lambda) = \Gamma(1,\lambda^{-1})$. The \code{define} tag takes an \code{id} 
+attribute specifying the new type identifier. Then, one ore more \code{param} elements are
+used to specify the parameters of the new type. 
+Here only one parameter named \code{lambda} is defined. Finally a random variable with the same
+identifier as the type name is defined which implements the new random variable type.
+
+A more complex example might be
+\begin{lstlisting}[language=XML]
+ <define id="exgauss">
+  <param id="lambda">
+  <param id="mu"/>
+  <param id="sigma"/>
+
+  <var type="gamma" id="ex">
+   <param name="k"><m:cn>1</m:cn></param>
+   <param name="theta">
+    <m:apply>
+     <m:divide/>
+     <m:cn>1</m:cn>
+     <m:ci>lambda</m:ci>
+    </m:apply>
+   </param>
+  </var>
+
+  <var type="normal" id="gauss">
+   <param name="mu"> <m:ci>mu</m:ci> </param>
+   <param name="sigma"> <m:ci>sigma</m:ci> </param>
+  </var>
+
+  <var type="chain" id="exgauss">
+    <var ref="ex"/> <var ref="gauss"/>
+  </var>
+ </define>
+\end{lstlisting}
+
+This defines a new random-variable type with an exponentially modified Gaussian (Ex-Gauss) 
+distribution by chaining an exponential- (defined here as a special case of the Gamma 
+distribution) and a Gaussian-distributed random variable. This new type can then be used
+to instantiate Ex-Gauss-distributed random variables as
+\begin{lstlisting}[language=XML]
+ <var type="exgauss">
+  <param name="lambda"> <m:cn>10</m:cn> </param>
+  <param name="mu"> <m:cn>20</m:cn> </param>
+  <param name="sigma"> <m:cn>10</m:cn> </param>
+ </var>
+\end{lstlisting}
+
+\subsection{Modules}
+Some of the aforementioned user defined random variable types may be reused in several
+simulations. For these cases it is convenient to export these definitions into separate files
+and load them when needed. These files are called modules and form simple collections of
+variable type definitions. For example a module defining the an exponential distributed 
+random variable could be implemented as
+\begin{lstlisting}[language=XML]
+ <?xml version="1.0"?>
+ <module xmlns="http://hmatuschek.github.io/stochbb/module-0.0.dtd"
+             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
+  <define id="exp">
+   <param id="lambda"/>
+
+   <var type="gamma" id="exp">
+    <param name="k"><m:cn>1</m:cn></param>
+    <param name="theta">
+     <m:apply>
+      <m:divide/>
+      <m:cn>1</m:cn>
+      <m:ci>lambda</m:ci>
+     </m:apply>
+    </param>
+   </var>
+  </define>
+
+ </module>
+\end{lstlisting}
+
+Within the body of the module, the user-defined types can be specified. Such a module can then
+be loaded using the \code{load} tag within a simulation or other modules like
+\begin{lstlisting}[language=XML]
+ <?xml version="1.0"?>
+ <simulation xmlns="http://hmatuschek.github.io/stochbb/simulation-0.0.dtd"
+             xmlns:m="http://www.w3.org/1998/Math/MathML">
+
+  <load>exp.xml</load>
+
+  <output ...>
+   [ ... ]
+  </output>
+ </simulation>
+\end{lstlisting}
+
+With this XML language, it is possible to specify complex systems of random variables that can be analyzed 
+using the \code{stochbb} command line tool described in the next section.

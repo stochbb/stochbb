@@ -34,7 +34,7 @@
 
 
 
-namespace sbb {
+namespace stochbb {
 
 // Forward declaration
 class Object;

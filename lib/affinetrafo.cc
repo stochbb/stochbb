@@ -1,6 +1,6 @@
 #include "affinetrafo.hh"
 
-using namespace sbb;
+using namespace stochbb;
 
 
 AffineTrafoObj::AffineTrafoObj(double scale, double shift, const Var &variable, const std::string &name)

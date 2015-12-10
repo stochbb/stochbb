@@ -4,14 +4,14 @@
 #include "chain.hh"
 #include "minmax.hh"
 
-using namespace sbb;
+using namespace stochbb;
 
 
 /* ********************************************************************************************* *
  * Implementation of sbb::delta()
  * ********************************************************************************************* */
 Var
-sbb::delta(double value) {
+stochbb::delta(double value) {
   return AtomicVar::delta(value);
 }
 
@@ -19,7 +19,7 @@ sbb::delta(double value) {
  * Implementation of sbb::uniform()
  * ********************************************************************************************* */
 Var
-sbb::uniform(double a, double b) {
+stochbb::uniform(double a, double b) {
   return AtomicVar::unif(a, b);
 }
 
@@ -27,39 +27,39 @@ sbb::uniform(double a, double b) {
  * Implementation of sbb::normal()
  * ********************************************************************************************* */
 Var
-sbb::normal(double mu, double sigma, const std::string &name) {
+stochbb::normal(double mu, double sigma, const std::string &name) {
   return AtomicVar::norm(mu, sigma, name);
 }
 
 Var
-sbb::normal(const Var &mu, double sigma, const std::string &name) {
+stochbb::normal(const Var &mu, double sigma, const std::string &name) {
   // If mu is delta distributed -> simplify to atomic random variable
   if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*mu.density())) {
-    return sbb::normal(delta->delay(), sigma, name);
+    return stochbb::normal(delta->delay(), sigma, name);
   }
   // Otherwise assemble CompoundVar
   return Compound::norm(mu, AtomicVar::delta(sigma), name);
 }
 
 Var
-sbb::normal(double mu, const Var &sigma, const std::string &name) {
+stochbb::normal(double mu, const Var &sigma, const std::string &name) {
   // If sigma is delta distributed -> simplify to atomic random variable
   if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*sigma.density())) {
-    return sbb::normal(mu, delta->delay(), name);
+    return stochbb::normal(mu, delta->delay(), name);
   }
   // Otherwise assemble CompoundVar
   return Compound::norm(AtomicVar::delta(mu), sigma, name);
 }
 
 Var
-sbb::normal(const Var &mu, const Var &sigma, const std::string &name) {
+stochbb::normal(const Var &mu, const Var &sigma, const std::string &name) {
   // If mu is delta distributed -> simplify to atomic random variable
   if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*mu.density())) {
-    return sbb::normal(delta->delay(), sigma, name);
+    return stochbb::normal(delta->delay(), sigma, name);
   }
   // else if sigma is delta distributed -> simplify to atomic random variable
   if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*sigma.density())) {
-    return sbb::normal(mu, delta->delay(), name);
+    return stochbb::normal(mu, delta->delay(), name);
   }
   // Otherwise assemble CompoundVar
   return Compound::norm(mu, sigma, name);
@@ -70,39 +70,39 @@ sbb::normal(const Var &mu, const Var &sigma, const std::string &name) {
  * Implementation of sbb::gamma()
  * ********************************************************************************************* */
 Var
-sbb::gamma(double k, double theta, const std::string &name) {
+stochbb::gamma(double k, double theta, const std::string &name) {
   return AtomicVar::gamma(k, theta, name);
 }
 
 Var
-sbb::gamma(const Var &k, double theta, const std::string &name) {
+stochbb::gamma(const Var &k, double theta, const std::string &name) {
   // If mu is delta distributed -> simplify to atomic random variable
   if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*k.density())) {
-    return sbb::gamma(delta->delay(), theta, name);
+    return stochbb::gamma(delta->delay(), theta, name);
   }
   // Otherwise assemble CompoundVar
   return Compound::gamma(k, AtomicVar::delta(theta), name);
 }
 
 Var
-sbb::gamma(double k, const Var &theta, const std::string &name) {
+stochbb::gamma(double k, const Var &theta, const std::string &name) {
   // If sigma is delta distributed -> simplify to atomic random variable
   if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*theta.density())) {
-    return sbb::gamma(k, delta->delay(), name);
+    return stochbb::gamma(k, delta->delay(), name);
   }
   // Otherwise assemble CompoundVar
   return Compound::gamma(AtomicVar::delta(k), theta, name);
 }
 
 Var
-sbb::gamma(const Var &k, const Var &theta, const std::string &name) {
+stochbb::gamma(const Var &k, const Var &theta, const std::string &name) {
   // If mu is delta distributed -> simplify to atomic random variable
   if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*k.density())) {
-    return sbb::gamma(delta->delay(), theta, name);
+    return stochbb::gamma(delta->delay(), theta, name);
   }
   // else if sigma is delta distributed -> simplify to atomic random variable
   if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*theta.density())) {
-    return sbb::gamma(k, delta->delay(), name);
+    return stochbb::gamma(k, delta->delay(), name);
   }
   // Otherwise assemble CompoundVar
   return Compound::gamma(k, theta, name);
@@ -113,7 +113,7 @@ sbb::gamma(const Var &k, const Var &theta, const std::string &name) {
  * Implementation of minimum
  * ********************************************************************************************* */
 Var
-sbb::minimum(const std::vector<Var> &variables) {
+stochbb::minimum(const std::vector<Var> &variables) {
   // Check size of variables
   if (0 == variables.size()) {
     AssumptionError err;
@@ -195,7 +195,7 @@ sbb::minimum(const std::vector<Var> &variables) {
  * Implementation of maximum
  * ********************************************************************************************* */
 Var
-sbb::maximum(const std::vector<Var> &variables) {
+stochbb::maximum(const std::vector<Var> &variables) {
   // Check size of variables
   if (0 == variables.size()) {
     AssumptionError err;
@@ -282,7 +282,7 @@ sbb::maximum(const std::vector<Var> &variables) {
  * Implementation of independent
  * ********************************************************************************************* */
 bool
-sbb::independent(const std::vector<Var> &vars) {
+stochbb::independent(const std::vector<Var> &vars) {
   for (size_t i=0; i<vars.size(); i++) {
     for (size_t j=(i+1); j<vars.size(); j++) {
       if (! vars[i].mutuallyIndep(vars[j])) {
@@ -298,7 +298,7 @@ sbb::independent(const std::vector<Var> &vars) {
  * Implementation of chain
  * ********************************************************************************************* */
 Var
-sbb::chain(const std::vector<Var> &vars) {
+stochbb::chain(const std::vector<Var> &vars) {
   std::vector<Var> variables;
   variables.reserve(2*vars.size());
 
@@ -329,7 +329,7 @@ sbb::chain(const std::vector<Var> &vars) {
  * Implementation of affine
  * ********************************************************************************************* */
 Var
-sbb::affine(const Var &var, double scale, double shift) {
+stochbb::affine(const Var &var, double scale, double shift) {
   // Flatten affine trafo objects
   if (var.is<AffineTrafo>()) {
     AffineTrafo a = var.as<AffineTrafo>();

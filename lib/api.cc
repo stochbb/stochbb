@@ -12,7 +12,7 @@
 #include "marginalsampler.hh"
 
 
-using namespace sbb;
+using namespace stochbb;
 
 
 /* ********************************************************************************************* *

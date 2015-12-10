@@ -4,7 +4,7 @@
 #include <Eigen/Eigen>
 #include "api.hh"
 
-namespace sbb {
+namespace stochbb {
 
 /** Implements a simple and possibly fast marginal sampler for a single variable.
  * This marginal sampler uses the numerical approximation of the derived CDF and

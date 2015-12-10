@@ -8,7 +8,7 @@
 #include <QVector>
 #include <QHash>
 
-namespace sbb {
+namespace stochbb {
 
 // Forward decl.
 class XmlParser;

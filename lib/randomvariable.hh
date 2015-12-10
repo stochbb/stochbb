@@ -8,7 +8,7 @@
 #include <vector>
 
 
-namespace sbb {
+namespace stochbb {
 
 /** Base class of all random variable objects.
  * @ingroup internal */

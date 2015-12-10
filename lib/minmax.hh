@@ -5,7 +5,7 @@
 #include "api.hh"
 #include "randomvariable.hh"
 
-namespace sbb {
+namespace stochbb {
 
 /** Implements the density of a random variable being the maximum of several independent random
  * variables. */

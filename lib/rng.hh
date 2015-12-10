@@ -3,7 +3,7 @@
 
 #include "mersennetwister.hh"
 
-namespace sbb {
+namespace stochbb {
 
 /** Singleton class of the random number generator using the @c MersenneTwister.
  * The singleton instance is not directly accessible, but random numbers can be drawn using the

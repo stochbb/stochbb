@@ -4,7 +4,7 @@
 #include "api.hh"
 #include "randomvariable.hh"
 
-namespace sbb {
+namespace stochbb {
 
 /** Base class of all compound random variables. */
 class CompoundObj : public DerivedVarObj

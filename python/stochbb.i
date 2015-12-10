@@ -3,9 +3,7 @@
 %{
 #define SWIG_FILE_WITH_INIT
 //#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include "lib/api.hh"
-#include "lib/randomvariable.hh"
-#include "lib/density.hh"
+#include "lib/stochbb.hh"
 %}
 
 %include "numpy.i"
@@ -18,7 +16,7 @@ import_array();
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int N)}
 %apply (double* INPLACE_FARRAY2, int DIM1, int DIM2) {(double* out, int Nrow, int Ncol)}
 
-namespace sbb {
+namespace stochbb {
 
 class Container
 {
@@ -90,6 +88,55 @@ public:
 };
 
 
+class AffineTrafo: public DerivedVar
+{
+protected:
+  AffineTrafo();
+
+public:
+  double scale() const;
+  double shift() const;
+};
+
+
+class Chain: public DerivedVar
+{
+protected:
+  Chain();
+};
+
+
+class Maximum: public DerivedVar
+{
+protected:
+  Maximum();
+};
+
+
+class Minimum: public DerivedVar
+{
+protected:
+  Minimum();
+};
+
+
+class Mixture: public DerivedVar
+{
+protected:
+  Mixture();
+
+public:
+  double weight(size_t i) const;
+};
+
+
+class Compound: public DerivedVar
+{
+protected:
+  Compound();
+};
+
+
 class ExactSampler: public Container
 {
 public:
@@ -145,11 +192,31 @@ Var minimum(const std::vector<Var> &variables);
 Var maximum(const std::vector<Var> &variables);
 
 %extend Container {
-  bool isVar() const { return self->is<sbb::Var>(); }
-  sbb::Var asVar() { return self->as<sbb::Var>(); }
-  bool isDerivedVar() const { return self->is<sbb::DerivedVar>(); }
-  sbb::DerivedVar asDerivedVar() { return self->as<sbb::DerivedVar>(); }
-  bool isDensity() const { return self->is<sbb::Density>(); }
-  sbb::Density asDensity() { return self->as<sbb::Density>(); }
+  bool isDensity() const { return self->is<stochbb::Density>(); }
+  stochbb::Density asDensity() { return self->as<stochbb::Density>(); }
+
+  bool isVar() const { return self->is<stochbb::Var>(); }
+  stochbb::Var asVar() { return self->as<stochbb::Var>(); }
+
+  bool isDerivedVar() const { return self->is<stochbb::DerivedVar>(); }
+  stochbb::DerivedVar asDerivedVar() { return self->as<stochbb::DerivedVar>(); }
+
+  bool isAffineTrafo() const { return self->is<stochbb::AffineTrafo>(); }
+  stochbb::AffineTrafo asAffineTrafo() { return self->as<stochbb::AffineTrafo>(); }
+
+  bool isChain() const { return self->is<stochbb::Chain>(); }
+  stochbb::Chain asChain() { return self->as<stochbb::Chain>(); }
+
+  bool isMaximum() const { return self->is<stochbb::Maximum>(); }
+  stochbb::Maximum asMaximum() { return self->as<stochbb::Maximum>(); }
+
+  bool isMinimum() const { return self->is<stochbb::Minimum>(); }
+  stochbb::Minimum asMinimum() { return self->as<stochbb::Minimum>(); }
+
+  bool isMixture() const { return self->is<stochbb::Mixture>(); }
+  stochbb::Mixture asMixture() { return self->as<stochbb::Mixture>(); }
+
+  bool isCompound() const { return self->is<stochbb::Compound>(); }
+  stochbb::Compound asCompound() { return self->as<stochbb::Compound>(); }
 }
 }

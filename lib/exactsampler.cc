@@ -9,7 +9,7 @@
 #include "rng.hh"
 
 #include <algorithm>
-using namespace sbb;
+using namespace stochbb;
 
 
 inline size_t _find_index(double p, size_t a, size_t b, const std::vector<double> &cdf) {

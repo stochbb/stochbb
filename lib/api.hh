@@ -7,7 +7,7 @@
 #include "object.hh"
 
 
-namespace sbb {
+namespace stochbb {
 
 // Forward declarations
 class DensityObj;

@@ -4,7 +4,7 @@
 #include <typeinfo>
 #include "logger.hh"
 
-using namespace sbb;
+using namespace stochbb;
 
 
 /* ********************************************************************************************* *

@@ -7,7 +7,7 @@
 #include <vector>
 
 
-namespace sbb {
+namespace stochbb {
 
 /** A context mapping unique identifier to random variables and parameters.
  * @ingroup internal */

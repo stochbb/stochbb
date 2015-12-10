@@ -5,7 +5,7 @@
 #include <sstream>
 
 
-namespace sbb {
+namespace stochbb {
 
 /** Base class of all exceptions. */
 class Error: public std::exception, public std::stringstream

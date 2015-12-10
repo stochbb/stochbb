@@ -3,7 +3,7 @@
 #include "api.hh"
 
 
-using namespace sbb;
+using namespace stochbb;
 
 /* ********************************************************************************************* *
  * Implementation of ContextObj

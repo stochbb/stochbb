@@ -1,7 +1,7 @@
 #include "randomvariable.hh"
 #include <sstream>
 
-using namespace sbb;
+using namespace stochbb;
 
 
 

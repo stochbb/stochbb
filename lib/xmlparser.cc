@@ -9,7 +9,7 @@
 #include <QFileInfo>
 
 
-using namespace sbb;
+using namespace stochbb;
 
 /* ********************************************************************************************* *
  * Implementation of VariableDefinition

@@ -4,7 +4,7 @@
 #include <list>
 #include <algorithm>
 
-using namespace sbb;
+using namespace stochbb;
 
 // tiny helper function to sort vectors of densities
 inline int density_pointer_compare(const DensityObj *a, const DensityObj *b) {

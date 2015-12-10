@@ -5,7 +5,7 @@
 #include <algorithm>
 
 
-using namespace sbb::opt;
+using namespace stochbb::opt;
 
 
 RuleInterface::RuleInterface(Parser *parser)

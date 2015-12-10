@@ -3,7 +3,7 @@
 #include "math.hh"
 
 
-using namespace sbb;
+using namespace stochbb;
 
 // Helper function to construct a vector of variables inline
 inline std::vector<Var> mk_var_vec(const Var &a, const Var &b) {
@@ -227,7 +227,7 @@ GammaCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Vec
       double theta = Tmin;
       for (int m=0; m<out.size(); m++, theta+=dt) {
         out(i) += dt*dt * dk[l] * dtheta[m] *
-            sbb::gamma_li(k, t/theta);
+            stochbb::gamma_li(k, t/theta);
       }
     }
   }

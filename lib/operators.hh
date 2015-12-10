@@ -4,7 +4,7 @@
 #include "api.hh"
 #include <vector>
 
-namespace sbb {
+namespace stochbb {
 
 /** Tests if the vector of variables are mutually independent.
  * @param vars The vector of variables.
@@ -71,42 +71,42 @@ Var affine(const Var &var, double scale, double shift);
 
 /** Overloads the +-operator to construct a @c Chain.
  * See also @c sbb::chain() function. */
-inline sbb::Var operator +(const sbb::Var &a, const sbb::Var &b) {
-  std::vector<sbb::Var> args; args.reserve(2);
+inline stochbb::Var operator +(const stochbb::Var &a, const stochbb::Var &b) {
+  std::vector<stochbb::Var> args; args.reserve(2);
   args.push_back(a); args.push_back(b);
-  return sbb::chain(args);
+  return stochbb::chain(args);
 }
 
 /** Overloads the +-operator to construct an affine transform of the variable. */
-inline sbb::Var operator +(const sbb::Var &var, double b) {
-  return sbb::affine(var, 1, b);
+inline stochbb::Var operator +(const stochbb::Var &var, double b) {
+  return stochbb::affine(var, 1, b);
 }
 /** Overloads the +-operator to construct an affine transform of the variable. */
-inline sbb::Var operator +(double b, const sbb::Var &var) {
-  return sbb::affine(var, 1, b);
+inline stochbb::Var operator +(double b, const stochbb::Var &var) {
+  return stochbb::affine(var, 1, b);
 }
 /** Overloads the *-operator to construct an affine transform of the variable. */
-inline sbb::Var operator *(double a, const sbb::Var &var) {
-  return sbb::affine(var, a, 0);
+inline stochbb::Var operator *(double a, const stochbb::Var &var) {
+  return stochbb::affine(var, a, 0);
 }
 /** Overloads the *-operator to construct an affine transform of the variable. */
-inline sbb::Var operator *(const sbb::Var &var, double a) {
-  return sbb::affine(var, a, 0);
+inline stochbb::Var operator *(const stochbb::Var &var, double a) {
+  return stochbb::affine(var, a, 0);
 }
 
 
 namespace std {
 
 /** Overloads the standard library @c max function to construct a @c Maximum RV. */
-inline  sbb::Var min(const sbb::Var &a, const sbb::Var &b) {
-  std::vector<sbb::Var> args; args.reserve(2); args.push_back(a); args.push_back(b);
-  return sbb::minimum(args);
+inline  stochbb::Var min(const stochbb::Var &a, const stochbb::Var &b) {
+  std::vector<stochbb::Var> args; args.reserve(2); args.push_back(a); args.push_back(b);
+  return stochbb::minimum(args);
 }
 
 /** Overloads the standard library @c min function to construct a @c Minimum RV. */
-inline  sbb::Var max(const sbb::Var &a, const sbb::Var &b) {
-  std::vector<sbb::Var> args; args.reserve(2); args.push_back(a); args.push_back(b);
-  return sbb::maximum(args);
+inline  stochbb::Var max(const stochbb::Var &a, const stochbb::Var &b) {
+  std::vector<stochbb::Var> args; args.reserve(2); args.push_back(a); args.push_back(b);
+  return stochbb::maximum(args);
 }
 
 }

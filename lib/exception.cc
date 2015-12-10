@@ -1,6 +1,6 @@
 #include "exception.hh"
 
-using namespace sbb;
+using namespace stochbb;
 
 
 Error::Error()

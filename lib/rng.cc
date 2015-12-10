@@ -3,7 +3,7 @@
 #include <cmath>
 
 
-using namespace sbb;
+using namespace stochbb;
 
 RNG *RNG::_instance = 0;
 

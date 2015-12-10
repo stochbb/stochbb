@@ -5,7 +5,7 @@
 #include "api.hh"
 #include "randomvariable.hh"
 
-namespace sbb {
+namespace stochbb {
 
 /** Implements the convolution of several PDFs using the FFT convolution. */
 class ConvolutionDensityObj: public DensityObj

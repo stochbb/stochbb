@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-namespace sbb {
+namespace stochbb {
 
 /** Logarithm of the gamma function. */
 double lgamma(double z);

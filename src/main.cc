@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 
-using namespace sbb;
+using namespace stochbb;
 
 int main(int argc, char *argv[])
 {

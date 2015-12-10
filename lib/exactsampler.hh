@@ -5,7 +5,7 @@
 #include "api.hh"
 #include <map>
 
-namespace sbb {
+namespace stochbb {
 
 /** Implements an exact sampler for a system of random varaibles.
  * Proper sampling from a system of potentially dependent random variables is not trivial. First,

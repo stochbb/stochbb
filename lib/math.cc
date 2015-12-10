@@ -1,13 +1,13 @@
 #include "math.hh"
 
-using namespace sbb;
+using namespace stochbb;
 
 /* Log gamma function
  * \log{\Gamma(z)}
  * AS245, 2nd algorithm, http://lib.stat.cmu.edu/apstat/245
  */
 double
-sbb::lgamma(double z) {
+stochbb::lgamma(double z) {
   double x = 0;
   x += 0.1659470187408462e-06 / (z+7);
   x += 0.9934937113930748e-05 / (z+6);
@@ -26,7 +26,7 @@ sbb::lgamma(double z) {
  * AS66, 2nd algorithm, http://lib.stat.cmu.edu/apstat/66
  */
 double
-sbb::erfc(double x) {
+stochbb::erfc(double x) {
   const double p0 = 220.2068679123761;
   const double p1 = 221.2135961699311;
   const double p2 = 112.0792914978709;
@@ -78,7 +78,7 @@ _gammap(double s, double z) {
     sum += (x *= z / (s + k));
     if (x / sum < SBB_GAMMA_EPS) break;
   }
-  return exp(s * log(z) - z - sbb::lgamma(s + 1.) + log(sum));
+  return exp(s * log(z) - z - stochbb::lgamma(s + 1.) + log(sum));
 }
 
 // regularized upper incomplete gamma function, by continued fraction
@@ -100,16 +100,16 @@ _gammaq(double s, double z) {
     f *= d;
     if (fabs(d - 1.) < SBB_GAMMA_EPS) break;
   }
-  return exp(s * log(z) - z - sbb::lgamma(s) - log(f));
+  return exp(s * log(z) - z - stochbb::lgamma(s) - log(f));
 }
 
 double
-sbb::gamma_li(double s, double z) {
+stochbb::gamma_li(double s, double z) {
   return z <= 1. || z < s? _gammap(s, z) : 1. - _gammaq(s, z);
 }
 
 double
-sbb::gamma_ui(double s, double z) {
+stochbb::gamma_ui(double s, double z) {
   return z <= 1. || z < s? 1. - _gammap(s, z) : _gammaq(s, z);
 }
 
@@ -142,10 +142,10 @@ _betai_aux(double a, double b, double x) {
     f *= d;
     if (fabs(d - 1.) < SBB_GAMMA_EPS) break;
   }
-  return exp(sbb::lgamma(a+b) - sbb::lgamma(a) - sbb::lgamma(b) + a * log(x) + b * log(1.-x)) / a / f;
+  return exp(stochbb::lgamma(a+b) - stochbb::lgamma(a) - stochbb::lgamma(b) + a * log(x) + b * log(1.-x)) / a / f;
 }
 
 double
-sbb::betai(double a, double b, double x) {
+stochbb::betai(double a, double b, double x) {
   return x < (a + 1.) / (a + b + 2.)? _betai_aux(a, b, x) : 1. - _betai_aux(b, a, 1. - x);
 }

@@ -6,7 +6,7 @@
 #include "density.hh"
 
 
-namespace sbb {
+namespace stochbb {
 
 /** Implements a mixture density. */
 class MixtureDensityObj: public DensityObj

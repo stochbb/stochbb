@@ -6,7 +6,7 @@
 #include <typeindex>
 
 
-using namespace sbb;
+using namespace stochbb;
 
 
 /* ********************************************************************************************* *
@@ -303,7 +303,7 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> o
   Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = sbb::gamma_li(_k, t/_theta);
+    out[i] = stochbb::gamma_li(_k, t/_theta);
   }
 }
 

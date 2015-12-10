@@ -2,7 +2,7 @@
 #include "exception.hh"
 #include "chain.hh"
 
-using namespace sbb;
+using namespace stochbb;
 
 
 /* ********************************************************************************************* *

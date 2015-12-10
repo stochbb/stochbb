@@ -3,7 +3,7 @@
 #include "randomvariable.hh"
 
 
-using namespace sbb;
+using namespace stochbb;
 
 // log(N) binary search algorithm for the index at which p must be inserted to maintain order
 inline size_t _find_index(double p, size_t a, size_t b, const Eigen::VectorXd &cdf) {

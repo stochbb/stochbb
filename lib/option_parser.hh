@@ -7,7 +7,7 @@
 #include <map>
 
 
-namespace sbb {
+namespace stochbb {
 namespace opt {
 
 // forward declaration:

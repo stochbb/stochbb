@@ -4,7 +4,7 @@
 #include "api.hh"
 #include "randomvariable.hh"
 
-namespace sbb {
+namespace stochbb {
 
 class AffineTrafoObj : public DerivedVarObj
 {

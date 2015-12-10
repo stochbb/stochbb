@@ -5,7 +5,7 @@
 #include "api.hh"
 #include <Eigen/Eigen>
 
-namespace sbb {
+namespace stochbb {
 
 
 /** Base class of all densities. */
