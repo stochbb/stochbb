@@ -211,6 +211,15 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
 
 void
 ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  if (0 == out.size()) { return; }
+  double dt = (Tmax-Tmin)/(out.size()*_scale);
+  this->eval(Tmin, Tmax, out);
+  out[0] *=dt;
+  for (int i=1; i<out.size(); i++) { out[i] = out[i-1] + out[i]*dt; }
+}
+
+/*void
+ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Apply affine transform
   Tmin = (Tmin-_shift)/_scale;
   Tmax = (Tmax-_shift)/_scale;
@@ -227,7 +236,7 @@ ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Vecto
   }
   fft.inv(tmp1, prod);
   out = tmp1.head(out.size());
-}
+} */
 
 Density
 ConvolutionDensityObj::affine(double scale, double shift) const {

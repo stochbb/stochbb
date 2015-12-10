@@ -74,3 +74,8 @@ void
 Object::unmark() {
   _marked = false;
 }
+
+void
+Object::print(std::ostream &stream) const {
+  stream << "<Object #" << (void *) this << ">";
+}

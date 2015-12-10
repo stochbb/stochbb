@@ -90,6 +90,8 @@ public:
   inline void unref() { if (_refcount) _refcount--; if (!_refcount) GC::get().run(); }
   /** Retruns the reference count. */
   inline size_t refcount() const { return _refcount; }
+  /** Prints a textual representation of the object. */
+  virtual void print(std::ostream &stream) const;
 
 protected:
   /** If @c true, the object is marked. */

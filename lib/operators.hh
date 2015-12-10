@@ -108,6 +108,14 @@ inline stochbb::Var operator *(const stochbb::Var &var, double a) {
   return stochbb::affine(var, a, 0);
 }
 
+inline std::ostream &operator<<(std::ostream &stream, const stochbb::Container &x) {
+  if (x.isNull()) {
+    stream << "<null>";
+  } else {
+    x->print(stream);
+  }
+  return stream;
+}
 
 namespace std {
 
