@@ -3,6 +3,7 @@
 #include "affinetrafo.hh"
 #include "chain.hh"
 #include "minmax.hh"
+#include "mixture.hh"
 
 using namespace stochbb;
 
@@ -112,6 +113,24 @@ stochbb::gamma(const Var &k, const Var &theta, const std::string &name) {
 /* ********************************************************************************************* *
  * Implementation of minimum
  * ********************************************************************************************* */
+Var stochbb::minimum(const Var &X) {
+  std::vector<Var> vars; vars.reserve(1);
+  vars.push_back(X);
+  return minimum(vars);
+}
+
+Var stochbb::minimum(const Var &X1, const Var &X2) {
+  std::vector<Var> vars; vars.reserve(2);
+  vars.push_back(X1); vars.push_back(X2);
+  return minimum(vars);
+}
+
+Var stochbb::minimum(const Var &X1, const Var &X2, const Var &X3) {
+  std::vector<Var> vars; vars.reserve(3);
+  vars.push_back(X1); vars.push_back(X2); vars.push_back(X3);
+  return minimum(vars);
+}
+
 Var
 stochbb::minimum(const std::vector<Var> &variables) {
   // Check size of variables
@@ -194,6 +213,24 @@ stochbb::minimum(const std::vector<Var> &variables) {
 /* ********************************************************************************************* *
  * Implementation of maximum
  * ********************************************************************************************* */
+Var stochbb::maximum(const Var &X) {
+  std::vector<Var> vars; vars.reserve(1);
+  vars.push_back(X);
+  return maximum(vars);
+}
+
+Var stochbb::maximum(const Var &X1, const Var &X2) {
+  std::vector<Var> vars; vars.reserve(2);
+  vars.push_back(X1); vars.push_back(X2);
+  return maximum(vars);
+}
+
+Var stochbb::maximum(const Var &X1, const Var &X2, const Var &X3) {
+  std::vector<Var> vars; vars.reserve(3);
+  vars.push_back(X1); vars.push_back(X2); vars.push_back(X3);
+  return maximum(vars);
+}
+
 Var
 stochbb::maximum(const std::vector<Var> &variables) {
   // Check size of variables
@@ -337,4 +374,31 @@ stochbb::affine(const Var &var, double scale, double shift) {
   }
 
   return new AffineTrafoObj(scale, shift, var);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of mixture
+ * ********************************************************************************************* */
+Var
+stochbb::mixture(double wX1, const Var &X1, double wX2, const Var &X2) {
+  std::vector<double> weights; weights.reserve(2);
+  std::vector<Var> variables; variables.reserve(2);
+  weights.push_back(wX1); weights.push_back(wX2);
+  variables.push_back(X1); variables.push_back(X2);
+  return mixture(weights, variables);
+}
+
+Var
+stochbb::mixture(double wX1, const Var &X1, double wX2, const Var &X2, double wX3, const Var &X3) {
+  std::vector<double> weights; weights.reserve(3);
+  std::vector<Var> variables; variables.reserve(3);
+  weights.push_back(wX1); weights.push_back(wX2); weights.push_back(wX3);
+  variables.push_back(X1); variables.push_back(X2); variables.push_back(X3);
+  return mixture(weights, variables);
+}
+
+Var
+stochbb::mixture(const std::vector<double> &weights, const std::vector<Var> &variables) {
+  return new MixtureObj(weights, variables);
 }

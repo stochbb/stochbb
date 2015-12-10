@@ -15,9 +15,9 @@
 \author{Hannes Matuschek}
 \institution{Focus area \emph{Dynamics of complex systems},\\ University of Potdsam, Germany}
 
-
-
-
+%
+% Setup 
+%
 \setlength{\parindent}{0em}
 \setlength{\parskip}{.8em}
 
@@ -32,23 +32,26 @@
   stringstyle=\color[rgb]{0.58,0,0.82}   % string literal style
 }
 
+%
+% Content
+%
 
 \begin{document}
 
 \maketitle
  
-\include{introduction}
-\include{api}
-\include{xml}
-\include{cli}
-\include{ezreader}
+\input{introduction}
+\input{api}
+\input{xml}
+\input{ezreader}
 
 \bibliographystyle{plain}
 \bibliography{references}
 
 \clearpage
 \appendix
-\include{apidoc}
-\include{build}
+\input{cli}
+\input{apidoc}
+\input{build}
 
 \end{document}

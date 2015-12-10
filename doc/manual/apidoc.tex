@@ -13,16 +13,16 @@ does not provide constructs like templates) are documented.
  Constructs a new delta-distributed random variable located at \code{value}, that is $\delta(x-x_0)$.
 \end{deffunc}
 
-\begin{deffunc}{stochbb::unif}{\class{Var}}{double a, double b}	
+\begin{deffunc}{stochbb::uniform}{\class{Var}}{double a, double b}	
 Constructs a new uniform-distributed random variable on the interval $[a,b]$, that is $\text{U}[a,b](x)$.
 \end{deffunc}
 
-\begin{deffunc}{stochbb::norm}{\class{Var}}{double mu, double sigma}
+\begin{deffunc}{stochbb::normal}{\class{Var}}{double mu, double sigma}
 Constructs a new normal-distributed random variable with mean \code{mu} and 
 standard deviation \code{sigma} , that is $\phi(x;\mu, \sigma)$.
 \end{deffunc}
 
-\begin{deffunc*}{stochbb::norm}{\class{Var}}{const \class{Var}\& mu, const \class{Var}\& sigma}
+\begin{deffunc*}{stochbb::normal}{\class{Var}}{const \class{Var}\& mu, const \class{Var}\& sigma}
 Constructs a new compound-normal-distributed random variable with mean \code{mu} and 
 standard deviation \code{sigma} being random variables too.
 \end{deffunc*}
@@ -53,6 +53,17 @@ Constructs a maximum random variable, a variable that represents the maximum of 
 Constructs a minimum random variable, a variable that represents the minimum of several other random variables as $Y = \min\{X_1,...,X_N\}$.
 \end{deffunc}
 
+\begin{deffunc}{stochbb::mixture}{\class{Var}}{double w1, const \class{Var}\& X1, double w2, const \class{Var}\& X2}
+Constructs a mixture of the random variables $X_1$ and $X_2$ using their associated weights $w_1$ and $w_2$.
+\end{deffunc}
+
+\begin{deffunc}{stochbb::mixture}{\class{Var}}{double w1, const \class{Var}\& X1, double w2, const \class{Var}\& X2, double w3, const \class{Var}\& X3}
+Constructs a mixture of the random variables $X_1, X_2$ and $X_3$ using their associated weights $w_1, w_2$ and $w_3$.
+\end{deffunc}
+
+\begin{deffunc}{stochbb::mixture}{\class{Var}}{const std::vector<double>\& weights, const std::vector<\class{Var}>\& variables}
+Constructs a mixture of the given random variables using their associated weights.
+\end{deffunc}
 
 \begin{defclass}{Container}
 Base class of all container object holding references to managed objects. This class is an essential part of the internal memory 

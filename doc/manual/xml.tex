@@ -1,7 +1,7 @@
 \section{Process \& simulation description in XML} \label{sec:xml}
-In contrast to the application programming interface (see Section \ref{sec:api}, above), 
+In contrast to the application programming interface (see Section \ref{sec:api} above), 
 complex processes can also be defined in XML and analyzed using the
-StochBB command line tool (see Section \ref{sec:cli}, below). A single XML file defines a 
+StochBB command line tool (see Section \ref{sec:cli}, below). A XML file defines a single 
 \class{Simulation}, a simple collection of random variables together with the specification which
 variables as used for the output. For example the XML code
 \begin{lstlisting}[language=XML]
@@ -14,31 +14,29 @@ variables as used for the output. For example the XML code
    <param name="theta"> <m:cn>30</m:cn> </param>
   </var>
 
-  <output from="0" to="100">
+  <output from="0" to="100" steps="1000">
    <var ref="gamma"/>
   </output>
 
  </simulation>
 \end{lstlisting}
-specifies a trivial simulation.
-
-Here a single gamma-distributed random variable is defined.
+specifies a trivial simulation. Here a single gamma-distributed random variable is defined.
 It gets the identifier \code{gamma} assigned. With this identifier, it is possible to refer to the random
 variable later. The \code{type} attribute specifies the type of the random variable. Here the
 build-in type \code{gamma} is used, specifying a gamma-distributed random variable. The shape and
-scale parameters, \code{k} and \code{theta}, are specified using the \code{param} elements. 
-The \code{name} attribute of each \code{param} element specified the name of the parameter while 
-its value is given as an MathML child element of the \code{param} element.
+scale parameters of the gamma distribution, \code{k} and \code{theta}, are specified using the \code{param} elements. 
+The \code{name} attribute of each \code{param} element specifies the name of the parameter while 
+its value is given as an MathML expression.
 
 Finally, the \code{output} element specifies which random variables are used for output. Each child
 element of the \code{output} element specifies one variable. Either by referencing a previously defined
-random variable or by specifying the random variable directly. For example,
+random variable or by specifying the random variable directly. For example, the XML code
 \begin{lstlisting}[language=XML]
  <?xml version="1.0"?>
  <simulation xmlns="http://hmatuschek.github.io/stochbb/simulation-0.0.dtd"
              xmlns:m="http://www.w3.org/1998/Math/MathML">
 
-  <output from="0" to="100">
+  <output from="0" to="100" steps="1000">
    <var type="gamma">
     <param name="k"> <m:cn>5</m:cn> </param>
     <param name="theta"> <m:cn>30</m:cn> </param>
@@ -93,8 +91,8 @@ of
 is just the maximum of the random variables \code{X1}--\code{X3}.
 
 \subsubsection{Minimum of random variables}
-Likewise, the \code{minimum} derived random variable is simply the minimum of the referred random
-variables and represents the waiting time of the fastest parallel processes \code{X1}--\code{X3}:
+Likewise, the \code{minimum} random variable is simply the minimum of the referred random
+variables and represents the waiting time for the fastest parallel processes \code{X1}--\code{X3}:
 \begin{lstlisting}[language=XML]
  <var type="minimum">
   <var ref="X1"/> <var ref="X2"/> <var ref="X2"/>
@@ -111,12 +109,14 @@ weight-variable pairs. For example
   <weight> <m:cn>1</m:cn> <var ref="X3"/> </weight>
  </var>
 \end{lstlisting}
+where the first element of the \code{weight} pair specifies the weight as an MathML expression
+and the second element the variable.
 
 \subsubsection{Compound random variables} 
 A compound random variable $Y$ has a distribution $f_{Y|A}(y|A)$ where the parameter $A$ is a random
-variable too, with its own distribution $A~g()$. In XML a compound is specified using the 
-\code{compound} type by specifying the base type of the distribution using the \code{base} attribute.
-Instead of simple parameters, the parameters of an compound are specified as random variables. 
+variable too, with its own distribution $A\sim g()$. In XML, a compound is specified using the 
+\code{compound} type and by specifying the base type of the distribution using the \code{base} attribute.
+Instead of simple parameters, the parameters of a compound are specified as random variables. 
 For example, the code
 \begin{lstlisting}[language=XML]
  <var id="mu" ...>
@@ -136,8 +136,8 @@ variable \code{mu} and its standard deviation like \code{sigma}. Of course these
 variables have to be defined earlier.
 
 \subsection{User defined random-variable types}
-The limited number of build-in random-variable types would turn the definition of complex stationary random
-processes difficult. Hence it is possible to define new types derived from the build-in ones. For example,
+The limited number of build-in random-variable types would turn the definition of complex systems of random
+variables difficult. Hence it is possible to define new types derived from the build-in ones. For example,
 the code 
 \begin{lstlisting}[language=XML]
  <define id="exp">
@@ -204,10 +204,10 @@ to instantiate Ex-Gauss-distributed random variables as
 \end{lstlisting}
 
 \subsection{Modules}
-Some of the aforementioned user defined random variable types may be reused in several
+Some of the aforementioned user defined random-variable types may be reused in several
 simulations. For these cases it is convenient to export these definitions into separate files
 and load them when needed. These files are called modules and form simple collections of
-variable type definitions. For example a module defining the an exponential distributed 
+variable-type definitions. For example a module defining the an exponential-distributed 
 random variable could be implemented as
 \begin{lstlisting}[language=XML]
  <?xml version="1.0"?>
@@ -248,4 +248,4 @@ be loaded using the \code{load} tag within a simulation or other modules like
 \end{lstlisting}
 
 With this XML language, it is possible to specify complex systems of random variables that can be analyzed 
-using the \code{stochbb} command line tool described in the next section.
+using the \code{stochbb} command line tool described in Appendix \ref{sec:cli}.

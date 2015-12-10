@@ -54,6 +54,9 @@ Var chain(const std::vector<Var> &vars);
  * \f]
  * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables. */
 Var minimum(const std::vector<Var> &variables);
+Var minimum(const Var &X);
+Var minimum(const Var &X1, const Var &X2);
+Var minimum(const Var &X1, const Var &X2, const Var &X3);
 
 /** Constructs a random variable \f$Y\f$, as the maximum of the given random variables.
  * In contrast to the @c MaximumObj, it handles partial dependency between the random variables
@@ -64,9 +67,20 @@ Var minimum(const std::vector<Var> &variables);
  * \f]
  * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables. */
 Var maximum(const std::vector<Var> &variables);
+Var maximum(const Var &X);
+Var maximum(const Var &X1, const Var &X2);
+Var maximum(const Var &X1, const Var &X2, const Var &X3);
 
 /** Constructs an affine transform of the given variable. */
 Var affine(const Var &var, double scale, double shift);
+
+/** Constructs a mixture of the given variables with assiciated weights. */
+Var mixture(double wX1, const Var &X1, double wX2, const Var &X2);
+/** Constructs a mixture of the given variables with assiciated weights. */
+Var mixture(double wX1, const Var &X1, double wX2, const Var &X2, double wX3, const Var &X3);
+/** Constructs a mixture of the given variables with assiciated weights. */
+Var mixture(const std::vector<double> &weights, const std::vector<Var> &variables);
+
 }
 
 /** Overloads the +-operator to construct a @c Chain.

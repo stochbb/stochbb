@@ -7,6 +7,7 @@
 %}
 
 %include "numpy.i"
+%include "std_vector.i"
 
 %init %{
 import_array();
@@ -187,9 +188,19 @@ Var affine(const Var &var, double scale, double shift);
 
 Var chain(const std::vector<Var> &vars);
 
+Var minimum(const Var &X);
+Var minimum(const Var &X1, const Var &X2);
+Var minimum(const Var &X1, const Var &X2, const Var &X3);
 Var minimum(const std::vector<Var> &variables);
 
+Var maximum(const Var &X);
+Var maximum(const Var &X1, const Var &X2);
+Var maximum(const Var &X1, const Var &X2, const Var &X3);
 Var maximum(const std::vector<Var> &variables);
+
+Var mixture(double w1, const Var &X1, double w2, const Var &X2);
+Var mixture(double w1, const Var &X1, double w2, const Var &X2, double w3, const Var &X3);
+Var mixture(const std::vector<double> weights, const std::vector<Var> &variables);
 
 %extend Container {
   bool isDensity() const { return self->is<stochbb::Density>(); }

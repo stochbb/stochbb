@@ -3,7 +3,7 @@ Frequently, complex systems are described in terms of stochastic processes, as t
 underlying deterministic process is too complex to be modeled exactly or as the
 process is indeed random. It is not always the random process itself that is of 
 interest, but a derived quantity. For example, the distribution of waiting times until the
-process reaches a certain state. In the field of cognition psychology, random processes are frequently used to
+process reaches a certain state. In the field of cognitive psychology, random processes are frequently used to
 describe each processing stage in a chain of stages that leads to a response. The state of
 each random process itself is usually not measurable but the total response time of all processing 
 stages involved. Although each processing stage is modeled as a random process, the waiting-time
@@ -11,7 +11,7 @@ of a single stage is just a random variable and the complete system is then a sy
 variables.
 
 StochBB is able to describe and analyze complex systems of dependent random variables
-by combining simple ones (representing stages with a known waiting-time distribution) to
+by combining simple ones (representing single stages with a known waiting-time distribution) to
 a complex system. For example, consider the following independent random variables
 \begin{equation}
   X_1 \sim \Gamma(10, 100)\,, X_2 \sim \Gamma(20, 50)\text{ and } X_3 \sim \text{Exp}(0.01)\,,\nonumber
@@ -41,7 +41,8 @@ and correct sampler for the system of random variables.
 
 \section{Representation and reductions of random variables}
 Continuing the example above, please note that the sum of random variables commutes. Hence the
-random variable $Y$ remains the same if defined as $Y = X_1 + X_3 + X_2$. Moreover, the 
+random variable $Y$ remains the same if defined as $Y = X_1 + X_3 + X_2$ instead of 
+$Y = X_1 + X_2 + X_3$. Moreover, the 
 distribution of the sum of $X_1$ and $X_3$ can be determined analytically as 
 $X' = (X_1+X_3)\sim\Gamma(11,100)$. Hence the random variable $Y$ can now be expressed as 
 $Y = X_2 + X'$, and only a single numeric convolution is necessary to obtain the PDF of the
@@ -55,7 +56,7 @@ of random variables efficiently.
 An affine transformation of the random variable $X$ has the form $Y = a\,X+b$, where $a\neq 0$
 and $b$ are real values. Although affine transformations of random variables are not frequently
 used directly in a system of random variables, they may appear as a result of other reductions
-of the system. The PDF and CDF of the random variable $Y$ define above, are then simply 
+of the system. The PDF and CDF of the random variable $Y$ defined above, are then 
 \begin{equation}
  f_Y(y) = \frac{1}{a}f_X\left(\frac{y-b}{a}\right)\text{ and }
  F_Y(y) = F_X\left(\frac{y-b}{a}\right)\,. \nonumber
@@ -119,7 +120,7 @@ The minimum or maximum of some given random variables, e.g. $Y=\min\{X_1,X_2\}$ 
 $Y=\max\{X_1,X_2\}$ are them self random variables. These derived random variables can be used to
 express the waiting time of a processing stage that consists of several independent processes being
 performed in parallel (in contrast to sequential processes described by sums of random variables). 
-If the processing stage is finished, once the first of the parallel processes is finished, the 
+If processing stage finishes, once the first of the parallel processes is finished, the 
 resulting waiting time is expressed by the minimum of the underlying random variables. If the stage
 finishes once all underlying processes are finished, the resulting waiting time is described
 by the maximum. 
@@ -132,7 +133,7 @@ of the random variables $X_1$ and $X_2$. Likewise, the CDF and PDF of the minimu
 $F_Y(y)=1-(1-F_1(y))\cdot(1-F_2(y))$ and therefore $f_Y(y) = f_1(y)(1-F_2(y)) + f_2(y)(1-F_1(y))$.
 
 For applying these equations to derive the CDF and PDFs of the minimum and maximum random variables, the 
-underlying random variables must be independent. To achieve independence, where possible the following 
+underlying random variables must be independent. To achieve independence where possible, the following 
 reductions are performed on maximum as well as minimum random variables.
 
 Again, first maximum and minimum structures were flattened, for example
@@ -160,7 +161,7 @@ A mixture is the weighted sum of random variables
 \begin{equation}
  Y = \frac{w_1X_1+\cdots+x_NX_N}{w_1+\cdots+w_N}\,, \nonumber
 \end{equation}
-where $w_i$ are positive weights, is also a random variable with the PDF
+where $w_i$ are positive weights. The result $Y$ is also a random variable with the PDF
 \begin{equation}
  f_Y(y) = \frac{w_1f_1(x)+\cdots+w_Nf_N(x)}{w_1+\cdots+w_N}\,,\nonumber
 \end{equation}

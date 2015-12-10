@@ -25,6 +25,7 @@
      </var>
     </param>
    </var>
+   <var ref="mu"/>
   </output>
 
 </simulation>
