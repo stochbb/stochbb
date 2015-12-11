@@ -4,7 +4,7 @@ using namespace stochbb;
 
 
 AffineTrafoObj::AffineTrafoObj(double scale, double shift, const Var &variable, const std::string &name)
-  : DerivedVarObj(std::vector<Var>(1,variable), name), _density(0), _scale(scale), _shift(shift)
+  : DerivedVarObj(std::vector<Var> { variable }, name), _density(0), _scale(scale), _shift(shift)
 {
   _density = *variable->density().affine(scale,shift);
 }
@@ -20,4 +20,11 @@ Density
 AffineTrafoObj::density() {
   _density->ref();
   return _density;
+}
+
+void
+AffineTrafoObj::print(std::ostream &stream) const {
+  stream << "<AffineTrafoObj " << _scale << " * ";
+  _variables[0]->print(stream);
+  stream << " + " << _shift << " #" << this << ">";
 }

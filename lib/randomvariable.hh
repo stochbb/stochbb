@@ -53,6 +53,9 @@ public:
   /** Sets the name of the random variable. */
   inline void setName(const std::string &name) { _name = name; }
 
+  virtual void print(std::ostream &stream) const;
+
+
 protected:
   /** The random variables, this RV depends on. */
   std::set<VarObj *> _dependencies;
@@ -72,7 +75,7 @@ class AtomicVarObj: public VarObj
 {
 public:
   /** Constructor from density. */
-  AtomicVarObj(AtomicDensityObj *density, const std::string &name="");
+  AtomicVarObj(const AtomicDensity &density, const std::string &name="");
   /** Destructor. */
   virtual ~AtomicVarObj();
 
@@ -84,6 +87,8 @@ public:
   inline void sample(Eigen::Ref<Eigen::VectorXd> out) const {
     return _density->sample(out);
   }
+
+  virtual void print(std::ostream &stream) const;
 
 public:
   /** Constructs a delta distributed random variable. */
@@ -121,6 +126,8 @@ public:
   inline size_t numVariables() const { return _variables.size(); }
   /** Returns the i-th underlying random variable. */
   inline Var variable(size_t i) { _variables[i]->ref(); return _variables[i]; }
+
+  virtual void print(std::ostream &stream) const;
 
 protected:
   /** References to the underlaying random variables. */

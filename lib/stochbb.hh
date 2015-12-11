@@ -2,6 +2,7 @@
 #ifndef __SBB_STOCHBB_HH__
 #define __SBB_STOCHBB_HH__
 
+#include "logger.hh"
 #include "api.hh"
 
 #include "density.hh"

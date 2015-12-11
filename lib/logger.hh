@@ -6,6 +6,7 @@
 #include <ctime>
 #include <list>
 
+#include "object.hh"
 
 /** A log message. */
 class LogMessage
@@ -80,15 +81,15 @@ protected:
 
 
 /** The base class of all log-handlers. */
-class LogHandler
+class LogHandlerObj
 {
 protected:
   /** Hidden constructor. */
-  LogHandler(LogMessage::Level level);
+  LogHandlerObj(LogMessage::Level level);
 
 public:
   /** Destructor. */
-  virtual ~LogHandler();
+  virtual ~LogHandlerObj();
 
   /** Needs to be implemented to handle log messages. */
   virtual void handleMessage(const LogMessage &msg) = 0;
@@ -100,13 +101,13 @@ protected:
 
 
 /** Serializes log messages to the given file. */
-class IOLogHandler: public LogHandler
+class IOLogHandlerObj: public LogHandlerObj
 {
 public:
   /** Constructor.
    * @param level Spicifies the mimimum log level to process.
    * @param stream Specifies the output stream. */
-  IOLogHandler(std::ostream &stream, LogMessage::Level level=LogMessage::DEBUG);
+  IOLogHandlerObj(std::ostream &stream, LogMessage::Level level=LogMessage::DEBUG);
 
   /** Implements the @c LogHandler interface. */
   void handleMessage(const LogMessage &msg);
@@ -131,7 +132,7 @@ public:
   /** Logs a message. */
   static void log(const LogMessage &msg);
   /** Adds a handler to the logger, the ownership is transferred to the @c Logger. */
-  static void addHandler(LogHandler *handler);
+  static void addHandler(LogHandlerObj *handler);
 
 protected:
   /** Factory method. */
@@ -139,7 +140,7 @@ protected:
 
 protected:
   /** The list of registered handlers. */
-  std::list<LogHandler *> _handler;
+  std::list<LogHandlerObj *> _handler;
 
 protected:
   /** The singleton instance. */

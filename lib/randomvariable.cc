@@ -38,12 +38,16 @@ VarObj::mark() {
   }
 }
 
+void
+VarObj::print(std::ostream &stream) const {
+  stream << "<VarObj #" << (void *)this << ">";
+}
 
 /* ********************************************************************************************* *
  * Implementation of GenericRandomVariableObj
  * ********************************************************************************************* */
-AtomicVarObj::AtomicVarObj(AtomicDensityObj *density, const std::string &name)
-  : VarObj(name), _density(density)
+AtomicVarObj::AtomicVarObj(const AtomicDensity &density, const std::string &name)
+  : VarObj(name), _density(*density)
 {
   // pass...
 }
@@ -59,9 +63,16 @@ AtomicVarObj::mark() {
   _density->mark();
 }
 
-Density AtomicVarObj::density() {
+Density
+AtomicVarObj::density() {
   _density->ref();
   return _density;
+}
+
+void
+AtomicVarObj::print(std::ostream &stream) const {
+  stream << "<AtomicVar density="; _density->print(stream);
+  stream << " #" << (void *)this << ">";
 }
 
 AtomicVarObj *
@@ -112,6 +123,11 @@ DerivedVarObj::mark() {
   if (isMarked()) { return; }
   VarObj::mark();
   // all dependent variable objects are marked by VarObj::mark() through _dependencies
+}
+
+void
+DerivedVarObj::print(std::ostream &stream) const {
+  stream << "<DerivedVarObj #" << (void *)this << ">";
 }
 
 

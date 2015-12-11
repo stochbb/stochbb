@@ -74,6 +74,7 @@ public:
 
   virtual Density density();
 
+  virtual void print(std::ostream &stream) const;
 
 protected:
   /** The density of the sum, the convolution of all PDFs of the underlaying random variables. */

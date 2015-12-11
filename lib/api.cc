@@ -444,6 +444,36 @@ Conditional::operator =(const Conditional &other) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of CondChain container
+ * ********************************************************************************************* */
+CondChain::CondChain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2, const std::string &name)
+  : DerivedVar(new CondChainObj(X1, X2, Y1, Y2, name)),
+    _condchain(static_cast<CondChainObj *>(_object))
+{
+  // pass...
+}
+
+CondChain::CondChain(CondChainObj *obj)
+  : DerivedVar(obj), _condchain(obj)
+{
+  // pass...
+}
+
+CondChain::CondChain(const CondChain &other)
+  : DerivedVar(other), _condchain(other._condchain)
+{
+  // pass...
+}
+
+CondChain &
+CondChain::operator =(const CondChain &other) {
+  DerivedVar::operator =(other);
+  _condchain = other._condchain;
+  return *this;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of Compound container
  * ********************************************************************************************* */
 Compound::Compound(CompoundObj *obj)

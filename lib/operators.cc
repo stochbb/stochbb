@@ -30,7 +30,7 @@ stochbb::uniform(double a, double b) {
  * ********************************************************************************************* */
 Var
 stochbb::normal(double mu, double sigma, const std::string &name) {
-  return AtomicVar::norm(mu, sigma, name);
+  return AtomicVarObj::norm(mu, sigma, name);
 }
 
 Var
@@ -142,10 +142,12 @@ stochbb::minimum(const std::vector<Var> &variables) {
   std::vector<Var> vars; vars.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
     if (variables[i].is<Minimum>()) {
-      Minimum max = variables[i].as<Minimum>();
-      for (size_t j=0; j<max.numVariables(); j++) {
-        vars.push_back(max.variable(j));
+      Minimum min = variables[i].as<Minimum>();
+      for (size_t j=0; j<min.numVariables(); j++) {
+        vars.push_back(min.variable(j));
       }
+    } else {
+      vars.push_back(variables[i]);
     }
   }
 
@@ -242,6 +244,8 @@ stochbb::maximum(const std::vector<Var> &variables) {
       for (size_t j=0; j<max.numVariables(); j++) {
         vars.push_back(max.variable(j));
       }
+    } else {
+      vars.push_back(variables[i]);
     }
   }
 
@@ -356,6 +360,8 @@ stochbb::chain(const std::vector<Var> &vars) {
  * ********************************************************************************************* */
 Var
 stochbb::affine(const Var &var, double scale, double shift) {
+  logDebug() << "Affine trafo " << var << " -> "
+             << scale << "*" << var << "+" << shift;
   // Flatten affine trafo objects
   if (var.is<AffineTrafo>()) {
     AffineTrafo a = var.as<AffineTrafo>();
@@ -393,4 +399,13 @@ stochbb::mixture(const std::vector<double> &weights, const std::vector<Var> &var
 Var
 stochbb::conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) {
   return new ConditionalObj(X1, X2, Y1, Y2);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of condchain
+ * ********************************************************************************************* */
+Var
+stochbb::condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) {
+  return new CondChainObj(X1, X2, Y1, Y2);
 }

@@ -11,6 +11,8 @@
 
 %init %{
 import_array();
+//Logger::addHandler(
+//      new IOLogHandlerObj(std::cerr, LogMessage::DEBUG));
 %}
 
 
@@ -145,6 +147,13 @@ protected:
 };
 
 
+class CondChain: public DerivedVar
+{
+protected:
+  CondChain();
+};
+
+
 class Compound: public DerivedVar
 {
 protected:
@@ -217,6 +226,7 @@ Var mixture(double w1, const Var &X1, double w2, const Var &X2, double w3, const
 Var mixture(const std::vector<double> weights, const std::vector<Var> &variables) throw( Error );
 
 Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw( Error );
+Var condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw( Error );
 
 %extend Container {
   bool isDensity() const { return self->is<stochbb::Density>(); }

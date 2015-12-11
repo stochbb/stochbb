@@ -246,6 +246,7 @@ MaximumObj::MaximumObj(const std::vector<Var> &variables, const std::string &nam
 {
   // Construct density
   _density = new MaximumDensityObj(_variables);
+  _density->unref();
 }
 
 MaximumObj::~MaximumObj() {
@@ -274,6 +275,7 @@ MinimumObj::MinimumObj(const std::vector<Var> &variables, const std::string &nam
 {
   // Construct density
   _density = new MinimumDensityObj(_variables);
+  _density->unref();
 }
 
 MinimumObj::~MinimumObj() {

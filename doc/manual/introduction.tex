@@ -169,6 +169,63 @@ where $f_i(\cdot)$ is the PDF of the i-th random variable $X_i$. The CDF of the
 mixture is obtained analogously. A mixture can be used to describe a random 
 path-selection in a system of processing stages. 
 
+\subsection{Conditional random variables}
+\todo{Write}
+
+\subsection{Conditional chained random variables}
+One of the few non-textbook examples of a derived random variable is the conditional chained random variable. 
+It can be defined as
+\begin{equation}
+ Z = \begin{cases}
+   X_1 + Y_1 & \mbox{if } X_1 < X_2\\
+   X_2 + Y_2 & \mbox{else\,,} 
+ \end{cases} \nonumber
+\end{equation}
+where $X_1, X_2, Y_1$ and $X_1, X_2, Y_2$ are mutually independent. $Y_1$ and $Y_2$ may be 
+dependent random variables. Although being similar to the conditional random variable, there is an 
+important difference: Both possible outcomes ($X_1+Y_1$ and $X_2+Y_2$) of the condition 
+$X_1<X_2$ are not independent from the condition (i.e. $X_1+Y_1$ is trivially dependent on $X_1$).
+Therefore, the simple conditional random variable cannot be used here. 
+
+The conditional chained random variable can be used to describe two independent parallel processing
+stages where the fastest stage will trigger another stage. For example, if $X_1$ wins, it triggers $Y_1$
+and if $X_2$ wins it triggers $Y_2$. In contrast to the conditional chained random variable, the 
+conditional random variable above does not trigger a next stage but \emph{selects} a third. 
+Therefore, the actual result of the \emph{winning} stage does not have an influence on the 
+selected one. 
+
+The conditional chained random variable is certainly not common and to my knowledge not
+covered in text books. Hence the density for it must be obtained first.
+Given that the cases ($X_1<X_2$ and $X_2<X_1$) are mutually exclusive, the density of $Z$, 
+$f_Z(z)$ can be expressed as as simple sum. Precisely
+\begin{multline}
+ f_Z(Z) = \iiint_{-\infty}^\infty f(z,x_1,x_2,y_1|z=x_1+y_1,x_1<x_2)\,dx_1\,dx_2\,dy_1 \\
+  + \iiint_{-\infty}^\infty f(z,x_1,x_2,y_2|z=x_2+y_2,x_2<x_1)\,dx_1\,dx_2\,dy_2\,. \nonumber
+\end{multline}
+
+Given that $X_1, X_2$ and $Y_1$ are mutually independent, the first integral can be reduced to
+\begin{multline}
+\iiint_{-\infty}^\infty f(z,x_1,x_2,y_1|z=x_1+y_1,x_1<x_2)\,dx_1\,dx_2\,dy_1 \\
+  = \iiint_{-\infty}^\infty f_{X_1}(x_1)\,f_{X_2}(x_2)\,f_{Y_1}(y_1)\,\delta(z-x_1-y_1)\,H(x_2-x_1)\,dx_1\,dx_2\,dy_1\\
+  = \iint_{-\infty}^\infty f_{X_1}(x_1)\,f_{X_2}(x_2)\,f_{Y_1}(z-x_1)\,H(x_2-x_1)\,dx_1\,dx_2\\
+  = \int_{-\infty}^\infty f_{X_1}(x_1)\,f_{Y_1}(z-x_1)\int_{-\infty}^\infty \,f_{X_2}(x_2)\,H(x_2-x_1)\,dx_2\,dx_1\\
+  = \int_{-\infty}^\infty f_{X_1}(x_1)\,f_{Y_1}(z-x_1)\int_{x_1}^{\infty} \,f_{X_2}(x_2)\,dx_2\,dx_1\\
+  = \int_{-\infty}^\infty f_{X_1}(x_1)\,\left(1-F_{X_2}(x_1)\right)\,f_{Y_1}(z-x_1)\,dx_1\,. \nonumber
+\end{multline}
+
+Analogously, the second integral can be reduced to
+\begin{multline}
+\iiint_{-\infty}^\infty f(z,x_1,x_2,y_2|z=x_2+y_2,x_2<x_1)\,dx_1\,dx_2\,dy_2 \\
+ = \int_{-\infty}^\infty \,f_{X_2}(x_2)\left(1-F_{X_1}(x_2)\right)\,f_{Y_2}(z-x_2)\,dx_2\,. \nonumber
+\end{multline}
+
+The final density of $Z$ is then given by
+\begin{equation}
+ f_Z(Z) = \int_{-\infty}^\infty f_{X_1}(x_1)\,\left(1-F_{X_2}(x_1)\right)\,f_{Y_1}(z-x_1)\,dx_1
+  + \int_{-\infty}^\infty \,f_{X_2}(x_2)\left(1-F_{X_1}(x_2)\right)\,f_{Y_2}(z-x_2)\,dx_2\,, \nonumber
+\end{equation}
+and it can be evaluated using the same \emph{trick} for chains of random variables.
+
 \subsection{Compound random variables}
 The most complex derived random-variable type is the compound random variable. That is a random variable
 $X$ distributed according to a parametric distribution $X\sim f_{X|A}(x;A)$ with parameter $A$. $A$, however, 

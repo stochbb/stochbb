@@ -77,26 +77,19 @@ protected:
  * the sum (chain) of \f$X_2\f$ and \f$Y_2\f$ else. Please note that this
  * random variable cannot be implemented useing the @c ConditionalObj class as e.g.
  * \f$X_1+Y_1\f$ (one possible outcome) depends trivially on \f$X_1\f$ (part of the condition).
- *
- * As both cases are mutually exclusive, the density of \f$Z\f$, \f$f_Z(z)\f$ can be writen as
- * \f[
- *  f_Z(z) = \iiint_{-\infty}^\infty f(z,x_1,x_2,y_1|z=x_1+y_1, x_1<x_2)\,dx_1\,dx_2\,dy_1
- *   + \iiint_{-\infty}^\infty f(z,x_1,x_2,y_2|z=x_2+y_2, x_2<x_1)\,dx_1\,dx_2\,dy_2
- * \f]
- * with
- * \f[
- *  \iiint_{-\infty}^\infty f(z,x_1,x_2,y_1|z=x_1+y_1, x_1<x_2)\,dx_1\,dx_2\,dy_1
- *   = \iiint_{-\infty}^\infty f_{X_1}(x_1)\,f_{X_2}(x_2)\,f_{Y_1}(y_1)\,\delta(z-x_1-y_1)\,H(x_2-x_1)\,dx_1\,dx_2\,dy_1
- * \f]
  */
 class CondChainDensityObj: public DensityObj
 {
+protected:
+  CondChainDensityObj(DensityObj *X1, DensityObj *X2, DensityObj *Y1, DensityObj *Y2);
+
 public:
   CondChainDensityObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
   virtual void mark();
 
   void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
 
 protected:
   DensityObj *_X1;
@@ -105,7 +98,17 @@ protected:
   DensityObj *_Y2;
 };
 
+class CondChainObj: public DerivedVarObj
+{
+public:
+  CondChainObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2, const std::string &name="");
+  virtual void mark();
 
+  virtual Density density();
+
+protected:
+  CondChainDensityObj *_density;
+};
 }
 
 #endif // __SBB_CONDITIONAL_HH__

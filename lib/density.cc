@@ -310,7 +310,7 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> o
 void
 GammaDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
   for (int i=0; i<out.size(); i++) {
-    out[i] = RNG::gamma(_k, _theta)+_shift;
+    out[i] = _scale*RNG::gamma(_k, _theta)+_shift;
   }
 }
 

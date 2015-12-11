@@ -21,6 +21,7 @@ class MaximumObj;
 class MinimumObj;
 class MixtureObj;
 class ConditionalObj;
+class CondChainObj;
 class CompoundObj;
 class SimulationObj;
 class ExactSamplerObj;
@@ -416,6 +417,22 @@ public:
 
 protected:
   ConditionalObj *_conditional;
+};
+
+
+class CondChain: public DerivedVar
+{
+public:
+  typedef CondChainObj ObjectType;
+
+public:
+  CondChain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2, const std::string &name="");
+  CondChain(CondChainObj *obj);
+  CondChain(const CondChain &other);
+  CondChain &operator=(const CondChain &other);
+
+protected:
+  CondChainObj *_condchain;
 };
 
 

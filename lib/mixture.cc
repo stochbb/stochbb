@@ -87,6 +87,7 @@ MixtureObj::MixtureObj(const std::vector<double> &weights, const std::vector<Var
   }
 
   _density = new MixtureDensityObj(_weights, _variables);
+  _density->unref();
 }
 
 void

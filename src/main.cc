@@ -43,11 +43,11 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  IOLogHandler *handler = 0;
+  IOLogHandlerObj *handler = 0;
   if (parser.has_flag("log-debug")) {
-    handler = new IOLogHandler(std::cerr, LogMessage::DEBUG);
+    handler = new IOLogHandlerObj(std::cerr, LogMessage::DEBUG);
   } else {
-    handler = new IOLogHandler(std::cerr, LogMessage::INFO);
+    handler = new IOLogHandlerObj(std::cerr, LogMessage::INFO);
   }
   Logger::addHandler(handler);
 

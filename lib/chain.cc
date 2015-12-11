@@ -262,7 +262,9 @@ ChainObj::ChainObj(const std::vector<Var> &variables, const std::string &name)
     err << "Cannot create chain: Variables not independent.";
     throw err;
   }
+
   _density = new ConvolutionDensityObj(_variables);
+  _density->unref();
 }
 
 ChainObj::~ChainObj() {
@@ -284,3 +286,11 @@ Density ChainObj::density() {
   return _density;
 }
 
+void
+ChainObj::print(std::ostream &stream) const {
+  stream << "<ChainObj";
+  for (size_t i=0; i<_variables.size(); i++) {
+    stream << " "; _variables[i]->print(stream);
+  }
+  stream << " #" << this << ">";
+}

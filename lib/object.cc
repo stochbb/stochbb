@@ -23,21 +23,19 @@ GC::~GC() {
 }
 
 void
-GC::run()
-{
+GC::run() {
   // Mark all boxed objects:
-  for (std::unordered_set<Object *>::iterator item=_objects.begin(); item!=_objects.end(); item++) {
-    if ((*item)->refcount())
-      (*item)->mark();
+  std::unordered_set<Object *>::iterator item=_objects.begin();
+  for (; item!=_objects.end(); item++) {
+    if ((*item)->refcount()) { (*item)->mark(); }
   }
   // Delete all unmarked objects:
-  for (std::unordered_set<Object *>::iterator item=_objects.begin(); item!=_objects.end(); ) {
+  for (item=_objects.begin(); item!=_objects.end(); ) {
     if ((*item)->isMarked()) {
       (*item)->unmark(); item++;
     } else {
-      Object *obj = *item;
+      delete *item;
       item = _objects.erase(item);
-      delete obj;
     }
   }
 }

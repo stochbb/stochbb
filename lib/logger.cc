@@ -83,13 +83,13 @@ LogMessageStream::~LogMessageStream() {
 /* ********************************************************************************************* *
  * Implementation of LogHandler
  * ********************************************************************************************* */
-LogHandler::LogHandler(LogMessage::Level level)
+LogHandlerObj::LogHandlerObj(LogMessage::Level level)
   : _minLevel(level)
 {
   // pass...
 }
 
-LogHandler::~LogHandler() {
+LogHandlerObj::~LogHandlerObj() {
   // pass...
 }
 
@@ -97,8 +97,8 @@ LogHandler::~LogHandler() {
 /* ********************************************************************************************* *
  * Implementation of IOLogHandler
  * ********************************************************************************************* */
-IOLogHandler::IOLogHandler(std::ostream &stream, LogMessage::Level level)
-  : LogHandler(level), _stream(stream)
+IOLogHandlerObj::IOLogHandlerObj(std::ostream &stream, LogMessage::Level level)
+  : LogHandlerObj(level), _stream(stream)
 {
   // pass...
 }
@@ -112,7 +112,7 @@ std::ostream & operator<<(std::ostream &stream, const std::tm &time) {
 }
 
 void
-IOLogHandler::handleMessage(const LogMessage &msg) {
+IOLogHandlerObj::handleMessage(const LogMessage &msg) {
   if (msg.level() < _minLevel) { return; }
   switch (msg.level()) {
   case LogMessage::DEBUG: _stream << "DEBUG: "; break;
@@ -140,10 +140,7 @@ Logger::Logger()
 }
 
 Logger::~Logger() {
-  std::list<LogHandler *>::iterator handler = _handler.begin();
-  for (; handler != _handler.end(); handler++) {
-    delete (*handler);
-  }
+
 }
 
 Logger *
@@ -157,14 +154,13 @@ Logger::get() {
 void
 Logger::log(const LogMessage &msg) {
   Logger *self = Logger().get();
-  std::list<LogHandler *>::iterator handler = self->_handler.begin();
+  std::list<LogHandlerObj *>::iterator handler = self->_handler.begin();
   for (; handler != self->_handler.end(); handler++) {
     (*handler)->handleMessage(msg);
   }
 }
 
 void
-Logger::addHandler(LogHandler *handler) {
-  Logger *self = Logger().get();
-  self->_handler.push_back(handler);
+Logger::addHandler(LogHandlerObj *handler) {
+  Logger().get()->_handler.push_back(handler);
 }

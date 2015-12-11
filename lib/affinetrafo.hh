@@ -20,6 +20,8 @@ public:
   /** Returns the shift of the affine transform. */
   inline double shift() const { return _shift; }
 
+  virtual void print(std::ostream &stream) const;
+
 protected:
   DensityObj *_density;
   double _scale;

@@ -5,13 +5,6 @@
 
 using namespace stochbb;
 
-// Helper function to construct a vector of variables inline
-inline std::vector<Var> mk_var_vec(const Var &a, const Var &b) {
-  std::vector<Var> vec; vec.reserve(2);
-  vec.push_back(a); vec.push_back(b);
-  return vec;
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of CompoundObj
@@ -128,7 +121,7 @@ NormalCompoundDensityObj::affine(double scale, double shift) const {
  * Implementation of NormalCompoundObj
  * ********************************************************************************************* */
 NormalCompoundObj::NormalCompoundObj(const Var &mu, const Var &sigma, const std::string &name)
-  : CompoundObj(mk_var_vec(mu, sigma), name), _density(0)
+  : CompoundObj(std::vector<Var> {mu, sigma}, name), _density(0)
 {
   // Test for independence
   if (! mu.mutuallyIndep(sigma)) {
@@ -243,7 +236,7 @@ GammaCompoundDensityObj::affine(double scale, double shift) const {
  * Implementation of GammaCompoundObj
  * ********************************************************************************************* */
 GammaCompoundObj::GammaCompoundObj(const Var &k, const Var &theta, const std::string &name)
-  : CompoundObj(mk_var_vec(k, theta), name), _density(0)
+  : CompoundObj(std::vector<Var> {k, theta}, name), _density(0)
 {
   // Test for independence
   if (! k.mutuallyIndep(theta)) {
