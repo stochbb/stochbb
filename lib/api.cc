@@ -6,6 +6,7 @@
 #include "chain.hh"
 #include "minmax.hh"
 #include "mixture.hh"
+#include "conditional.hh"
 #include "compound.hh"
 #include "simulation.hh"
 #include "exactsampler.hh"
@@ -409,6 +410,36 @@ Mixture::operator =(const Mixture &other) {
 double
 Mixture::weight(size_t i) const {
   return _mixture->weight(i);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of Conditional container
+ * ********************************************************************************************* */
+Conditional::Conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2, const std::string &name)
+  : DerivedVar(new ConditionalObj(X1, X2, Y1, Y2, name)),
+    _conditional(static_cast<ConditionalObj *>(_object))
+{
+  // pass...
+}
+
+Conditional::Conditional(ConditionalObj *obj)
+  : DerivedVar(obj), _conditional(obj)
+{
+  // pass...
+}
+
+Conditional::Conditional(const Conditional &other)
+  : DerivedVar(other), _conditional(other._conditional)
+{
+  // pass...
+}
+
+Conditional &
+Conditional::operator =(const Conditional &other) {
+  DerivedVar::operator =(other);
+  _conditional = other._conditional;
+  return *this;
 }
 
 

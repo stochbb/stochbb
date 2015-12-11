@@ -81,6 +81,7 @@ Var mixture(double wX1, const Var &X1, double wX2, const Var &X2, double wX3, co
 /** Constructs a mixture of the given variables with assiciated weights. */
 Var mixture(const std::vector<double> &weights, const std::vector<Var> &variables);
 
+Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
 }
 
 /** Overloads the +-operator to construct a @c Chain.
@@ -132,5 +133,6 @@ inline  stochbb::Var max(const stochbb::Var &a, const stochbb::Var &b) {
 }
 
 }
+
 
 #endif // __SSB_OPERATORS_HH__

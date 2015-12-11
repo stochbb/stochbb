@@ -20,6 +20,7 @@ class ChainObj;
 class MaximumObj;
 class MinimumObj;
 class MixtureObj;
+class ConditionalObj;
 class CompoundObj;
 class SimulationObj;
 class ExactSamplerObj;
@@ -399,6 +400,22 @@ public:
 protected:
   /** The reference to the @c MixtureObj instance. */
   MixtureObj *_mixture;
+};
+
+
+class Conditional: public DerivedVar
+{
+public:
+  typedef ConditionalObj ObjectType;
+
+public:
+  Conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2, const std::string &name="");
+  Conditional(ConditionalObj *obj);
+  Conditional(const Conditional &other);
+  Conditional &operator=(const Conditional &other);
+
+protected:
+  ConditionalObj *_conditional;
 };
 
 

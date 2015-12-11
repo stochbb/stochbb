@@ -218,26 +218,6 @@ ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Vecto
   for (int i=1; i<out.size(); i++) { out[i] = out[i-1] + out[i]*dt; }
 }
 
-/*void
-ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
-  // Apply affine transform
-  Tmin = (Tmin-_shift)/_scale;
-  Tmax = (Tmax-_shift)/_scale;
-
-  Eigen::FFT<double> fft;
-  Eigen::VectorXd tmp1(2*out.size());  tmp1.setZero();
-  Eigen::VectorXcd tmp2(2*out.size());
-  Eigen::VectorXcd prod(2*out.size()); prod.setOnes();
-  // Perform FFT convolution
-  for (size_t i=0; i<_densities.size(); i++) {
-    _densities[i]->evalCDF(Tmin, Tmax, out);
-    tmp1.head(out.size()) = out;
-    fft.fwd(tmp2, tmp1); prod.array() *= tmp2.array();
-  }
-  fft.inv(tmp1, prod);
-  out = tmp1.head(out.size());
-} */
-
 Density
 ConvolutionDensityObj::affine(double scale, double shift) const {
   return new ConvolutionDensityObj(_densities, _scale*scale, scale*_shift+shift);
@@ -276,6 +256,12 @@ ConvolutionDensityObj::print(std::ostream &stream) const {
 ChainObj::ChainObj(const std::vector<Var> &variables, const std::string &name)
   : DerivedVarObj(variables, name), _density(0)
 {
+  // Check for independence
+  if (! independent(variables)) {
+    AssumptionError err;
+    err << "Cannot create chain: Variables not independent.";
+    throw err;
+  }
   _density = new ConvolutionDensityObj(_variables);
 }
 

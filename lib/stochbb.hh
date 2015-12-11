@@ -10,6 +10,7 @@
 #include "chain.hh"
 #include "minmax.hh"
 #include "mixture.hh"
+#include "conditional.hh"
 #include "compound.hh"
 #include "exactsampler.hh"
 #include "marginalsampler.hh"

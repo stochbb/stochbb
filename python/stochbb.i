@@ -131,6 +131,13 @@ public:
 };
 
 
+class Conditional: public DerivedVar
+{
+protected:
+  Conditional();
+};
+
+
 class Compound: public DerivedVar
 {
 protected:
@@ -202,6 +209,8 @@ Var mixture(double w1, const Var &X1, double w2, const Var &X2);
 Var mixture(double w1, const Var &X1, double w2, const Var &X2, double w3, const Var &X3);
 Var mixture(const std::vector<double> weights, const std::vector<Var> &variables);
 
+Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
+
 %extend Container {
   bool isDensity() const { return self->is<stochbb::Density>(); }
   stochbb::Density asDensity() { return self->as<stochbb::Density>(); }
@@ -226,6 +235,9 @@ Var mixture(const std::vector<double> weights, const std::vector<Var> &variables
 
   bool isMixture() const { return self->is<stochbb::Mixture>(); }
   stochbb::Mixture asMixture() { return self->as<stochbb::Mixture>(); }
+
+  bool isConditional() const { return self->is<stochbb::Conditional>(); }
+  stochbb::Conditional asConditional() { return self->as<stochbb::Conditional>(); }
 
   bool isCompound() const { return self->is<stochbb::Compound>(); }
   stochbb::Compound asCompound() { return self->as<stochbb::Compound>(); }
