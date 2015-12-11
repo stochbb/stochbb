@@ -11,8 +11,8 @@ namespace stochbb {
  * That is the density of the random variable
  * \f[
  *  Z = \begin{cases}
- *   Y_1 & \text{ if } X_1 < X_2\\
- *   Y_2 & \text{else.}
+ *   Y_1 & \mbox{if }\, X_1 < X_2\\
+ *   Y_2 & \mbox{else.}
  *  \end{cases}
  * \f]
  * assuming \f$X_1,X_2,Y_1\f$ and \fX_1,$X_2,Y_2\f$ mutually independent, the probability of
@@ -62,6 +62,49 @@ public:
 protected:
   ConditionalDensityObj *_density;
 };
+
+
+/** Implements the density of a conditional chained variable.
+ * That is
+ * \f[
+ *  Z = \begin{cases}
+ *   X_1+Y_1 & \text{ if } X_1 < X_2\\
+ *   X_2+Y_2 & \text{else,}
+ *  \end{cases}
+ * \f]
+ * where \f$X_1, X_2, Y_1\f$ and \f$X_1, X_2, Y_2\f$ are mutually independent.
+ * This means that Z is the sum (chain) of \f$X_1\f$ and \f$Y_1\f$ if \f$X_1<X_2\f$ and
+ * the sum (chain) of \f$X_2\f$ and \f$Y_2\f$ else. Please note that this
+ * random variable cannot be implemented useing the @c ConditionalObj class as e.g.
+ * \f$X_1+Y_1\f$ (one possible outcome) depends trivially on \f$X_1\f$ (part of the condition).
+ *
+ * As both cases are mutually exclusive, the density of \f$Z\f$, \f$f_Z(z)\f$ can be writen as
+ * \f[
+ *  f_Z(z) = \iiint_{-\infty}^\infty f(z,x_1,x_2,y_1|z=x_1+y_1, x_1<x_2)\,dx_1\,dx_2\,dy_1
+ *   + \iiint_{-\infty}^\infty f(z,x_1,x_2,y_2|z=x_2+y_2, x_2<x_1)\,dx_1\,dx_2\,dy_2
+ * \f]
+ * with
+ * \f[
+ *  \iiint_{-\infty}^\infty f(z,x_1,x_2,y_1|z=x_1+y_1, x_1<x_2)\,dx_1\,dx_2\,dy_1
+ *   = \iiint_{-\infty}^\infty f_{X_1}(x_1)\,f_{X_2}(x_2)\,f_{Y_1}(y_1)\,\delta(z-x_1-y_1)\,H(x_2-x_1)\,dx_1\,dx_2\,dy_1
+ * \f]
+ */
+class CondChainDensityObj: public DensityObj
+{
+public:
+  CondChainDensityObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
+  virtual void mark();
+
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+
+protected:
+  DensityObj *_X1;
+  DensityObj *_X2;
+  DensityObj *_Y1;
+  DensityObj *_Y2;
+};
+
 
 }
 

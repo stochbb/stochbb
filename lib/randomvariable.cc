@@ -99,11 +99,6 @@ DerivedVarObj::DerivedVarObj(const std::vector<Var> &variables, const std::strin
 
   // Collect dependencies
   for (size_t i=0; i<_variables.size(); i++) {
-    /* if (! this->mutuallyIndep(_variables[i])) {
-      AssumptionError err;
-      err << "Cannot assemble derived variable, arguments are not mutually independent.";
-      throw err;
-    } */
     // Add implicit dependencies
     _dependencies.insert(_variables[i]->dependencies().begin(),
                          _variables[i]->dependencies().end());

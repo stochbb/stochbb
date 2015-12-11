@@ -19,6 +19,13 @@ import_array();
 
 namespace stochbb {
 
+class Error { };
+%extend Error {
+  std::string __str__() {
+    return self->str();
+  }
+}
+
 class Container
 {
 protected:
@@ -193,23 +200,23 @@ Var gamma(const Var &k, const Var &theta);
 
 Var affine(const Var &var, double scale, double shift);
 
-Var chain(const std::vector<Var> &vars);
+Var chain(const std::vector<Var> &vars) throw( Error );
 
 Var minimum(const Var &X);
-Var minimum(const Var &X1, const Var &X2);
-Var minimum(const Var &X1, const Var &X2, const Var &X3);
-Var minimum(const std::vector<Var> &variables);
+Var minimum(const Var &X1, const Var &X2) throw( Error );
+Var minimum(const Var &X1, const Var &X2, const Var &X3) throw( Error );
+Var minimum(const std::vector<Var> &variables) throw( Error );
 
 Var maximum(const Var &X);
-Var maximum(const Var &X1, const Var &X2);
-Var maximum(const Var &X1, const Var &X2, const Var &X3);
-Var maximum(const std::vector<Var> &variables);
+Var maximum(const Var &X1, const Var &X2) throw( Error );
+Var maximum(const Var &X1, const Var &X2, const Var &X3) throw( Error );
+Var maximum(const std::vector<Var> &variables) throw( Error );
 
-Var mixture(double w1, const Var &X1, double w2, const Var &X2);
-Var mixture(double w1, const Var &X1, double w2, const Var &X2, double w3, const Var &X3);
-Var mixture(const std::vector<double> weights, const std::vector<Var> &variables);
+Var mixture(double w1, const Var &X1, double w2, const Var &X2) throw( Error );
+Var mixture(double w1, const Var &X1, double w2, const Var &X2, double w3, const Var &X3) throw( Error );
+Var mixture(const std::vector<double> weights, const std::vector<Var> &variables) throw( Error );
 
-Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
+Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw( Error );
 
 %extend Container {
   bool isDensity() const { return self->is<stochbb::Density>(); }

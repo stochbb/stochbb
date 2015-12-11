@@ -81,15 +81,15 @@ M13 = stochbb.gamma(M1_shape, M1_scale)
 #
 # The motor control is a mixtrue in this case. Here, there are at least
 # 3 possible paths that can lead to a saccade.
-# ... -> L11 -> M11 -> M2 -> ...,                              : No attention shift
-# ... -> L11 -> L21 -> L12 -> M12 -> M2 -> ... and             : attention shift to N+1
-# ... -> L11 -> L21 -> L12 -> L22 -> L13 -> M13 -> M2 -> ...   : attention shift to N+2
 #
 # case 1; M11 finsihed before L21 & L12, (M11<L21+L12)
-# case 2: (M11>L12+L21) & (M12<L22+L13)
-# case 3: (M11>L12+L21) & (M12>L22+L13)
+# ... -> L11 -> M11 -> ...,                              : No attention shift
 P1 = visual + L11 + M11;
+# case 2: (M11>L12+L21) & (M12<L22+L13)
+# ... -> L11 -> L21 -> L12 -> M12 -> ... and             : attention shift to N+1
 P2 = visual + L11 + L21 + L12 + M12;
+# case 3: (M11>L12+L21) & (M12>L22+L13)
+# ... -> L11 -> L21 -> L12 -> L22 -> L13 -> M13 -> ...   : attention shift to N+2
 P3 = visual + L11 + L21 + L12 + L22 + L13 + M13
 
 
@@ -103,8 +103,10 @@ M2 = stochbb.gamma(M2_shape, M2_scale)
 S = 25.
 
 # Now assemble fixation duration RV as the mixture
-dur = S + M2 + stochbb.conditional(M11, L21+L12, P1, stochbb.conditional(M12, L22+L13, P2, P3));
-
+dur = S + M2 + visual + L11 \
+   + stochbb.conditional(M11, L21+L12,
+                         M11, L21+L12 + stochbb.conditional(M12, L22+L13,
+                                                            M12, L22+L13+M13))
 # update paths
 P1 += S + M2;
 P2 += S + M2;
