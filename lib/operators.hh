@@ -1,6 +1,7 @@
 #ifndef __SSB_OPERATORS_HH__
 #define __SSB_OPERATORS_HH__
 
+#include <ostream>
 #include "api.hh"
 #include <vector>
 
