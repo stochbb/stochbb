@@ -5,6 +5,7 @@
 #include "minmax.hh"
 #include "mixture.hh"
 #include "conditional.hh"
+#include "logger.hh"
 
 using namespace stochbb;
 
