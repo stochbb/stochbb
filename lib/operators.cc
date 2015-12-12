@@ -361,8 +361,8 @@ stochbb::chain(const std::vector<Var> &vars) {
  * ********************************************************************************************* */
 Var
 stochbb::affine(const Var &var, double scale, double shift) {
-  logDebug() << "Affine trafo " << var << " -> "
-             << scale << "*" << var << "+" << shift;
+/*  logDebug() << "Affine trafo " << var << " -> "
+             << scale << "*" << var << "+" << shift; */
   // Flatten affine trafo objects
   if (var.is<AffineTrafo>()) {
     AffineTrafo a = var.as<AffineTrafo>();
