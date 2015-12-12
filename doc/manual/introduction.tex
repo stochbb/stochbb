@@ -170,7 +170,23 @@ mixture is obtained analogously. A mixture can be used to describe a random
 path-selection in a system of processing stages. 
 
 \subsection{Conditional random variables}
-\todo{Write}
+The \emph{conditional} random variable selects one of two random variables (e.g. $Y_1$ or $Y_2$) depending
+on the condition $X_1 < X_2$. That is 
+\begin{equation}
+ Z = \begin{cases}
+   Y_1 & \mbox{if } X_1 < X_2\\
+   Y_2 & \mbox{else\,,} 
+ \end{cases} \nonumber
+\end{equation}
+where $X_1, X_2, Y_1$ and $X_1, X_2, Y_2$ are mutually independent random variables. The variables
+$Y_1$ and $Y_2$ do not need to be mutually independent. Given that the possible result variables $Y_1$
+and $Y_2$ are independent from the condition, the result variable is then a simple mixture where the weight
+is given by the probability of $X_1<X_2$. Hence the density of the result variable $Z$ is
+\begin{align}
+ f_Z(z) &= Pr[X_1<X_2]\,f_{Y_1}(z) + \left(1-Pr[X_1<X_2]\right)\,f_{Y_2}(z) \nonumber \\
+    &= f_{Y_1}(z)\,\int_{-\infty}^{\infty}F_{X_1}(x)\,f_{X_2}(x)\,dx + 
+    f_{Y_2}(z)\,\int_{-\infty}^{\infty}F_{X_2}(x)\,f_{X_1}(x)\,dx\,.\nonumber
+\end{align}
 
 \subsection{Conditional chained random variables}
 One of the few non-textbook examples of a derived random variable is the conditional chained random variable. 
@@ -183,8 +199,8 @@ It can be defined as
 \end{equation}
 where $X_1, X_2, Y_1$ and $X_1, X_2, Y_2$ are mutually independent. $Y_1$ and $Y_2$ may be 
 dependent random variables. Although being similar to the conditional random variable, there is an 
-important difference: Both possible outcomes ($X_1+Y_1$ and $X_2+Y_2$) of the condition 
-$X_1<X_2$ are not independent from the condition (i.e. $X_1+Y_1$ is trivially dependent on $X_1$).
+important difference: Both possible outcomes ($X_1+Y_1$ and $X_2+Y_2$) 
+are not independent from the condition (i.e. $X_1+Y_1$ is trivially dependent on $X_1$).
 Therefore, the simple conditional random variable cannot be used here. 
 
 The conditional chained random variable can be used to describe two independent parallel processing
@@ -197,7 +213,7 @@ selected one.
 The conditional chained random variable is certainly not common and to my knowledge not
 covered in text books. Hence the density for it must be obtained first.
 Given that the cases ($X_1<X_2$ and $X_2<X_1$) are mutually exclusive, the density of $Z$, 
-$f_Z(z)$ can be expressed as as simple sum. Precisely
+$f_Z(z)$ can be expressed as a simple sum. Precisely
 \begin{multline}
  f_Z(Z) = \iiint_{-\infty}^\infty f(z,x_1,x_2,y_1|z=x_1+y_1,x_1<x_2)\,dx_1\,dx_2\,dy_1 \\
   + \iiint_{-\infty}^\infty f(z,x_1,x_2,y_2|z=x_2+y_2,x_2<x_1)\,dx_1\,dx_2\,dy_2\,. \nonumber

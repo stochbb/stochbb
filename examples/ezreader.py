@@ -110,34 +110,14 @@ def ezreader(log_f, pred):
 
 # log word frequency (high, medium, low)
 log_f = [3.0, 2., 1.]
-# predictability (high, high, medium)
-pred = [0.7, 0.6, 0.2]
-# scan p2 (pred[1]) from 0 to 0.9 in 100 steps
-p2_range = linspace(0, 0.9, 100)
+# predictability (medium, high, low)
+pred = [0.4, 0.8, 0.1]
 # time scales
 t = linspace(Tmin, Tmax, steps)
 
-def eval_pdf(p):
-    pred[1] = p;
-    dur = ezreader(log_f, pred)
-    # Eval density of mixture
-    pdf = empty(steps,); dur.density().eval(Tmin, Tmax, pdf)
-    return pdf;
+dur = ezreader(log_f, pred)
+# Eval density of mixture
+pdf = empty(steps,); dur.density().eval(Tmin, Tmax, pdf)
 
-fig, ax = pylab.subplots()
-line, = ax.plot(t, eval_pdf(0))
-text = ax.text(1000, 0.008, "p(N+1)=0")
-
-def animate(p):
-    line.set_ydata(eval_pdf(p));
-    text.set_text("p(N+1)={0:.2f}".format(p))
-    return line,text
-
-def init():
-    return animate(0);
-
-import matplotlib.animation as animation
-animation = animation.FuncAnimation(fig, animate, p2_range, init_func=init,
-                                    interval=25);
-animation.save("ezreader.ogg")
+pylab.plot(t, pdf)
 pylab.show()
