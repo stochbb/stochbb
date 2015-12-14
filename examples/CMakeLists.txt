@@ -1,3 +1,2 @@
-SET(example_FILES simple_chain.xml gamma.xml minmax.xml exp.xml exgauss.xml chisq.xml mixture.xml
-    compound.xml example.xml ezreader.py)
+SET(example_FILES ezreader.py condchain.py)
 add_custom_target(examples SOURCES ${example_FILES})
