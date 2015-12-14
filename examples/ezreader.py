@@ -3,8 +3,6 @@
 
 from numpy import *
 import stochbb
-import matplotlib
-matplotlib.use("Agg")
 from matplotlib import pylab
 
 #
@@ -87,7 +85,7 @@ def ezreader(log_f, pred):
     #
     # case 1; M11 finsihed before L21 & L12, (M11<L21+L12)
     # ... -> M11 -> ...,                              : No attention shift
-    P1 = visual + L11 + M11 + (M2 + S);
+    P1 = visual + L11 + M11 + M2 + S;
     # case 2: (M11>L12+L21) & (M12<L22+L13)
     # ... -> L21 -> L12 -> M12 -> ... and             : attention shift to N+1
     P2 = visual + L11 + L21 + L12 + M12 + (M2 + S);
@@ -106,7 +104,7 @@ def ezreader(log_f, pred):
                                                M13));
     dur += M2 + S
     # Done
-    return dur;
+    return dur, P1, P2, P3;
 
 # log word frequency (high, medium, low)
 log_f = [3.0, 2., 1.]
@@ -115,9 +113,16 @@ pred = [0.4, 0.8, 0.1]
 # time scales
 t = linspace(Tmin, Tmax, steps)
 
-dur = ezreader(log_f, pred)
+dur, P1, P2, P3 = ezreader(log_f, pred)
 # Eval density of mixture
 pdf = empty(steps,); dur.density().eval(Tmin, Tmax, pdf)
+pp1 = empty(steps,); P1.density().eval(Tmin, Tmax, pp1)
+pp2 = empty(steps,); P2.density().eval(Tmin, Tmax, pp2)
+pp3 = empty(steps,); P3.density().eval(Tmin, Tmax, pp3)
 
-pylab.plot(t, pdf)
+pylab.plot(t, pdf, label="EZ-Reader")
+pylab.plot(t, pp1, label="no skip")
+pylab.plot(t, pp2, label="skip N+1")
+pylab.plot(t, pp3, label="skip N+1, N+2")
+pylab.legend()
 pylab.show()
