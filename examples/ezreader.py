@@ -22,7 +22,6 @@ def ezreader(log_f, pred):
     # 90ms visual stage delay
     # This however, I am not sure. Eq. 1 in Reichle 2003 makes absolutely no sense:
     #  visual processing = t/(\epsilon ^ {\Simga i \_letter i - fixation\_/N })
-    # Oh boy! And this has been published, where t is the fixation duration.
     visual = 90.
 
     #
@@ -59,10 +58,9 @@ def ezreader(log_f, pred):
     L13, L23 = lexical(log_f[2], pred[2])
 
     #
-    # Motor control stages
-    #
-    # first stage: mean specified in paper, sd not
-    # what the heck? Anyway, assume the same sd like in L1 & L2
+    # Motor control stages:
+    #  first stage: mean specified in paper, sd not
+    #   what the heck? Anyway, assume the same sd like in L1 & L2
     M1_mean = 187.
     M1_sd   = 0.18*M1_mean
     M1_shape = (1/0.18)**2;
@@ -72,7 +70,7 @@ def ezreader(log_f, pred):
     M12 = stochbb.gamma(M1_shape, M1_scale)
     M13 = stochbb.gamma(M1_shape, M1_scale)
 
-    # second stage
+    #  second stage:
     M2_mean  = 53.
     M2_sd    = 0.18*M2_mean
     M2_shape = (1/0.18)**2;

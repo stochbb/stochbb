@@ -182,14 +182,14 @@ public:
   inline double k() const { return _k; }
   /** Returns the scale parameter of the gamma distribution. */
   inline double theta() const { return _theta; }
+  /** Returns the shift of the distribution. */
+  inline double shift() const { return _shift; }
 
 protected:
   /** The shape paramter. */
   double _k;
   /** The scale parameter. */
   double _theta;
-  /** Scale of the affine transform. */
-  double _scale;
   /** Shift of the affine transform. */
   double _shift;
 };
