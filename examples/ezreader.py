@@ -3,6 +3,8 @@
 
 from numpy import *
 import stochbb
+import matplotlib
+matplotlib.use("Agg")
 from matplotlib import pylab
 
 #
@@ -137,7 +139,12 @@ def init():
     return animate(0);
 
 import matplotlib.animation as animation
-animation = animation.FuncAnimation(fig, animate, p2_range, init_func=init,
-                                    interval=25);
-animation.save("ezreader.ogg")
-pylab.show()
+ani = animation.FuncAnimation(fig, animate, p2_range, init_func=init,
+                              interval=25);
+
+# Set up formatting for the movie files
+Writer = animation.writers['avconv']
+writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+
+ani.save("ezreader.mp4", writer=writer)
+#pylab.show()
