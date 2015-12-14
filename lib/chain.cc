@@ -79,8 +79,7 @@ DensityObj *convolution_combine(DensityObj *a, DensityObj *b) {
   } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(a)) {
     // If LHS is a gamma density
     if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(b)) {
-      Density res = gamma_a->affine(1, delta_b->delay()); res->ref();
-      return *res;
+      return new GammaDensityObj(gamma_a->k(), gamma_a->theta(), gamma_a->shift()+delta_b->delay());
     } else if (GammaDensityObj *gamma_b = dynamic_cast<GammaDensityObj *>(b)) {
       // If LHS is a gamma too and has the same scale
       if (gamma_a->theta() == gamma_b->theta()) {
