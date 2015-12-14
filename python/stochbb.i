@@ -12,8 +12,8 @@
 
 %init %{
 import_array();
-//Logger::addHandler(
-//      new IOLogHandlerObj(std::cerr, LogMessage::DEBUG));
+Logger::addHandler(
+      new IOLogHandlerObj(std::cerr, LogMessage::DEBUG));
 %}
 
 
