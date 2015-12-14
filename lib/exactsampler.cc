@@ -5,6 +5,7 @@
 #include "minmax.hh"
 #include "mixture.hh"
 #include "compound.hh"
+#include "conditional.hh"
 #include "exception.hh"
 #include "rng.hh"
 
@@ -122,6 +123,10 @@ ExactSamplerObj::_choose_sampler(VarObj *var) {
     return ExactSamplerObj::_sample_minimum;
   } else if (dynamic_cast<MixtureObj *>(var)) {
     return ExactSamplerObj::_sample_mixture;
+  } else if (dynamic_cast<ConditionalObj *>(var)) {
+    return ExactSamplerObj::_sample_conditional;
+  } else if (dynamic_cast<CondChainObj *>(var)) {
+    return ExactSamplerObj::_sample_condchain;
   } else if (dynamic_cast<NormalCompoundObj *>(var)) {
     return ExactSamplerObj::_sample_comp_normal;
   } else if (dynamic_cast<GammaCompoundObj *>(var)) {
@@ -208,6 +213,32 @@ ExactSamplerObj::_sample_mixture(ExactSamplerObj *self, VarObj *var, Eigen::Matr
     size_t idx = (p < cum[0]) ? 0 : _find_index(p, 0, mix->numVariables()-1, cum);
     // select sample
     out(i, var_idx) = out(i, self->_varmap[*mix->variable(idx)]);
+  }
+}
+
+void
+ExactSamplerObj::_sample_conditional(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
+  ConditionalObj *cond = static_cast<ConditionalObj *>(var);
+  size_t X1 = self->_varmap[*cond->variable(0)];
+  size_t X2 = self->_varmap[*cond->variable(1)];
+  size_t Y1 = self->_varmap[*cond->variable(2)];
+  size_t Y2 = self->_varmap[*cond->variable(3)];
+  size_t Z  = self->_varmap[cond];
+  for (int i=0; i<out.size(); i++) {
+    out(i, Z) = (out(i,X1)<out(i,X2)) ? out(i,Y1) : out(i,Y2);
+  }
+}
+
+void
+ExactSamplerObj::_sample_condchain(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
+  CondChainObj *cond = static_cast<CondChainObj *>(var);
+  size_t X1 = self->_varmap[*cond->variable(0)];
+  size_t X2 = self->_varmap[*cond->variable(1)];
+  size_t Y1 = self->_varmap[*cond->variable(2)];
+  size_t Y2 = self->_varmap[*cond->variable(3)];
+  size_t Z  = self->_varmap[cond];
+  for (int i=0; i<out.size(); i++) {
+    out(i, Z) = (out(i,X1)<out(i,X2)) ? out(i,X1)+out(i,Y1) : out(i,X2)+out(i,Y2);
   }
 }
 

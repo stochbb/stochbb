@@ -24,7 +24,6 @@ def ezreader(log_f, pred):
     # 90ms visual stage delay
     # This however, I am not sure. Eq. 1 in Reichle 2003 makes absolutely no sense:
     #  visual processing = t/(\epsilon ^ {\Simga i \_letter i - fixation\_/N })
-    # Oh boy! And this has been published, where t is the fixation duration.
     visual = 90.
 
     #
@@ -61,10 +60,9 @@ def ezreader(log_f, pred):
     L13, L23 = lexical(log_f[2], pred[2])
 
     #
-    # Motor control stages
-    #
-    # first stage: mean specified in paper, sd not
-    # what the heck? Anyway, assume the same sd like in L1 & L2
+    # Motor control stages:
+    #  first stage: mean specified in paper, sd not
+    #   what the heck? Anyway, assume the same sd like in L1 & L2
     M1_mean = 187.
     M1_sd   = 0.18*M1_mean
     M1_shape = (1/0.18)**2;
@@ -74,7 +72,7 @@ def ezreader(log_f, pred):
     M12 = stochbb.gamma(M1_shape, M1_scale)
     M13 = stochbb.gamma(M1_shape, M1_scale)
 
-    # second stage
+    #  second stage:
     M2_mean  = 53.
     M2_sd    = 0.18*M2_mean
     M2_shape = (1/0.18)**2;
@@ -112,39 +110,14 @@ def ezreader(log_f, pred):
 
 # log word frequency (high, medium, low)
 log_f = [3.0, 2., 1.]
-# predictability (high, high, medium)
-pred = [0.7, 0.6, 0.2]
-# scan p2 (pred[1]) from 0 to 0.9 in 100 steps
-p2_range = linspace(0, 0.9, 100)
+# predictability (medium, high, low)
+pred = [0.4, 0.8, 0.1]
 # time scales
 t = linspace(Tmin, Tmax, steps)
 
-def eval_pdf(p):
-    pred[1] = p;
-    dur = ezreader(log_f, pred)
-    # Eval density of mixture
-    pdf = empty(steps,); dur.density().eval(Tmin, Tmax, pdf)
-    return pdf;
+dur = ezreader(log_f, pred)
+# Eval density of mixture
+pdf = empty(steps,); dur.density().eval(Tmin, Tmax, pdf)
 
-fig, ax = pylab.subplots()
-line, = ax.plot(t, eval_pdf(0))
-text = ax.text(1000, 0.008, "p(N+1)=0")
-
-def animate(p):
-    line.set_ydata(eval_pdf(p));
-    text.set_text("p(N+1)={0:.2f}".format(p))
-    return line,text
-
-def init():
-    return animate(0);
-
-import matplotlib.animation as animation
-ani = animation.FuncAnimation(fig, animate, p2_range, init_func=init,
-                              interval=25);
-
-# Set up formatting for the movie files
-Writer = animation.writers['avconv']
-writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-
-ani.save("ezreader.mp4", writer=writer)
-#pylab.show()
+pylab.plot(t, pdf)
+pylab.show()

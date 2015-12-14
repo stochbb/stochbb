@@ -8,6 +8,7 @@
 
 %include "numpy.i"
 %include "std_vector.i"
+%include "std_string.i"
 
 %init %{
 import_array();
@@ -36,6 +37,13 @@ protected:
   bool isNull() const;
 };
 
+%extend Container {
+  std::string __str__() {
+    std::stringstream buffer;
+    buffer << *self;
+    return buffer.str();
+  }
+}
 
 class Density: public Container
 {
@@ -86,6 +94,17 @@ public:
     return (*self)*a;
   }
 }
+
+}
+
+// Define vector-of-variables type:
+//  This allows to pass list of variables to C++ functions taking
+//  std::vector<Var> arguments.
+namespace std {
+  %template(varvector) vector<stochbb::Var>;
+};
+
+namespace stochbb {
 
 class DerivedVar: public Var
 {

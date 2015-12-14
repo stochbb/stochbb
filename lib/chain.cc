@@ -16,21 +16,10 @@ inline int density_pointer_compare(const DensityObj *a, const DensityObj *b) {
  * ********************************************************************************************* */
 // Check if two densities can be combined
 bool convolution_can_combine(DensityObj *a, DensityObj *b) {
-  if (DeltaDensityObj *delta_a = dynamic_cast<DeltaDensityObj *>(a)) {
-    // If LHS is a delta density ...
-    // ... and its delay is 0 -> identity operation
-    if (0 == delta_a->delay()) { return true; }
-    // .. other wise check by RHS type
-    if (dynamic_cast<DeltaDensityObj *>(b)) {
-      // If RHS is a delta density too -> yes
-      return true;
-    } else if (dynamic_cast<UniformDensityObj *>(b)) {
-      // If RHS is a uniform density -> yes
-      return true;
-    } else if (dynamic_cast<NormalDensityObj *>(b)) {
-      // If RHS is a normal density -> yes
-      return true;
-    }
+  // Check by type
+  if (dynamic_cast<DeltaDensityObj *>(a)) {
+    // If LHS is a delta distribution -> ok
+    return true;
   } else if (dynamic_cast<UniformDensityObj *>(a)) {
     // If LHS is a uniform density ...
     if (dynamic_cast<DeltaDensityObj *>(b)) {
@@ -47,9 +36,9 @@ bool convolution_can_combine(DensityObj *a, DensityObj *b) {
       return true;
     }
   } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(a)) {
-    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(b)) {
-      // If RHS is a gamma density with 0-delay -> identity
-      return 0 == delta_b->delay();
+    if (dynamic_cast<DeltaDensityObj *>(b)) {
+      // If RHS is a delta density
+      return true;
     } else if (GammaDensityObj *gamma_b = dynamic_cast<GammaDensityObj *>(b)) {
       // If LHS is a gamma too and has the same scale
       return gamma_a->theta() == gamma_b->theta();
@@ -62,22 +51,12 @@ bool convolution_can_combine(DensityObj *a, DensityObj *b) {
 // Derives new the analytic convolution of densities (if possible, check with
 // convolution_can_combine). Returns a new reference to a convolution object
 DensityObj *convolution_combine(DensityObj *a, DensityObj *b) {
+  /// @bug Handle affine transformations!
   logDebug() << "Convolve densities " << *a << " and " << *b;
   if (DeltaDensityObj *delta_a = dynamic_cast<DeltaDensityObj *>(a)) {
-    // If delay is 0 -> identity
-    if (0 == delta_a->delay()) { b->ref(); return b; }
-    // If LHS is a delta density ...
-    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(b)) {
-      // If RHS is a delta density too
-      return new DeltaDensityObj(delta_a->delay() + delta_b->delay());
-    } else if (UniformDensityObj *unif_b = dynamic_cast<UniformDensityObj *>(b)) {
-      // If RHS is a uniform density
-      return new UniformDensityObj(unif_b->a()+delta_a->delay(),
-                                   unif_b->b()+delta_a->delay());
-    } else if (NormalDensityObj *norm_b = dynamic_cast<NormalDensityObj *>(b)) {
-      // If RHS is a normal density
-      return new NormalDensityObj(norm_b->mu()+delta_a->delay(), norm_b->sigma());
-    }
+    // If LHS is delta -> turn into affine trafor
+    Density res = b->affine(1, delta_a->delay()); res->ref();
+    return *res;
   } else if (UniformDensityObj *unif_a = dynamic_cast<UniformDensityObj *>(a)) {
     // If LHS is a uniform density ...
     if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(b)) {
@@ -100,12 +79,13 @@ DensityObj *convolution_combine(DensityObj *a, DensityObj *b) {
   } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(a)) {
     // If LHS is a gamma density
     if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(b)) {
-      // if RHS is a delta with 0-delay -> identity
-      if (0 == delta_b->delay()) { a->ref(); return a; }
+      Density res = gamma_a->affine(1, delta_b->delay()); res->ref();
+      return *res;
     } else if (GammaDensityObj *gamma_b = dynamic_cast<GammaDensityObj *>(b)) {
       // If LHS is a gamma too and has the same scale
       if (gamma_a->theta() == gamma_b->theta()) {
-        return new GammaDensityObj(gamma_a->k()+gamma_b->k(), gamma_a->theta());
+        return new GammaDensityObj(gamma_a->k()+gamma_b->k(), gamma_a->theta(),
+                                   gamma_a->shift()+gamma_b->shift());
       }
     }
   }
