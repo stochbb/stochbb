@@ -7,40 +7,41 @@
 using namespace stochbb;
 
 // tiny helper function to sort vectors of densities
-inline int density_pointer_compare(const DensityObj *a, const DensityObj *b) {
-  return a->compare(*b);
+inline int density_compare(const Density &a, const Density &b) {
+  return a.compare(b);
 }
 
 /* ********************************************************************************************* *
  * combine densities
  * ********************************************************************************************* */
 // Check if two densities can be combined
-bool convolution_can_combine(DensityObj *a, DensityObj *b) {
+bool
+convolution_can_combine(const Density &a, const Density &b) {
   // Check by type
-  if (dynamic_cast<DeltaDensityObj *>(a)) {
+  if (dynamic_cast<DeltaDensityObj *>(*a)) {
     // If LHS is a delta distribution -> yes
     return true;
-  } else if (dynamic_cast<UniformDensityObj *>(a)) {
+  } else if (dynamic_cast<UniformDensityObj *>(*a)) {
     // If LHS is a uniform density ...
-    if (dynamic_cast<DeltaDensityObj *>(b)) {
+    if (dynamic_cast<DeltaDensityObj *>(*b)) {
       // ... and RHS is a delta density -> yes
       return true;
     }
-  } else if (dynamic_cast<NormalDensityObj *>(a)) {
+  } else if (dynamic_cast<NormalDensityObj *>(*a)) {
     // If RHS is a normal distribution ...
-    if (dynamic_cast<DeltaDensityObj *>(b)) {
+    if (dynamic_cast<DeltaDensityObj *>(*b)) {
       // ... and RHS is a delta density -> yes
       return true;
-    } else if (dynamic_cast<NormalDensityObj *>(b)) {
+    } else if (dynamic_cast<NormalDensityObj *>(*b)) {
       // ... and RHS is a normal density -> yes
       return true;
     }
-  } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(a)) {
+  } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(*a)) {
     // If LHS is a gamma density ...
-    if (dynamic_cast<DeltaDensityObj *>(b)) {
+    if (dynamic_cast<DeltaDensityObj *>(*b)) {
       // If RHS is a delta density ...
       return true;
-    } else if (GammaDensityObj *gamma_b = dynamic_cast<GammaDensityObj *>(b)) {
+    } else if (GammaDensityObj *gamma_b = dynamic_cast<GammaDensityObj *>(*b)) {
       // If LHS is a gamma too and has the same scale
       return gamma_a->theta() == gamma_b->theta();
     }
@@ -51,37 +52,36 @@ bool convolution_can_combine(DensityObj *a, DensityObj *b) {
 
 // Derives new the analytic convolution of densities (if possible, check with
 // convolution_can_combine). Returns a new reference to a convolution object
-DensityObj *convolution_combine(DensityObj *a, DensityObj *b) {
-  /// @bug Handle affine transformations!
-  logDebug() << "Convolve densities " << *a << " and " << *b;
-  if (DeltaDensityObj *delta_a = dynamic_cast<DeltaDensityObj *>(a)) {
+Density
+convolution_combine(const Density &a, const Density &b) {
+  logDebug() << "Convolve densities " << a << " and " << b;
+  if (DeltaDensityObj *delta_a = dynamic_cast<DeltaDensityObj *>(*a)) {
     // If LHS is delta -> turn into affine trafo
-    Density res = b->affine(1, delta_a->delay()); res->ref();
-    return *res;
-  } else if (UniformDensityObj *unif_a = dynamic_cast<UniformDensityObj *>(a)) {
+    return b.affine(1, delta_a->delay());
+  } else if (UniformDensityObj *unif_a = dynamic_cast<UniformDensityObj *>(*a)) {
     // If LHS is a uniform density ...
-    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(b)) {
+    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(*b)) {
       // ... and RHS is a delta density -> yes
       return new UniformDensityObj(unif_a->a()+delta_b->delay(),
                                    unif_a->b()+delta_b->delay());
     }
-  } else if (NormalDensityObj *norm_a = dynamic_cast<NormalDensityObj *>(a)) {
+  } else if (NormalDensityObj *norm_a = dynamic_cast<NormalDensityObj *>(*a)) {
     // If LHS is a normal distribution ...
-    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(b)) {
+    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(*b)) {
       // ... and RHS is a delta density
       return new NormalDensityObj(norm_a->mu()+delta_b->delay(), norm_a->sigma());
-    } else if (NormalDensityObj *norm_b = dynamic_cast<NormalDensityObj *>(b)) {
+    } else if (NormalDensityObj *norm_b = dynamic_cast<NormalDensityObj *>(*b)) {
       // ... and RHS is a normal density too
       return new NormalDensityObj(norm_a->mu()+norm_b->mu(),
                                   std::sqrt(norm_a->sigma()*norm_a->sigma()
                                             + norm_b->sigma()*norm_b->sigma()));
     }
-  } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(a)) {
+  } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(*a)) {
     // If LHS is a gamma density ...
-    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(b)) {
+    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(*b)) {
       // ... and RHS is a delta density
       return new GammaDensityObj(gamma_a->k(), gamma_a->theta(), gamma_a->shift()+delta_b->delay());
-    } else if (GammaDensityObj *gamma_b = dynamic_cast<GammaDensityObj *>(b)) {
+    } else if (GammaDensityObj *gamma_b = dynamic_cast<GammaDensityObj *>(*b)) {
       // If LHS is a gamma too and has the same scale
       if (gamma_a->theta() == gamma_b->theta()) {
         return new GammaDensityObj(gamma_a->k()+gamma_b->k(), gamma_a->theta(),
@@ -95,6 +95,35 @@ DensityObj *convolution_combine(DensityObj *a, DensityObj *b) {
   throw err;
 }
 
+Density
+stochbb::convolve(const std::vector<Density> &densities, double scale, double shift) {
+  // copy vector
+  std::vector<Density> dens(densities);
+  // Sort densities w.r.t type and parameters
+  std::sort(dens.begin(), dens.end(), density_compare);
+
+  logDebug() << "Try to convolve " << dens.size() << " densities.";
+  // Try to combine some of the densities
+  std::vector<Density>::iterator last = dens.begin();
+  std::vector<Density>::iterator current = dens.begin(); current++;
+  while (current != dens.end()) {
+    if (convolution_can_combine(*last, *current)) {
+      // If densities can be combined -> combine & replace last density
+      *last = convolution_combine(*last, *current);
+      // erase combined density
+      current = dens.erase(current);
+    } else {
+      // If densities cannot be combined -> advance iterators
+      last++; current++;
+    }
+  }
+
+  if (1 == dens.size()) {
+    return dens.back();
+  }
+
+  return new ConvolutionDensityObj(dens);
+}
 
 /* ********************************************************************************************* *
  * Implementation of ConvolutionDensityObj
@@ -105,6 +134,15 @@ ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<DensityObj *> &de
   // pass...
 }
 
+ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<Density> &densities, double scale, double shift)
+  : DensityObj(), _densities(), _scale(scale), _shift(shift)
+{
+  _densities.reserve(densities.size());
+  for (size_t i=0; i<densities.size(); i++) {
+    _densities.push_back(*densities[i]);
+  }
+}
+
 ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<Var> &variables, double scale, double shift)
   : DensityObj(), _densities(), _scale(scale), _shift(shift)
 {
@@ -112,46 +150,6 @@ ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<Var> &variables, 
   _densities.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
     _densities.push_back(*variables[i]->density());
-  }
-
-  // Try to reduce the number of densities
-  _combine_densities();
-}
-
-ConvolutionDensityObj::ConvolutionDensityObj(const std::vector<VarObj *> &variables, double scale, double shift)
-  : DensityObj(), _densities(), _scale(scale), _shift(shift)
-{
-  // Get & store the densities of all variables, assuming they are mutually independent.
-  _densities.reserve(variables.size());
-  for (size_t i=0; i<variables.size(); i++) {
-    _densities.push_back(*variables[i]->density());
-  }
-
-  // Try to reduce the number of densities
-  _combine_densities();
-}
-
-
-void
-ConvolutionDensityObj::_combine_densities() {
-  // Sort densities w.r.t type and parameters
-  std::sort(_densities.begin(), _densities.end(), density_pointer_compare);
-
-  // Try to combine some of the densities
-  std::vector<DensityObj *>::iterator last = _densities.begin();
-  std::vector<DensityObj *>::iterator current = _densities.begin(); current++;
-  while (current != _densities.end()) {
-    if (convolution_can_combine(*last, *current)) {
-      // If densities can be combined -> combine & replace last density
-      *last = convolution_combine(*last, *current);
-      // release reference to new (combined) densitiy
-      (*last)->unref();
-      // erase combined density
-      current = _densities.erase(current);
-    } else {
-      // If densities cannot be combined -> advance iterators
-      last++; current++;
-    }
   }
 }
 
@@ -173,6 +171,8 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
   // Apply affine transform
   Tmin = (Tmin-_shift)/_scale;
   Tmax = (Tmax-_shift)/_scale;
+  double mid = Tmin+(Tmax-Tmin)/2;
+  double Fs = out.size()/(Tmax-Tmin);
 
   Eigen::FFT<double> fft;
   Eigen::VectorXd tmp1(2*out.size());  tmp1.setZero();
@@ -183,7 +183,17 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
   for (size_t i=0; i<_densities.size(); i++) {
     _densities[i]->eval(Tmin, Tmax, out);
     tmp1.head(out.size()) = out*dt;
-    fft.fwd(tmp2, tmp1); prod.array() *= tmp2.array();
+    fft.fwd(tmp2, tmp1);
+    // apply time shift,
+    for (int i=0; i<out.size();i++) {
+      tmp2[i] *= std::exp(std::complex<double>(0, 2*M_PI*mid*i*Fs/double(2*out.size())));
+      tmp2[out.size()+i] *= std::exp(std::complex<double>(0, -2*M_PI*mid*i*Fs/double(2*out.size())));
+    }
+    prod.array() *= tmp2.array();
+  }
+  for (int i=0; i<out.size();i++) {
+    prod[i] *= std::exp(std::complex<double>(0, -2*M_PI*mid*i*Fs/double(2*out.size())));
+    prod[out.size()+i] *= std::exp(std::complex<double>(0, 2*M_PI*mid*i*Fs/double(2*out.size())));
   }
   fft.inv(tmp1, prod);
   out = tmp1.head(out.size())/(dt*_scale);
@@ -244,7 +254,11 @@ ChainObj::ChainObj(const std::vector<Var> &variables, const std::string &name)
     throw err;
   }
 
-  _density = new ConvolutionDensityObj(_variables);
+  std::vector<Density> dens; dens.reserve(variables.size());
+  for (size_t i=0; i<variables.size(); i++) {
+    dens.push_back(variables[i].density());
+  }
+  _density = *convolve(dens);
   _density->unref();
 }
 

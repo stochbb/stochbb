@@ -132,6 +132,9 @@ class Chain: public DerivedVar
 {
 protected:
   Chain();
+
+public:
+  Chain(const std::vector<Var> &vars);
 };
 
 

@@ -11,15 +11,14 @@ namespace stochbb {
 class ConvolutionDensityObj: public DensityObj
 {
 protected:
-  /** Constructs a new PDF as the convolution of the PDFs of the given variables
-   * (weak references). */
-  ConvolutionDensityObj(const std::vector<VarObj *> &variables, double scale=1, double shift=0);
   /** Constructs a new PDF as the convolution of the given PDFs (weak references). */
-  ConvolutionDensityObj(const std::vector<DensityObj *> &variables, double scale=1, double shift=0);
+  ConvolutionDensityObj(const std::vector<DensityObj *> &densities, double scale=1, double shift=0);
 
 public:
   /** Constructs a new PDF as the convolution of the PDFs of the given variables. */
   ConvolutionDensityObj(const std::vector<Var> &variables, double scale=1, double shift=0);
+  /** Constructs a new PDF as the convolution of the given PDFs. */
+  ConvolutionDensityObj(const std::vector<Density> &densities, double scale=1, double shift=0);
   /** Destructor. */
   virtual ~ConvolutionDensityObj();
 
@@ -62,6 +61,11 @@ protected:
 };
 
 
+/** Returns the convoultion of the given densities.
+ * This function first tries to perform the convolutions analytically and
+ * resorts to the numerical convolution if necessary. */
+Density convolve(const std::vector<Density> &densities, double scale=1, double shift=0);
+
 /** Represetns the sum of several independent random variables. */
 class ChainObj : public DerivedVarObj
 {
@@ -78,7 +82,7 @@ public:
 
 protected:
   /** The density of the sum, the convolution of all PDFs of the underlaying random variables. */
-  ConvolutionDensityObj *_density;
+  DensityObj *_density;
 };
 
 }

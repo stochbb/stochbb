@@ -203,6 +203,11 @@ Density::affine(double scale, double shift) const {
   return _density->affine(scale, shift);
 }
 
+int
+Density::compare(const Density &other) const {
+  return _density->compare(**other);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AtomicDensity container

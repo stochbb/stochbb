@@ -71,7 +71,7 @@ AtomicDensityObj::mark() {
 DeltaDensityObj::DeltaDensityObj(double delay)
   : AtomicDensityObj(), _delay(delay)
 {
-  logDebug() << "Create DeltaDensity with delay=" << _delay << ".";
+  logDebug() << "Create DeltaDensity with delay=" << _delay << " #" << this << ".";
 }
 
 DeltaDensityObj::~DeltaDensityObj() {
@@ -137,7 +137,7 @@ DeltaDensityObj::print(std::ostream &stream) const {
 UniformDensityObj::UniformDensityObj(double a, double b)
   : AtomicDensityObj(), _a(a), _b(b)
 {
-  logDebug() << "Create UniformDensity with a=" << _a << ", b=" << _b << ".";
+  logDebug() << "Create UniformDensity with a=" << _a << ", b=" << _b << " #" << this << ".";
 }
 
 UniformDensityObj::~UniformDensityObj() {
@@ -205,7 +205,8 @@ UniformDensityObj::print(std::ostream &stream) const {
 NormalDensityObj::NormalDensityObj(double mean, double stddev)
   : AtomicDensityObj(), _mu(mean), _sigma(stddev)
 {
-  logDebug() << "Create NormalDensity with mu=" << _mu << ", sigma=" << _sigma << ".";
+  logDebug() << "Create NormalDensity with mu=" << _mu << ", sigma=" << _sigma
+             << " #" << this << ".";
 }
 
 NormalDensityObj::~NormalDensityObj() {
@@ -273,7 +274,7 @@ GammaDensityObj::GammaDensityObj(double k, double theta, double shift)
   : AtomicDensityObj(), _k(k), _theta(theta), _shift(shift)
 {
   logDebug() << "Create GammaDensity with k=" << _k << ", theta=" << _theta
-             << ", shift=" << _shift << "." ;
+             << ", shift=" << _shift << " #" << this << "." ;
 }
 
 GammaDensityObj::~GammaDensityObj() {

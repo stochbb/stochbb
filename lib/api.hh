@@ -109,6 +109,8 @@ public:
   /** Returns an affine transform of the density. */
   Density affine(double scale, double shift) const;
 
+  int compare(const Density &other) const;
+
   /** Retruns a weak reference to the @c DensityObj. */
   inline DensityObj *operator *() const { return _density; }
   /** Retruns a weak reference to the @c DensityObj. */
