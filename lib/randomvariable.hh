@@ -99,6 +99,8 @@ public:
   static AtomicVarObj *norm(double mu, double sigma, const std::string &name="");
   /** Constructs a gamma distributed random variable. */
   static AtomicVarObj *gamma(double k, double theta, const std::string &name="");
+  /** Constructs a weibull distributed random variable. */
+  static AtomicVarObj *weibull(double k, double theta, const std::string &name="");
 
 protected:
   /** The density object. */

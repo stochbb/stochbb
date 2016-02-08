@@ -242,6 +242,8 @@ public:
   static AtomicVar norm(double mu, double sigma, const std::string &name="");
   /** Constructs a gamma distributed random variable. */
   static AtomicVar gamma(double k, double theta, const std::string &name="");
+  /** Constructs a weibull distributed random variable. */
+  static AtomicVar weibull(double k, double lambda, const std::string &name="");
 
 protected:
   /** Holds the @c GenericVarObj. */

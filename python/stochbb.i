@@ -229,6 +229,9 @@ Var gamma(double k, const Var &theta);
 Var gamma(const Var &k, double theta);
 Var gamma(const Var &k, const Var &theta);
 
+Var weibull(double k, double lambda);
+
+
 Var affine(const Var &var, double scale, double shift);
 
 Var chain(const std::vector<Var> &vars) throw( Error );

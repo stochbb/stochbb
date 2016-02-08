@@ -95,6 +95,11 @@ AtomicVarObj::gamma(double k, double theta, const std::string &name) {
   return new AtomicVarObj(new GammaDensityObj(k, theta), name);
 }
 
+AtomicVarObj *
+AtomicVarObj::weibull(double k, double lambda, const std::string &name) {
+  return new AtomicVarObj(new WeibullDensityObj(k, lambda), name);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DerivedVarObj

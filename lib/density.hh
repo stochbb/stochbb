@@ -196,6 +196,49 @@ protected:
   double _shift;
 };
 
+
+/** Implements the Weibull distribution.
+ * The (shifted) Weilbull distribution is defined as
+ * \f[
+ *  f(x\ge 0;k,\lambda,\theta) = \frac{k}{\lambda}\left(\frac{x-\theta}{\lambda}\right)^{k-1}
+ *    \exp\left[-\left(\frac{x-\theta}{\lambda}\right)^k\right]\,,
+ * \f]
+ * where \f$k\f$ is the shape parameter, \f$\lambda\f$ the scale parameter and \f$\theta\f$
+ * the shift*/
+class WeibullDensityObj: public AtomicDensityObj
+{
+public:
+  /** Constructor with shape @c k, scale @c lambda and @c shift. */
+  WeibullDensityObj(double k, double lambda, double shift=0);
+  /** Destructor. */
+  virtual ~WeibullDensityObj();
+  virtual void mark();
+
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual Density affine(double scale, double shift) const;
+
+  /** Compares densities. */
+  virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &stream) const;
+
+  /** Returns the shape parameter of the Weilbull distribution. */
+  inline double k() const { return _k; }
+  /** Returns the scale parameter of the Weibull distribution. */
+  inline double lambda() const { return _lambda; }
+  /** Returns the shift of the distribution. */
+  inline double shift() const { return _shift; }
+
+protected:
+  /** The shape paramter. */
+  double _k;
+  /** The scale parameter. */
+  double _lambda;
+  /** Shift of the affine transform. */
+  double _shift;
+};
+
 }
 
 #endif // __SBB_DENSITY_HH__

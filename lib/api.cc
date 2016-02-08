@@ -165,6 +165,11 @@ AtomicVar::gamma(double k, double theta, const std::string &name) {
   return AtomicVarObj::gamma(k, theta, name);
 }
 
+AtomicVar
+AtomicVar::weibull(double k, double lambda, const std::string &name) {
+  return AtomicVarObj::weibull(k, lambda, name);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of Density container

@@ -163,18 +163,8 @@ CondChainDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> 
   _Y1->eval(Tmin, Tmax, out);
   tmp1.head(out.size()) = out*dt;
   fft.fwd(tmp2, tmp1);
-  // apply time shift
-  for (int i=1; i<out.size();i++) {
-    tmp2[i] *= std::exp(-double(i)*dphi);
-    tmp2[2*out.size()-i] *= std::exp(double(i)*dphi);
-  }
   // FFT_INV( FFT(f_{X_1}*F_{X_2}) * FFT(f_{Y_1}) )
   prod.array() *= tmp2.array();
-  // Reverse time-shift
-  for (int i=1; i<out.size();i++) {
-    prod[i] *= std::exp(double(i)*dphi);
-    prod[2*out.size()-i] *= std::exp(-double(i)*dphi);
-  }
   fft.inv(tmp1, prod);
   sum.noalias() = tmp1.head(out.size())/dt;
 
@@ -194,18 +184,8 @@ CondChainDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> 
   _Y2->eval(Tmin, Tmax, out);
   tmp1.head(out.size()) = out*dt;
   fft.fwd(tmp2, tmp1);
-  // apply time shift
-  for (int i=1; i<out.size();i++) {
-    tmp2[i] *= std::exp(-double(i)*dphi);
-    tmp2[2*out.size()-i] *= std::exp(double(i)*dphi);
-  }
   // FFT_INV( FFT(f_{X_2}*F_{X_1}) * FFT(f_{Y_2}) )
   prod.array() *= tmp2.array();
-  // Reverse time-shift
-  for (int i=1; i<out.size();i++) {
-    prod[i] *= std::exp(double(i)*dphi);
-    prod[2*out.size()-i] *= std::exp(-double(i)*dphi);
-  }
   fft.inv(tmp1, prod);
   // sum
   out.noalias() = sum + tmp1.head(out.size())/dt;

@@ -113,6 +113,14 @@ stochbb::gamma(const Var &k, const Var &theta, const std::string &name) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of sbb::weibull()
+ * ********************************************************************************************* */
+Var
+stochbb::weibull(double k, double theta, const std::string &name) {
+  return AtomicVar::weibull(k, theta, name);
+}
+
+/* ********************************************************************************************* *
  * Implementation of minimum
  * ********************************************************************************************* */
 Var stochbb::minimum(const Var &X) {

@@ -196,18 +196,16 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
     tmp1.head(out.size()) = out*dt;
     // ... tmp2 = FFT(tmp1)
     fft.fwd(tmp2, tmp1);
-    // apply time shift
-    for (int i=1; i<out.size();i++) {
-      tmp2[i] *= std::exp(-double(i)*dphi);
-      tmp2[2*out.size()-i] *= std::exp(double(i)*dphi);
+    // Skip first PDF, this avoid the back-shift of the product
+    if (i>0) {
+      // apply time shift
+      for (int j=1; j<out.size();j++) {
+        tmp2[j] *= std::exp(-double(j)*dphi);
+        tmp2[2*out.size()-j] *= std::exp(double(j)*dphi);
+      }
     }
     // prod = prod * FFT( density )
     prod.array() *= tmp2.array();
-  }
-  // Reverse time-shift
-  for (int i=1; i<out.size();i++) {
-    prod[i] *= std::exp(double(i)*dphi);
-    prod[2*out.size()-i] *= std::exp(-double(i)*dphi);
   }
   // tmp1 = InvFFT(prod)
   fft.inv(tmp1, prod);

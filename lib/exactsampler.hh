@@ -36,6 +36,7 @@ public:
 protected:
   /** Internal used fucntion type to sample a specific variable type. */
   typedef void (*sampler_f)(ExactSamplerObj *, VarObj *, Eigen::MatrixXd &out);
+
   /** Assembles the sampling queue recusrively. */
   void _add_to_queue(VarObj *var);
   /** Chooses the correct sampler for the given variable. */

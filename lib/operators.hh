@@ -42,6 +42,11 @@ Var gamma(double k, const Var &theta, const std::string &name="");
  * Where both, the shape and scale parameter are random variables. */
 Var gamma(const Var& k, const Var &theta, const std::string &name="");
 
+/** Constructs a Weibull-distributed random variable for the given shape and scale parameters. */
+Var weibull(double k, double theta, const std::string &name="");
+
+/// @todo Implmenet CompoundWeibull distributed RVs.
+
 /** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
  * @param vars */
 Var chain(const std::vector<Var> &vars);

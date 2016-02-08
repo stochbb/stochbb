@@ -343,3 +343,90 @@ GammaDensityObj::print(std::ostream &stream) const {
   stream << " #" << (void *)this << ">";
 }
 
+
+/* ********************************************************************************************* *
+ * Implementation of WeibullDensityObj
+ * ********************************************************************************************* */
+WeibullDensityObj::WeibullDensityObj(double k, double lambda, double shift)
+  : AtomicDensityObj(), _k(k), _lambda(lambda), _shift(shift)
+{
+  logDebug() << "Create WeibullDensity with k=" << _k << ", lambda=" << _lambda
+             << ", shift=" << _shift << " #" << this << "." ;
+}
+
+WeibullDensityObj::~WeibullDensityObj() {
+  // pass...
+}
+
+void
+WeibullDensityObj::mark() {
+  if (isMarked()) { return; }
+  AtomicDensityObj::mark();
+}
+
+void
+WeibullDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  // Apply affine transform on arguments
+  Tmin -= _shift; Tmax -= _shift;
+  double t = Tmin, dt = (Tmax-Tmin)/out.size();
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    if (t<0) {
+      out[i] = 0;
+    } else {
+      out[i] = std::exp(std::log(_k)-std::log(_lambda)
+                        + (_k-1)*(std::log(t)-std::log(_lambda))
+                        - std::pow(t/_lambda, _k));
+    }
+  }
+}
+
+void
+WeibullDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  // Apply affine transform on arguments
+  Tmin -= _shift; Tmax -= _shift;
+  double t = Tmin, dt = (Tmax-Tmin)/out.size();
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    if (t<0) {
+      out[i] = 0;
+    } else {
+      out[i] = 1-std::exp(std::pow(t/_lambda,_k));
+    }
+  }
+}
+
+void
+WeibullDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
+  for (int i=0; i<out.size(); i++) {
+    out[i] = _lambda*std::pow(-std::log(1-RNG::unif()), 1./_k) + _shift;
+  }
+}
+
+Density
+WeibullDensityObj::affine(double scale, double shift) const {
+  return new WeibullDensityObj(_k, scale*_lambda, scale*_shift+shift);
+}
+
+int
+WeibullDensityObj::compare(const DensityObj &other) const {
+  // Compare types
+  if (int res = DensityObj::compare(other)) {
+    return res;
+  }
+  // Compare Weibull densities
+  const WeibullDensityObj *owb = dynamic_cast<const WeibullDensityObj *>(&other);
+  if (_k < owb->_k) { return -1; }
+  else if (_k > owb->_k) { return 1; }
+  if (_lambda < owb->_lambda) { return -1; }
+  else if (_lambda > owb->_lambda) { return 1; }
+  if (_shift < owb->_shift) { return -1; }
+  else if (_shift > owb->_shift) { return 1; }
+  return 0;
+}
+
+void
+WeibullDensityObj::print(std::ostream &stream) const {
+  stream << "<WeibullDensityObj k=" << _k << ", lambda=" << _lambda;
+  if (_shift) { stream << ", shift=" << _shift; }
+  stream << " #" << (void *)this << ">";
+}
+
