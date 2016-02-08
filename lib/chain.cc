@@ -119,11 +119,14 @@ stochbb::convolve(const std::vector<Density> &densities, double scale, double sh
   }
 
   if (1 == dens.size()) {
+    // If only one density is left -> unpack
     return dens.back();
   }
 
+  // Otherwise construct convolution density from list of densities
   return new ConvolutionDensityObj(dens);
 }
+
 
 /* ********************************************************************************************* *
  * Implementation of ConvolutionDensityObj
@@ -171,32 +174,45 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
   // Apply affine transform
   Tmin = (Tmin-_shift)/_scale;
   Tmax = (Tmax-_shift)/_scale;
-  double mid = Tmin+(Tmax-Tmin)/2;
+  // Get sample period
+  double dt = (Tmax-Tmin)/out.size();
+  // Get sample rate
   double Fs = out.size()/(Tmax-Tmin);
+  // Compute time-shift
+  std::complex<double> dphi(0, 2*M_PI*Tmin*Fs/double(2*out.size()));
 
+  // Allocate some buffers & FFT trafo
   Eigen::FFT<double> fft;
   Eigen::VectorXd tmp1(2*out.size());  tmp1.setZero();
   Eigen::VectorXcd tmp2(2*out.size());
   Eigen::VectorXcd prod(2*out.size()); prod.setOnes();
-  // Perform FFT convolution
-  double dt = (Tmax-Tmin)/out.size();
+
+  // Perform FFT convolution:
+  // For each density ...
   for (size_t i=0; i<_densities.size(); i++) {
+    // ... eval
     _densities[i]->eval(Tmin, Tmax, out);
+    // ... turn into PMF
     tmp1.head(out.size()) = out*dt;
+    // ... tmp2 = FFT(tmp1)
     fft.fwd(tmp2, tmp1);
-    // apply time shift,
-    for (int i=0; i<out.size();i++) {
-      tmp2[i] *= std::exp(std::complex<double>(0, 2*M_PI*mid*i*Fs/double(2*out.size())));
-      tmp2[out.size()+i] *= std::exp(std::complex<double>(0, -2*M_PI*mid*i*Fs/double(2*out.size())));
+    // apply time shift
+    for (int i=1; i<out.size();i++) {
+      tmp2[i] *= std::exp(-double(i)*dphi);
+      tmp2[2*out.size()-i] *= std::exp(double(i)*dphi);
     }
+    // prod = prod * FFT( density )
     prod.array() *= tmp2.array();
   }
-  for (int i=0; i<out.size();i++) {
-    prod[i] *= std::exp(std::complex<double>(0, -2*M_PI*mid*i*Fs/double(2*out.size())));
-    prod[out.size()+i] *= std::exp(std::complex<double>(0, 2*M_PI*mid*i*Fs/double(2*out.size())));
+  // Reverse time-shift
+  for (int i=1; i<out.size();i++) {
+    prod[i] *= std::exp(double(i)*dphi);
+    prod[2*out.size()-i] *= std::exp(-double(i)*dphi);
   }
+  // tmp1 = InvFFT(prod)
   fft.inv(tmp1, prod);
-  out = tmp1.head(out.size())/(dt*_scale);
+  // Store result
+  out.noalias() = tmp1.head(out.size())/(dt*_scale);
 }
 
 void
@@ -205,7 +221,10 @@ ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Vecto
   double dt = (Tmax-Tmin)/out.size();
   this->eval(Tmin, Tmax, out);
   out[0] *=dt;
-  for (int i=1; i<out.size(); i++) { out[i] = out[i-1] + out[i]*dt; }
+  // Approx integral
+  for (int i=1; i<out.size(); i++) {
+    out[i] = out[i-1] + out[i]*dt;
+  }
 }
 
 Density
@@ -254,10 +273,13 @@ ChainObj::ChainObj(const std::vector<Var> &variables, const std::string &name)
     throw err;
   }
 
+  // Get vector of densities
   std::vector<Density> dens; dens.reserve(variables.size());
   for (size_t i=0; i<variables.size(); i++) {
     dens.push_back(variables[i].density());
   }
+
+  // Assemble convolution density
   _density = *convolve(dens);
   _density->unref();
 }

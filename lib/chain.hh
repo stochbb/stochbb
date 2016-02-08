@@ -46,10 +46,6 @@ public:
   void print(std::ostream &stream) const;
 
 protected:
-  /** Inernal used function to perfrom some convolutions analytically. */
-  void _combine_densities();
-
-protected:
   /** The @c DensityObj instances of the underlaying variables. */
   std::vector<DensityObj *> _densities;
   /** Scale of the affine transform. */

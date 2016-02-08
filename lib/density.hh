@@ -20,16 +20,18 @@ public:
   virtual ~DensityObj();
   virtual void mark();
 
-  /** Evaluates the density at a regular grid on the interval \f$[Tmin, Tmax)\f$ and
+  /** Evaluates the density on a regular grid in \f$[Tmin, Tmax)\f$ and
    * stores it into the given output vector. The number of grid points is determined
    * by the length of the output vector. */
   virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const = 0;
+
   /** Evaluates the probability function (CDF) at a regular grid on the interval \f$[Tmin, Tmax)\f$
    * and stores it into the given output vector. The number of grid points is determined
    * by the length of the output vector. */
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const = 0;
 
-  /** Retruns a new density instance being the affine transformed of this density. */
+  /** Retruns a new density instance being the affine transformed of this density. That is
+   * \f$f(x) \mapsto f(a\,x+b)\f$.*/
   virtual Density affine(double scale, double shift) const = 0;
 
   /** Comparison operator between densities. This implementation compares only by type.

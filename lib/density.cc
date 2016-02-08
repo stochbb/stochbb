@@ -293,7 +293,7 @@ GammaDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out)
   Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    if (t<=0) { out[i] = 0; }
+    if (t<0) { out[i] = 0; }
     else { out[i] = std::exp((_k-1)*std::log(t) - t/_theta -std::lgamma(_k) -_k*std::log(_theta)); }
   }
 }
@@ -304,7 +304,8 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> o
   Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = stochbb::gamma_li(_k, t/_theta);
+    if (t<0) { out[i] = 0; }
+    else { out[i] = stochbb::gamma_li(_k, t/_theta); }
   }
 }
 
@@ -337,7 +338,8 @@ GammaDensityObj::compare(const DensityObj &other) const {
 
 void
 GammaDensityObj::print(std::ostream &stream) const {
-  stream << "<GammaDensityObj k=" << _k << ", theta=" << _theta
-         << ", shift=" << _shift << " #" << (void *)this << ">";
+  stream << "<GammaDensityObj k=" << _k << ", theta=" << _theta;
+  if (_shift) { stream << ", shift=" << _shift; }
+  stream << " #" << (void *)this << ">";
 }
 

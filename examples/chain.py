@@ -6,14 +6,10 @@ from matplotlib import pylab
 
 X1 = stochbb.gamma(10, 10);
 X2 = stochbb.gamma(10, 20);
-Y = stochbb.Chain([stochbb.delta(20), X1])
-Z = stochbb.delta(20) + X1
+Y = X1+X2
+Z = 20 + X1 + X2
 
-print( Y.density() )
-print( Z.density() )
-
-
-Tmin, Tmax, N = 0, 700, 10000;
+Tmin, Tmax, N = 100, 400, 10000;
 t = linspace(Tmin, Tmax, N)
 pX1 = empty(N,); X1.density().eval(Tmin, Tmax, pX1)
 pX2 = empty(N,); X2.density().eval(Tmin, Tmax, pX2)
@@ -25,10 +21,11 @@ pZ = empty(N,); Z.density().eval(Tmin, Tmax, pZ)
 #b = empty(N,); (X2+100).density().eval(Tmin, Tmax, b)
 #res = convolve(a,b, mode="same")
 
-pylab.plot(t, pX1, label="X1")
-#pylab.plot(t, pX2, label="X2")
-pylab.plot(t, pY, label="Y=20+X1")
-pylab.plot(t, pZ, label="Z=Y+100")
+pylab.plot(t, pX1, label="X1~Gamma(10,10)")
+pylab.plot(t, pX2, label="X2~Gamma(10,20)")
+pylab.plot(t, pY, label="Y=X1+X2")
+pylab.plot(t, pZ, label="Z=20+X1+X2")
 #pylab.plot(t, pZ2, label="(X1+X2)+120")
 pylab.legend()
+
 pylab.show()

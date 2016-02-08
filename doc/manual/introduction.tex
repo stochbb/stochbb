@@ -120,13 +120,13 @@ The minimum or maximum of some given random variables, e.g. $Y=\min\{X_1,X_2\}$ 
 $Y=\max\{X_1,X_2\}$ are them self random variables. These derived random variables can be used to
 express the waiting time of a processing stage that consists of several independent processes being
 performed in parallel (in contrast to sequential processes described by sums of random variables). 
-If the processing stage finishes, once the first of the parallel processes is finished, the 
-resulting waiting time is expressed by the minimum of the underlying random variables. If the stage
-finishes once all underlying processes are finished, the resulting waiting time is described
-by the maximum. 
+If the processing stage finishes once the first of the parallel processes finishes, the 
+resulting waiting time can be expressed by the minimum of the underlying random variables. If the stage
+finishes once all underlying processes are finished, the resulting waiting time can be described
+by the maximum.	 
 
-If the two random variables $X_1$ and $X_2$ are distributed according to the (cumulative) distribution
-functions $F_1(x)$ and $F_2(x)$, then the maximum of these two random variables $Y=\max\{X_1,X_2\}$
+If the two independent random variables $X_1$ and $X_2$ are distributed according to the (cumulative) distribution
+functions $F_1(x)$ and $F_2(x)$, the maximum of these two random variables $Y=\max\{X_1,X_2\}$
 is distributed according to the probability function $F_Y(y)=F_1(y)\cdot F_2(y)$. Consequently, its PDF
 is $f_Y(y)=f_1(y)\cdot F_2(y) + f_2(y)\cdot F_1(y)$, where $f_1(\cdot)$ and $f_2(\cdot)$ are the PDFs
 of the random variables $X_1$ and $X_2$. Likewise, the CDF and PDF of the minimum can be expressed as
@@ -152,9 +152,9 @@ then, possible common terms are collected like
  \max\{X_1 + X_2, X_3 + X_2\} \longrightarrow \max\{X_1,X_3\}+X_2\,. \nonumber
 \end{equation}
 
-This does not ensure independence of random variables, but decreases the complexity of
-setting-up a complex system of random variables by resolving simple-structured 
-dependencies between random variables.
+The latter transformation does not ensure independence of random variables, but 
+decreases the complexity of setting-up a complex system of random variables by 
+resolving simple-structured dependencies between random variables.
 
 \subsection{Mixture of random variables}
 A mixture is the weighted sum of random variables

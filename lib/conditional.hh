@@ -91,6 +91,8 @@ public:
   void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   Density affine(double scale, double shift) const;
 
+  void print(std::ostream &out) const;
+
 protected:
   DensityObj *_X1;
   DensityObj *_X2;

@@ -135,38 +135,77 @@ CondChainDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> 
   Eigen::FFT<double> fft;
   Eigen::VectorXd tmp1(2*out.size());  tmp1.setZero();
   Eigen::VectorXcd tmp2(2*out.size());
-  Eigen::VectorXcd prod(2*out.size()); prod.setOnes();
+  Eigen::VectorXcd prod(2*out.size()); //prod.setOnes();
   Eigen::VectorXd sum(out.size());
 
-  // Perform FFT convolution
+  /// @bug Fix shift if Tmin != 0, like in @c ConvolutionDensity!
+  logDebug() << "Eval CondChainDensityObj on int. [" << Tmin << ", " << Tmax << "].";
+
   double dt = (Tmax-Tmin)/out.size();
+  // Get sample rate
+  double Fs = out.size()/(Tmax-Tmin);
+  // Compute time-shift
+  std::complex<double> dphi(0, 2*M_PI*Tmin*Fs/double(2*out.size()));
+
+  // Perform FFT convolution
   // compute FFT(f_{X_1}*F_{X_2})
   _X1->eval(Tmin, Tmax, out);
   tmp1.head(out.size()) = out*dt;
   _X2->evalCDF(Tmin, Tmax, out);
   tmp1.head(out.size()).array() *= (1-out.array());
   fft.fwd(prod, tmp1);
+  // apply time shift
+  for (int i=1; i<out.size();i++) {
+    prod[i] *= std::exp(-double(i)*dphi);
+    prod[2*out.size()-i] *= std::exp(double(i)*dphi);
+  }
   // compute FFT(f_{Y_1})
   _Y1->eval(Tmin, Tmax, out);
   tmp1.head(out.size()) = out*dt;
   fft.fwd(tmp2, tmp1);
+  // apply time shift
+  for (int i=1; i<out.size();i++) {
+    tmp2[i] *= std::exp(-double(i)*dphi);
+    tmp2[2*out.size()-i] *= std::exp(double(i)*dphi);
+  }
   // FFT_INV( FFT(f_{X_1}*F_{X_2}) * FFT(f_{Y_1}) )
   prod.array() *= tmp2.array();
+  // Reverse time-shift
+  for (int i=1; i<out.size();i++) {
+    prod[i] *= std::exp(double(i)*dphi);
+    prod[2*out.size()-i] *= std::exp(-double(i)*dphi);
+  }
   fft.inv(tmp1, prod);
   sum.noalias() = tmp1.head(out.size())/dt;
 
+  tmp1.setZero();
   // compute FFT(f_{X_2}*F_{X_1})
   _X2->eval(Tmin, Tmax, out);
   tmp1.head(out.size()) = out*dt;
   _X1->evalCDF(Tmin, Tmax, out);
   tmp1.head(out.size()).array() *= (1-out.array());
   fft.fwd(prod, tmp1);
+  // apply time shift
+  for (int i=1; i<out.size();i++) {
+    prod[i] *= std::exp(-double(i)*dphi);
+    prod[2*out.size()-i] *= std::exp(double(i)*dphi);
+  }
   // compute FFT(f_{Y_2})
   _Y2->eval(Tmin, Tmax, out);
   tmp1.head(out.size()) = out*dt;
   fft.fwd(tmp2, tmp1);
+  // apply time shift
+  for (int i=1; i<out.size();i++) {
+    tmp2[i] *= std::exp(-double(i)*dphi);
+    tmp2[2*out.size()-i] *= std::exp(double(i)*dphi);
+  }
   // FFT_INV( FFT(f_{X_2}*F_{X_1}) * FFT(f_{Y_2}) )
   prod.array() *= tmp2.array();
+  // Reverse time-shift
+  for (int i=1; i<out.size();i++) {
+    prod[i] *= std::exp(double(i)*dphi);
+    prod[2*out.size()-i] *= std::exp(-double(i)*dphi);
+  }
   fft.inv(tmp1, prod);
   // sum
   out.noalias() = sum + tmp1.head(out.size())/dt;
@@ -178,7 +217,9 @@ CondChainDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorX
   double dt = (Tmax-Tmin)/(out.size());
   this->eval(Tmin, Tmax, out);
   out[0] *=dt;
-  for (int i=1; i<out.size(); i++) { out[i] = out[i-1] + out[i]*dt; }
+  for (int i=1; i<out.size(); i++) {
+    out[i] = out[i-1] + out[i]*dt;
+  }
 }
 
 Density
@@ -186,6 +227,19 @@ CondChainDensityObj::affine(double scale, double shift) const {
   // Simply apply affine transform on all densities
   return new CondChainDensityObj(*_X1->affine(scale, 0), *_X2->affine(scale, 0),
                                  *_Y1->affine(scale, shift), *_Y2->affine(scale, shift));
+}
+
+void
+CondChainDensityObj::print(std::ostream &stream) const {
+  stream << "<CondChainDensity of X1=";
+  _X1->print(stream);
+  stream << ", X2=";
+  _X2->print(stream);
+  stream << ", Y1=";
+  _Y1->print(stream);
+  stream << ", Y2=";
+  _Y2->print(stream);
+  stream << " #" << this << ">";
 }
 
 
