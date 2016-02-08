@@ -1,5 +1,4 @@
 #include "api.hh"
-#include "xmlparser.hh"
 #include "density.hh"
 #include "randomvariable.hh"
 #include "affinetrafo.hh"
@@ -8,7 +7,6 @@
 #include "mixture.hh"
 #include "conditional.hh"
 #include "compound.hh"
-#include "simulation.hh"
 #include "exactsampler.hh"
 #include "marginalsampler.hh"
 
@@ -513,118 +511,6 @@ Compound::norm(const Var &mu, const Var &sigma, const std::string &name) {
 Compound
 Compound::gamma(const Var &k, const Var &theta, const std::string &name) {
   return CompoundObj::gamma(k, theta, name);
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of Simulation container
- * ********************************************************************************************* */
-Simulation::Simulation()
-  : Container(new SimulationObj()), _simulation(static_cast<SimulationObj *>(_object))
-{
-  // pass...
-}
-
-Simulation::Simulation(SimulationObj *object)
-  : Container(object), _simulation(object)
-{
-  // pass...
-}
-
-Simulation::Simulation(const Simulation &other)
-  : Container(other), _simulation(other._simulation)
-{
-  // pass...
-}
-
-Simulation &
-Simulation::operator =(const Simulation &other) {
-  Container::operator=(other);
-  _simulation = other._simulation;
-  return *this;
-}
-
-Simulation
-Simulation::fromXml(const std::string &filename) {
-  XmlParser parser;
-  return parser.parse(filename.c_str());
-}
-
-bool
-Simulation::hasVar(const std::string &id) const {
-  return _simulation->hasVar(id);
-}
-
-Var
-Simulation::var(const std::string &id) const {
-  return _simulation->var(id);
-}
-
-void
-Simulation::addVar(const std::string &id, Var &var) const {
-  _simulation->addVar(id, *var);
-}
-
-double
-Simulation::tMin() const {
-  return _simulation->tMin();
-}
-
-void
-Simulation::setTMin(double tMin) {
-  _simulation->setTMin(tMin);
-}
-
-double
-Simulation::tMax() const {
-  return _simulation->tMax();
-}
-
-void
-Simulation::setTMax(double tMax) {
-  _simulation->setTMax(tMax);
-}
-
-size_t
-Simulation::steps() const {
-  return _simulation->steps();
-}
-
-void
-Simulation::setSteps(size_t steps) const {
-  _simulation->setSteps(steps);
-}
-
-size_t
-Simulation::numOutputVars() const {
-  return _simulation->numOutputVars();
-}
-
-Var
-Simulation::outputVar(size_t idx) const {
-  return _simulation->outputVar(idx);
-}
-
-
-void
-Simulation::addOutputVar(const Var &var) {
-  return _simulation->addOutputVar(var);
-}
-
-
-void
-Simulation::evalPDF(Eigen::MatrixXd &out) const {
-  return _simulation->evalPDF(out);
-}
-
-void
-Simulation::evalCDF(Eigen::MatrixXd &out) const {
-  return _simulation->evalCDF(out);
-}
-
-void
-Simulation::sample(Eigen::MatrixXd &out) const {
-  return _simulation->sample(out);
 }
 
 

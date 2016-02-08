@@ -57,9 +57,11 @@ or atomic random-variable types defined in StochBB:
  \function{stochbb::unif} & \code{a}, \code{b} & A process with a uniform-distributed waiting time. \\
  \function{stochbb::norm} & \code{mu}, \code{sigma} & A process with a normal-distributed waiting time. \\
  \function{stochbb::gamma} & \code{k}, \code{theta} & A process with a gamma-distributed waiting time. \\
+ \function{stochbb::weibull} & \code{k}, \code{lambda} & A process with a Weibull-distributed waiting time. \\
 \end{tabular}
 
 More complex processes can be derived by combining these atomic random variables or as special cases of them.
+
 
 \subsubsection{Affine transformation of random variables}
 An affine transformation of the random variable $X$ is of the form $a\,X+b$, where $a\neq 0$ and $b$ are

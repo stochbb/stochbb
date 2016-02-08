@@ -23,7 +23,6 @@ class MixtureObj;
 class ConditionalObj;
 class CondChainObj;
 class CompoundObj;
-class SimulationObj;
 class ExactSamplerObj;
 class MarginalSamplerObj;
 
@@ -469,81 +468,6 @@ public:
 protected:
   /** The reference to the @c CompoundObj instance. */
   CompoundObj *_compound;
-};
-
-
-/** Collects several variable definitions and which PDFs are evaluated.
- *
- * The simplest way to construct a @c Simulation is to parse a simulation specification from xml
- * e.g.
- * @code
- *  Simulation sim = Simulation::fromXml("filename.xml");
- * @endcode
- */
-class Simulation: public Container
-{
-public:
-  /** The object type of the container. */
-  typedef SimulationObj ObjectType;
-
-public:
-  /** Packs the given @c SimulationObj. */
-  Simulation(SimulationObj *object);
-  /** Copy constructor. */
-  Simulation(const Simulation &other);
-  /** Assignment operator. */
-  Simulation &operator= (const Simulation &other);
-  /** Empty constructor. */
-  Simulation();
-
-  /** Returns @c true if the given random variable is known. */
-  bool hasVar(const std::string &id) const;
-  /** Returns the specified random variable. */
-  Var var(const std::string &id) const;
-  /** Adds a random variable to the simulation. */
-  void addVar(const std::string &id, Var &var) const;
-
-  /** Returns the start time of the simulation. */
-  double tMin() const;
-  /** Sets the start time of the simulation. */
-  void setTMin(double tMin);
-  /** Returns the end time of the simulation. */
-  double tMax() const;
-  /** Sets the end time of the simulation. */
-  void setTMax(double tMax);
-  /** Returns the number of time-steps. */
-  size_t steps() const;
-  /** Sets the number of time-steps. */
-  void setSteps(size_t steps) const;
-  /** Returns the number of output variables. */
-  size_t numOutputVars() const;
-  /** Returns the specified output variable. */
-  Var outputVar(size_t idx) const;
-  /** Adds a output variable to the simulation. */
-  void addOutputVar(const Var &var);
-
-  /** Evaluates the PDF of the selected output variables and stores the results into the given
-   * matrix. The matrix gets resized. Each column represents a output variable where the first
-   * column is time. Each row represetns a time-point at which the PDFs are evaluated. */
-  void evalPDF(Eigen::MatrixXd &out) const;
-  /** Evaluates the CDF of the selected output variables and stores the results into the given
-   * matrix. The matrix gets resized. Each column represents a output variable where the first
-   * column is time. Each row represetns a time-point at which the CDFs are evaluated. */
-  void evalCDF(Eigen::MatrixXd &out) const;
-  /** Samples from the selected output variables and stores the results into the given
-   * matrix. The matrix gets resized. Each column represents a output variable and each row
-   * represetns a sample of the variables. */
-  void sample(Eigen::MatrixXd &out) const;
-
-public:  
-  /** Parses the simulation specification from XML.
-   * @returns A Simulation instance.
-   * @throws ParserError If parsing fails. */
-  static Simulation fromXml(const std::string &filename);
-
-protected:
-  /** Holds the SimulationObj instance. */
-  SimulationObj *_simulation;
 };
 
 

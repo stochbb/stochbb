@@ -37,6 +37,11 @@ Constructs a new compound-gamma-distributed random variable with shape \code{k} 
 scale \code{theta} begin random variables too.
 \end{deffunc*}
 
+\begin{deffunc}{stochbb::weibull}{\class{Var}}{double k, double lambda}
+Constructs a new Weibull-distributed random variable with shape \code{k} and 
+scale \code{lambda} , that is $Weibull(x; k, \lambda)$.
+\end{deffunc}
+
 \begin{deffunc}{stochbb::affine}{\class{Var}}{const \class{Var}\& X, double a, double b}
 Constructs an affine transformed random variable from the given one as $Y = a\,X+b$.
 \end{deffunc}

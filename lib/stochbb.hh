@@ -15,8 +15,6 @@
 #include "compound.hh"
 #include "exactsampler.hh"
 #include "marginalsampler.hh"
-#include "simulation.hh"
-#include "xmlparser.hh"
 
 #endif // __SBB_STOCHBB_HH__
 

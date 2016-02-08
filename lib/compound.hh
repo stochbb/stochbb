@@ -37,13 +37,17 @@ class NormalCompoundDensityObj: public DensityObj
 protected:
   /** Constructs the density from the given parameter random variables.
    * @param mu Specifies the mean random variable.
-   * @param sigma Specifies the standard deviation random variable. */
+   * @param sigma Specifies the standard deviation random variable.
+   * @param scale Specifies the optional scaling, default @c scale=1.
+   * @param shift Specifies the optional shift, default @c shift=0. */
   NormalCompoundDensityObj(DensityObj *mu, DensityObj *sigma, double scale=1, double shift=0);
 
 public:
   /** Constructs the density from the given parameter random variables.
    * @param mu Specifies the mean random variable.
-   * @param sigma Specifies the standard deviation random variable. */
+   * @param sigma Specifies the standard deviation random variable.
+   * @param scale Specifies the optional scaling, default @c scale=1.
+   * @param shift Specifies the optional shift, default @c shift=0. */
   NormalCompoundDensityObj(const Var &mu, const Var &sigma, double scale=1, double shift=0);
 
   virtual void mark();
@@ -72,7 +76,8 @@ class NormalCompoundObj: public CompoundObj
 public:
   /** Constructs a compound-normal distribution from the given parameter random variables.
    * @param mu Specifies the mean random variable.
-   * @param sigma Specifies the standard deviation random variable. */
+   * @param sigma Specifies the standard deviation random variable.
+   * @param name The optional variable name. */
   NormalCompoundObj(const Var &mu, const Var &sigma, const std::string &name="");
 
   void mark();
@@ -94,13 +99,17 @@ class GammaCompoundDensityObj: public DensityObj
 protected:
   /** Constructs the density from the given parameter distributions.
    * @param k Specifies the shape parameter random variable.
-   * @param theta Specifies the scale parameter random variable. */
+   * @param theta Specifies the scale parameter random variable.
+   * @param scale Specifies the optional scaling, default @c scale=1.
+   * @param shift Specifies the optional shift, default @c shift=0. */
   GammaCompoundDensityObj(DensityObj *k, DensityObj *theta, double scale=1, double shift=0);
 
 public:
   /** Constructs the density from the given parameter distributions.
    * @param k Specifies the shape parameter random variable.
-   * @param theta Specifies the scale parameter random variable. */
+   * @param theta Specifies the scale parameter random variable.
+   * @param scale Specifies the optional scaling, default @c scale=1.
+   * @param shift Specifies the optional shift, default @c shift=0. */
   GammaCompoundDensityObj(const Var &k, const Var &theta, double scale=1, double shift=0);
 
   virtual void mark();

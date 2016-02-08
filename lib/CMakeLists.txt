@@ -1,9 +1,9 @@
 SET(libsbb_SOURCES
-    object.cc density.cc randomvariable.cc rng.cc chain.cc minmax.cc simulation.cc xmlparser.cc
+    object.cc density.cc randomvariable.cc rng.cc chain.cc minmax.cc
     exception.cc math.cc api.cc option_parser.cc logger.cc operators.cc marginalsampler.cc
     exactsampler.cc mixture.cc compound.cc affinetrafo.cc conditional.cc unittest.cc cputime.cc)
 SET(libsbb_HEADERS mersennetwister.hh stochbb.hh
-    object.hh density.hh randomvariable.hh rng.hh chain.hh minmax.hh simulation.hh xmlparser.hh
+    object.hh density.hh randomvariable.hh rng.hh chain.hh minmax.hh
     exception.hh math.hh api.hh option_parser.hh logger.hh operators.hh marginalsampler.hh
     exactsampler.hh mixture.hh compound.hh affinetrafo.hh conditional.hh unittest.hh cputime.hh)
 
