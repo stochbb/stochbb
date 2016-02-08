@@ -108,6 +108,7 @@ public:
   /** Returns an affine transform of the density. */
   Density affine(double scale, double shift) const;
 
+  /** Provides a lexicographical order for all densities. */
   int compare(const Density &other) const;
 
   /** Retruns a weak reference to the @c DensityObj. */
@@ -276,21 +277,29 @@ protected:
 };
 
 
+/** Represents an affine transformation of another random variable.
+ * That is, \f$Y = a\,X+b\f$. */
 class AffineTrafo: public DerivedVar
 {
 public:
+  /** Object type of the container. */
   typedef AffineTrafoObj ObjectType;
 
 public:
+  /** Packs the given AffineTrafoObj. */
   AffineTrafo(AffineTrafoObj *obj);
+  /** Copy constructor. */
   AffineTrafo(const AffineTrafo &other);
-
+  /** Assignment operator. */
   AffineTrafo &operator =(const AffineTrafo &other);
 
+  /** Returns the scale of the transformation. */
   double scale() const;
+  /** Returns the shift of the transformation. */
   double shift() const;
 
 protected:
+  /** Hols a reference to the @c AffineTrafoObj instance. */
   AffineTrafoObj *_affine;
 };
 
@@ -407,34 +416,66 @@ protected:
 };
 
 
+/** This random variable represents a simple conditional mixture of two random variables.
+ * Assume \f$X_1, X_2\f$ and \f$Y_1\f$ as well as \f$X_1, X_2\f$ and \f$Y_2\f$ are mutually
+ * indepdent random variables. Then, the random variable \f$Z\f$ defined as
+ * \f[
+ *  Z = \begin{cases}
+ *        Y_1 & if\, X_1<X_2 \\
+ *        Y_2 & else,
+ *       \end{cases}
+ * \f]
+ * is implemented by this class. */
 class Conditional: public DerivedVar
 {
 public:
+  /** Object type of the container.*/
   typedef ConditionalObj ObjectType;
 
 public:
+  /** Constructs a conditional mixture from the given random variables. */
   Conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2, const std::string &name="");
+  /** Packs the given @c ConditionalObj instance. */
   Conditional(ConditionalObj *obj);
+  /** Copy constructor. */
   Conditional(const Conditional &other);
+  /** Assignment operator. */
   Conditional &operator=(const Conditional &other);
 
 protected:
+  /** Holds a reference to the @c ConditionalObj instance. */
   ConditionalObj *_conditional;
 };
 
 
+/** This random variable represents a conditional chain of two random variables.
+ * Assume \f$X_1, X_2\f$ and \f$Y_1\f$ as well as \f$X_1, X_2\f$ and \f$Y_2\f$ are mutually
+ * indepdent random variables. Then, the random variable \f$Z\f$ defined as
+ * \f[
+ *  Z = \begin{cases}
+ *        X_1 + Y_1 & if\, X_1<X_2 \\
+ *        X_2 + Y_2 & else,
+ *       \end{cases}
+ * \f]
+ * is implemented by this class. */
 class CondChain: public DerivedVar
 {
 public:
+  /** Object type of the container. */
   typedef CondChainObj ObjectType;
 
 public:
+  /** Constructs a conditional chain random variable from the given RVs. */
   CondChain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2, const std::string &name="");
+  /** Packs the @c CondChainObj instance. */
   CondChain(CondChainObj *obj);
+  /** Copy constructor. */
   CondChain(const CondChain &other);
+  /** Assignment operator. */
   CondChain &operator=(const CondChain &other);
 
 protected:
+  /** Holds a weak reference to the @c CondChainObj instance. */
   CondChainObj *_condchain;
 };
 

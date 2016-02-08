@@ -138,9 +138,6 @@ CondChainDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> 
   Eigen::VectorXcd prod(2*out.size()); //prod.setOnes();
   Eigen::VectorXd sum(out.size());
 
-  /// @bug Fix shift if Tmin != 0, like in @c ConvolutionDensity!
-  logDebug() << "Eval CondChainDensityObj on int. [" << Tmin << ", " << Tmax << "].";
-
   double dt = (Tmax-Tmin)/out.size();
   // Get sample rate
   double Fs = out.size()/(Tmax-Tmin);

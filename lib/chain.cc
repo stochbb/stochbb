@@ -102,7 +102,7 @@ stochbb::convolve(const std::vector<Density> &densities, double scale, double sh
   // Sort densities w.r.t type and parameters
   std::sort(dens.begin(), dens.end(), density_compare);
 
-  logDebug() << "Try to convolve " << dens.size() << " densities.";
+  logDebug() << "Try to convolve " << dens.size() << " densities...";
   // Try to combine some of the densities
   std::vector<Density>::iterator last = dens.begin();
   std::vector<Density>::iterator current = dens.begin(); current++;
@@ -117,6 +117,7 @@ stochbb::convolve(const std::vector<Density> &densities, double scale, double sh
       last++; current++;
     }
   }
+  logDebug() << "... done.";
 
   if (1 == dens.size()) {
     // If only one density is left -> unpack

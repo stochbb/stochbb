@@ -13,18 +13,25 @@ class MaximumDensityObj: public DensityObj
 {
 protected:
   /** Hidden constructor.
-   * @param variables Specifies the vector of independent random variables (weak references).
+   * @param densities Specifies the vector of densities associated with the independent random
+   *   variables (weak references).
+   * @param scale Specifies the optional scaling of the density. Default @c scale = 1.
+   * @param shift Specifies the optional shift of the density. Default @c shift = 0.
    * @throws AssumtionError If the given random variables are not mutually independent. */
   MaximumDensityObj(const std::vector<DensityObj *> &densities, double scale=1, double shift=0);
 
   /** Hidden constructor.
    * @param variables Specifies the vector of independent random variables (weak references).
+   * @param scale Specifies the optional scaling of the density. Default @c scale = 1.
+   * @param shift Specifies the optional shift of the density. Default @c shift = 0.
    * @throws AssumtionError If the given random variables are not mutually independent. */
   MaximumDensityObj(const std::vector<VarObj *> &variables, double scale=1, double shift=0);
 
 public:
   /** Constructor.
    * @param variables Specifies the vector of independent random variables.
+   * @param scale Specifies the optional scaling of the density. Default @c scale = 1.
+   * @param shift Specifies the optional shift of the density. Default @c shift = 0.
    * @throws AssumtionError If the given random variables are not mutually independent. */
   MaximumDensityObj(const std::vector<Var> &variables, double scale=1, double shift=0);
 
@@ -61,17 +68,24 @@ class MinimumDensityObj: public DensityObj
 {
 protected:
   /** Hidden constructor.
-   * @param variables Specifies the vector of independent random variables (weak references).
+   * @param densities Specifies the vector of densities associated with the independent random
+   *   variables (weak references).
+   * @param scale Specifies the optional scaling of the density. Default @c scale = 1.
+   * @param shift Specifies the optional shift of the density. Default @c shift = 0.
    * @throws AssumtionError If the given random variables are not mutually independent. */
   MinimumDensityObj(const std::vector<DensityObj *> &densities, double scale=1, double shift=0);
   /** Hidden constructor.
    * @param variables Specifies the vector of independent random variables (weak references).
+   * @param scale Specifies the optional scaling of the density. Default @c scale = 1.
+   * @param shift Specifies the optional shift of the density. Default @c shift = 0.
    * @throws AssumtionError If the given random variables are not mutually independent. */
   MinimumDensityObj(const std::vector<VarObj *> &variables, double scale=1, double shift=0);
 
 public:
   /** Constructor.
    * @param variables Specifies the vector of independent random variables.
+   * @param scale Specifies the optional scaling of the density. Default @c scale = 1.
+   * @param shift Specifies the optional shift of the density. Default @c shift = 0
    * @throws AssumtionError If the given random variables are not mutually independent. */
   MinimumDensityObj(const std::vector<Var> &variables, double scale=1, double shift=0);
 
