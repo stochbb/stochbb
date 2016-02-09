@@ -34,6 +34,7 @@ public:
   virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
 protected:
   /** First condition RV. */
@@ -100,6 +101,7 @@ public:
   void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
 
   void print(std::ostream &out) const;
 

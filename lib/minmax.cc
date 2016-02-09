@@ -93,6 +93,17 @@ MaximumDensityObj::affine(double scale, double shift) const {
   return new MaximumDensityObj(_densities, _scale*scale, scale*_shift+shift);
 }
 
+void
+MaximumDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  // Obtain an estimate of the alpha-quantiles as the maxiumum of all quantile intervals
+  _densities[0]->rangeEst(alpha, a, b);
+  for (size_t i=1; i<_densities.size(); i++) {
+    double c,d; _densities[i]->rangeEst(alpha, c,d);
+    a = std::max(a, c);
+    b = std::max(b, d);
+  }
+}
+
 int
 MaximumDensityObj::compare(const DensityObj &other) const {
   // Compare types
@@ -209,6 +220,17 @@ MinimumDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd>
 Density
 MinimumDensityObj::affine(double scale, double shift) const {
   return new MinimumDensityObj(_densities, scale*_scale, scale*_shift+shift);
+}
+
+void
+MinimumDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  // Obtain an estimate of the alpha-quantiles as the minimum of all quantile intervals
+  _densities[0]->rangeEst(alpha, a, b);
+  for (size_t i=1; i<_densities.size(); i++) {
+    double c,d; _densities[i]->rangeEst(alpha, c,d);
+    a = std::min(a, c);
+    b = std::min(b, d);
+  }
 }
 
 int

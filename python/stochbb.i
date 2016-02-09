@@ -9,6 +9,8 @@
 %include "numpy.i"
 %include "std_vector.i"
 %include "std_string.i"
+%include "typemaps.i"
+
 
 %init %{
 import_array();
@@ -19,6 +21,8 @@ Logger::addHandler(
 
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double* out, int N)}
 %apply (double* INPLACE_FARRAY2, int DIM1, int DIM2) {(double* out, int Nrow, int Ncol)}
+%apply double *OUTPUT { double *aout, double *bout }
+
 
 namespace stochbb {
 
@@ -55,13 +59,16 @@ protected:
 %extend Density {
   void eval(double Tmin, double Tmax, double* out, int N) const {
     Eigen::Map<Eigen::VectorXd> outMap(out, N);
-    self->eval(Tmin, Tmax, outMap);
+    $self->eval(Tmin, Tmax, outMap);
   }
-}
-%extend Density {
+
   void evalCDF(double Tmin, double Tmax, double* out, int N) const {
     Eigen::Map<Eigen::VectorXd> outMap(out, N);
-    self->evalCDF(Tmin, Tmax, outMap);
+    $self->evalCDF(Tmin, Tmax, outMap);
+  }
+
+  void rangeEst(double alpha, double *aout, double *bout) const {
+    $self->rangeEst(alpha, *aout, *bout);
   }
 }
 
@@ -252,6 +259,18 @@ Var mixture(const std::vector<double> weights, const std::vector<Var> &variables
 
 Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw( Error );
 Var condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw( Error );
+
+double dnorm(double x);
+double pnorm(double x);
+double qnorm(double p);
+
+double dgamma(double x, double k, double theta);
+double pgamma(double x, double k, double theta);
+double qgamma(double p, double k, double theta);
+
+double dweibull(double x, double k, double theta);
+double pweibull(double x, double k, double theta);
+double qweibull(double p, double k, double theta);
 
 %extend Container {
   bool isDensity() const { return self->is<stochbb::Density>(); }

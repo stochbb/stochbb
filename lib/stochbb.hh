@@ -16,5 +16,7 @@
 #include "exactsampler.hh"
 #include "marginalsampler.hh"
 
+#include "math.hh"
+
 #endif // __SBB_STOCHBB_HH__
 

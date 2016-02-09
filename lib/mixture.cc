@@ -72,6 +72,17 @@ MixtureDensityObj::affine(double scale, double shift) const {
   return new MixtureDensityObj(_weights, _densities, scale*_scale, scale*_shift + shift);
 }
 
+void
+MixtureDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  // Returns an estimate of the quantile as the union of all quantiles
+  _densities[0]->rangeEst(alpha, a, b);
+  for (size_t i=0; i<_densities.size(); i++) {
+    double c,d; _densities[i]->rangeEst(alpha, c, d);
+    a = std::min(a, c);
+    b = std::max(b, d);
+  }
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of MixtrueObj

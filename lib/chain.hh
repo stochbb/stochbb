@@ -27,6 +27,7 @@ public:
   virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
   /** Returns the number of underlaying densities. */
   inline size_t numDensities() const { return _densities.size(); }

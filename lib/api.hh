@@ -108,6 +108,9 @@ public:
   /** Returns an affine transform of the density. */
   Density affine(double scale, double shift) const;
 
+  /** Returns an estimate of the \f$\alpha\f$-quantiles. */
+  void rangeEst(double alpha, double &a, double &b) const;
+
   /** Provides a lexicographical order for all densities. */
   int compare(const Density &other) const;
 

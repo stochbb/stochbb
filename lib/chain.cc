@@ -3,6 +3,8 @@
 #include <unsupported/Eigen/FFT>
 #include <list>
 #include <algorithm>
+#include <complex>
+
 
 using namespace stochbb;
 
@@ -217,10 +219,13 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
 void
 ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   if (0 == out.size()) { return; }
+  // Get sample period
   double dt = (Tmax-Tmin)/out.size();
+  // Eval PDF
   this->eval(Tmin, Tmax, out);
-  out[0] *=dt;
-  // Approx integral
+  // Rescale first element
+  out[0] *= dt;
+  // compute cummulative
   for (int i=1; i<out.size(); i++) {
     out[i] = out[i-1] + out[i]*dt;
   }
@@ -229,6 +234,29 @@ ConvolutionDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Vecto
 Density
 ConvolutionDensityObj::affine(double scale, double shift) const {
   return new ConvolutionDensityObj(_densities, _scale*scale, scale*_shift+shift);
+}
+
+void
+ConvolutionDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  /* This function ties to approximate the alpha-quantiles of the convolution
+   * of the densities. The approx. quantiles are obtained as the support of the convolution
+   * of characteristic functions of the alpha-quantiles of the distributions. This can be
+   * a relatively bad approximation. */
+
+  // Get quantiles of the first density
+  _densities[0]->rangeEst(alpha,a,b);
+  double amin=a, bmax=b;
+  for (size_t i=1; i<_densities.size(); i++) {
+    // Get quantiles of next desity
+    double c,d; _densities[i]->rangeEst(alpha, c,d);
+    // Update quantiles;
+    a += c; b += d;
+    amin = std::min(amin, c);
+    bmax = std::max(bmax, d);
+  }
+  // Finally update amin bmax with a,b
+  a = std::min(a, amin);
+  b = std::max(b, bmax);
 }
 
 int

@@ -63,6 +63,17 @@ ConditionalDensityObj::affine(double scale, double shift) const {
         _X1, _X2, *_Y1->affine(scale, shift), *_Y2->affine(scale, shift));
 }
 
+void
+ConditionalDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  double a_x1, b_x1, a_x2, b_x2, a_y1, b_y1, a_y2, b_y2;
+  _X1->rangeEst(alpha, a_x1, b_x1);
+  _X2->rangeEst(alpha, a_x2, b_x2);
+  _Y1->rangeEst(alpha, a_y1, b_y1);
+  _Y2->rangeEst(alpha, a_y2, b_y2);
+  a = std::min(a_x1, std::min(a_x2, std::min(a_y1, a_y2)));
+  b = std::max(b_x1, std::max(b_x2, std::max(b_y1, b_y2)));
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConditionalObj
@@ -204,6 +215,19 @@ CondChainDensityObj::affine(double scale, double shift) const {
   // Simply apply affine transform on all densities
   return new CondChainDensityObj(*_X1->affine(scale, 0), *_X2->affine(scale, 0),
                                  *_Y1->affine(scale, shift), *_Y2->affine(scale, shift));
+}
+
+void
+CondChainDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  double a_x1, b_x1, a_x2, b_x2, a_y1, b_y1, a_y2, b_y2;
+  _X1->rangeEst(alpha, a_x1, b_x1);
+  _X2->rangeEst(alpha, a_x2, b_x2);
+  _Y1->rangeEst(alpha, a_y1, b_y1);
+  _Y2->rangeEst(alpha, a_y2, b_y2);
+  a = std::min(a_x1, std::min(a_x2, std::min(a_y1, a_y2)));
+  b = std::max(b_x1, std::max(b_x2, std::max(b_y1, b_y2)));
+  a = std::min(a, std::min(a_x2+a_y2, a_x1+a_y1));
+  b = std::max(a, std::max(a_x2+a_y2, a_x1+a_y1));
 }
 
 void

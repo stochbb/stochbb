@@ -43,6 +43,7 @@ public:
   virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
   /** Returns a vector of weak references to the underlaying densities. */
   inline const std::vector<DensityObj *> &densities() const { return _densities; }
@@ -96,6 +97,7 @@ public:
   virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
   /** Returns a vector of weak references to the underlaying densities. */
   inline const std::vector<DensityObj *> &densities() const { return _densities; }

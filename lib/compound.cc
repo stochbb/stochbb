@@ -63,8 +63,14 @@ NormalCompoundDensityObj::mark() {
 void
 NormalCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Eval PDFs of mu & sigma
-  Eigen::VectorXd dmu(out.size()), dsigma(out.size());
-  _mu->eval(Tmin, Tmax, dmu); _sigma->eval(Tmin, Tmax, dsigma);
+  const size_t steps = 100;
+  Eigen::VectorXd dmu(steps), dsigma(steps);
+  double muMin, muMax, sigMin, sigMax;
+  _mu->rangeEst(0.01, muMin, muMax);
+  _sigma->rangeEst(0.01, sigMin, sigMax);
+  double ddmu = (muMax-muMin)/steps, ddsig = (sigMax-sigMin)/steps;
+  _mu->eval(muMin, muMax, dmu);
+  _sigma->eval(sigMin, sigMax, dsigma);
 
   out.setZero();
   // Apply affine transform
@@ -74,11 +80,11 @@ NormalCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::Vecto
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     // Perform numerical integral over coeffs
-    double mu = Tmin;
-    for (int k=0; k<out.size(); k++, mu+=dt) {
-      double sigma = Tmin;
-      for (int l=0; l<out.size(); l++, sigma+=dt) {
-        out(i) += dt*dt * dmu[k] * dsigma[l] *
+    double mu = muMin;
+    for (int k=0; k<steps; k++, mu+=ddmu) {
+      double sigma = sigMin;
+      for (int l=0; l<steps; l++, sigma+=ddsig) {
+        out(i) += ddmu*ddsig * dmu[k] * dsigma[l] *
             std::exp( -(t-mu)*(t-mu)/(2*sigma*sigma)) / (std::sqrt(2*M_PI)*sigma*_scale);
       }
     }
@@ -89,8 +95,14 @@ NormalCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::Vecto
 void
 NormalCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   // Eval PDFs of mu & sigma
-  Eigen::VectorXd dmu(out.size()), dsigma(out.size());
-  _mu->eval(Tmin, Tmax, dmu); _sigma->eval(Tmin, Tmax, dsigma);
+  const size_t steps = 100;
+  Eigen::VectorXd dmu(steps), dsigma(steps);
+  double muMin, muMax, sigMin, sigMax;
+  _mu->rangeEst(0.01, muMin, muMax);
+  _sigma->rangeEst(0.01, sigMin, sigMax);
+  double ddmu = (muMax-muMin)/steps, ddsig = (sigMax-sigMin)/steps;
+  _mu->eval(muMin, muMax, dmu);
+  _sigma->eval(sigMin, sigMax, dsigma);
 
   out.setZero();
   // Apply affine transform
@@ -100,11 +112,11 @@ NormalCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Ve
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
     // Perform numerical integral over coeffs
-    double mu = Tmin;
-    for (int k=0; k<out.size(); k++, mu+=dt) {
-      double sigma = Tmin;
-      for (int l=0; l<out.size(); l++, sigma+=dt) {
-        out(i) += dt*dmu[k] * dt*dsigma[l] *
+    double mu = muMin;
+    for (int k=0; k<steps; k++, mu+=ddmu) {
+      double sigma = sigMin;
+      for (int l=0; l<out.size(); l++, sigma+=ddsig) {
+        out(i) += ddmu*dmu[k] * ddsig*dsigma[l] *
             0.5*(1+std::erf((t-mu)/(sigma*std::sqrt(2))));
       }
     }
@@ -115,6 +127,23 @@ Density
 NormalCompoundDensityObj::affine(double scale, double shift) const {
   return new NormalCompoundDensityObj(_mu, _sigma, scale*_scale, scale*_shift+shift);
 }
+
+void
+NormalCompoundDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  // Get quantiles from parameter distr.
+  double a_mu, b_mu, a_sig, b_sig;
+  _mu->rangeEst(alpha, a_mu, b_mu);
+  _sigma->rangeEst(alpha, a_sig, b_sig);
+
+  // Get max quantiles
+  a = a_mu+qnorm(alpha)*b_sig;
+  b = b_mu-qnorm(1-alpha)*b_sig;
+
+  // Apply affine trafo on a & b;
+  a = (a-_shift)/_scale;
+  b = (b-_shift)/_scale;
+}
+
 
 
 /* ********************************************************************************************* *
@@ -229,6 +258,20 @@ GammaCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Vec
 Density
 GammaCompoundDensityObj::affine(double scale, double shift) const {
   return new GammaCompoundDensityObj(_k, _theta, scale*_scale, scale*_shift+shift);
+}
+
+void
+GammaCompoundDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  // Get quantiles for parameter distributions
+  double a_k, b_k, a_theta, b_theta;
+  _k->rangeEst(alpha, a_k, b_k);
+  _theta->rangeEst(alpha, a_theta, b_theta);
+  // Get maximum quantiles
+  a = qgamma(alpha, a_k, a_theta);
+  b = qgamma(1-alpha, b_k, b_theta);
+  // Apply affine trafo on a & b;
+  a = (a-_shift)/_scale;
+  b = (b-_shift)/_scale;
 }
 
 

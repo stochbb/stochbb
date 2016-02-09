@@ -206,6 +206,11 @@ Density::affine(double scale, double shift) const {
   return _density->affine(scale, shift);
 }
 
+void
+Density::rangeEst(double alpha, double &a, double &b) const {
+  _density->rangeEst(alpha, a, b);
+}
+
 int
 Density::compare(const Density &other) const {
   return _density->compare(**other);

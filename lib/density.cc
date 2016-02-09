@@ -4,7 +4,7 @@
 #include "logger.hh"
 #include <typeinfo>
 #include <typeindex>
-
+#include <cmath>
 
 using namespace stochbb;
 
@@ -114,6 +114,11 @@ DeltaDensityObj::affine(double scale, double shift) const {
   return new DeltaDensityObj(scale*_delay+shift);
 }
 
+void
+DeltaDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  a = b = _delay;
+}
+
 int
 DeltaDensityObj::compare(const DensityObj &other) const {
   // Compare types
@@ -180,6 +185,12 @@ UniformDensityObj::affine(double scale, double shift) const {
   return new UniformDensityObj(scale*_a+shift, scale*_b+shift);
 }
 
+void
+UniformDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  double d = (_b-_a)*alpha/2;
+  a = _a+d; b = _b-d;
+}
+
 int
 UniformDensityObj::compare(const DensityObj &other) const {
   // Compare types
@@ -223,7 +234,7 @@ void
 NormalDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = std::exp( -(t-_mu)*(t-_mu)/(2*_sigma*_sigma) ) / (_sigma*std::sqrt(2*M_PI));
+    out[i] = stochbb::dnorm((t-_mu)/_sigma);
   }
 }
 
@@ -231,7 +242,7 @@ void
 NormalDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = 0.5*(1+std::erf((t-_mu)/(_sigma*std::sqrt(2))));
+    out[i] = stochbb::pnorm((t-_mu)/_sigma);
   }
 }
 
@@ -245,6 +256,18 @@ NormalDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
 Density
 NormalDensityObj::affine(double scale, double shift) const {
   return new NormalDensityObj(scale*_mu+shift, scale*_sigma);
+}
+
+void
+NormalDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  double d = stochbb::qnorm(alpha/2);
+  if (alpha<0.5) {
+    a = _mu + d*_sigma;
+    b = _mu - d*_sigma;
+  } else {
+    a = _mu - d*_sigma;
+    b = _mu + d*_sigma;
+  }
 }
 
 int
@@ -293,8 +316,7 @@ GammaDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out)
   Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    if (t<0) { out[i] = 0; }
-    else { out[i] = std::exp((_k-1)*std::log(t) - t/_theta -std::lgamma(_k) -_k*std::log(_theta)); }
+    out[i] = stochbb::dgamma(t, _k, _theta);
   }
 }
 
@@ -304,8 +326,7 @@ GammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> o
   Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    if (t<0) { out[i] = 0; }
-    else { out[i] = stochbb::gamma_li(_k, t/_theta); }
+    out[i] = stochbb::pgamma(t, _k, _theta);
   }
 }
 
@@ -319,6 +340,12 @@ GammaDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
 Density
 GammaDensityObj::affine(double scale, double shift) const {
   return new GammaDensityObj(_k, scale*_theta, scale*_shift+shift);
+}
+
+void
+GammaDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  a = stochbb::qgamma(alpha/2, _k, _theta);
+  b = stochbb::qgamma(1-alpha/2, _k, _theta);
 }
 
 int
@@ -370,13 +397,7 @@ WeibullDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> ou
   Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    if (t<0) {
-      out[i] = 0;
-    } else {
-      out[i] = std::exp(std::log(_k)-std::log(_lambda)
-                        + (_k-1)*(std::log(t)-std::log(_lambda))
-                        - std::pow(t/_lambda, _k));
-    }
+    out[i] = stochbb::dweibull(t, _k, _lambda);
   }
 }
 
@@ -386,11 +407,7 @@ WeibullDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd>
   Tmin -= _shift; Tmax -= _shift;
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    if (t<0) {
-      out[i] = 0;
-    } else {
-      out[i] = 1-std::exp(std::pow(t/_lambda,_k));
-    }
+    out[i] = stochbb::pweibull(t, _k, _lambda);
   }
 }
 
@@ -404,6 +421,12 @@ WeibullDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
 Density
 WeibullDensityObj::affine(double scale, double shift) const {
   return new WeibullDensityObj(_k, scale*_lambda, scale*_shift+shift);
+}
+
+void
+WeibullDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  a = stochbb::qweibull(alpha/2, _k, _lambda);
+  b = stochbb::qweibull(1-alpha/2, _k, _lambda);
 }
 
 int

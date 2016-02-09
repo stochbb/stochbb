@@ -22,23 +22,41 @@ public:
 
   /** Evaluates the density on a regular grid in \f$[Tmin, Tmax)\f$ and
    * stores it into the given output vector. The number of grid points is determined
-   * by the length of the output vector. */
+   * by the length of the output vector.
+   * @param Tmin Specifies the lower bound of the evaluation interval.
+   * @param Tmax Specifies the upper bound of the evaluation interval.
+   * @param out A preallocated vector that will hold the density evaluation. The length of the
+   *   vector specifies the number of evaluation points. */
   virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const = 0;
 
   /** Evaluates the probability function (CDF) at a regular grid on the interval \f$[Tmin, Tmax)\f$
    * and stores it into the given output vector. The number of grid points is determined
-   * by the length of the output vector. */
+   * by the length of the output vector.
+   * @param Tmin Specifies the lower bound of the evaluation interval.
+   * @param Tmax Specifies the upper bound of the evaluation interval.
+   * @param out A preallocated vector that will hold the CDF evaluation. The length of the
+   *   vector specifies the number of evaluation points. */
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const = 0;
 
   /** Retruns a new density instance being the affine transformed of this density. That is
-   * \f$f(x) \mapsto f(a\,x+b)\f$.*/
+   * \f$f(x) \mapsto f(a\,x+b)\f$.
+   * @param scale The scale parameter \f$a\f$.
+   * @param shift The shift parameter \f$b\f$. */
   virtual Density affine(double scale, double shift) const = 0;
+
+  /** Estimates the range on which the PDF and CDFs need to be evaluated based on the
+   * \f$\alpha\f-quantile of the atomic distributions.  Please note that this value
+   * is not an estimate of the quantile.
+   * @param alpha Specifies the quantiles used for the estimation.
+   * @param a The lower bound estimate for the evaluation.
+   * @param b The upper bound estimate for the evaluation. */
+  virtual void rangeEst(double alpha, double &a, double &b) const = 0;
 
   /** Comparison operator between densities. This implementation compares only by type.
    * The specialization needs to compare also densities within types. */
   virtual int compare(const DensityObj &other) const;
 
-  /** Prints a textual representation of the density object. */
+  /** Prints a textual representation of the density object into the given stream. */
   virtual void print(std::ostream &stream) const;
 };
 
@@ -83,6 +101,7 @@ public:
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -111,6 +130,7 @@ public:
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -143,6 +163,7 @@ public:
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -175,6 +196,7 @@ public:
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
@@ -218,6 +240,7 @@ public:
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
   /** Compares densities. */
   virtual int compare(const DensityObj &other) const;
