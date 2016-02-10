@@ -14,8 +14,6 @@
 
 %init %{
 import_array();
-Logger::addHandler(
-      new IOLogHandlerObj(std::cerr, LogMessage::DEBUG));
 %}
 
 
@@ -303,4 +301,56 @@ double qweibull(double p, double k, double theta);
   bool isCompound() const { return self->is<stochbb::Compound>(); }
   stochbb::Compound asCompound() { return self->as<stochbb::Compound>(); }
 }
+
+class LogMessage
+{
+public:
+  typedef enum {
+    DEBUG = 0,
+    INFO,
+    WARNING,
+    ERROR
+  } Level;
+
+public:
+  LogMessage();
+  LogMessage(const std::string &filename, int line, Level level, const std::string &message);
+  LogMessage(const LogMessage &other);
+
+  const std::string &filename() const;
+  int linenumber() const;
+  Level level() const;
+  const std::string &message() const;
+  const std::time_t &timestamp() const;
+};
+
+
+class LogHandler: public Container
+{
+protected:
+  LogHandler(LogHandlerObj *obj);
+
+public:
+  void handleMessage(const LogMessage &msg);
+};
+
+
+class IOLogHandler: public LogHandler
+{
+public:
+  IOLogHandler(std::ostream &stream=std::cerr, LogMessage::Level level=LogMessage::DEBUG);
+};
+
+class Logger
+{
+protected:
+  Logger();
+
+public:
+  /** Logs a message. */
+  static void log(const LogMessage &msg);
+  /** Adds a handler to the logger, the ownership is transferred to the @c Logger. */
+  static void addHandler(const LogHandler &handler);
+};
+
 }

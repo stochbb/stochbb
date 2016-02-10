@@ -2,6 +2,8 @@
 #include <QFileInfo>
 #include <locale>
 
+using namespace stochbb;
+
 /* ********************************************************************************************* *
  * Implementation of LogMessage
  * ********************************************************************************************* */
@@ -81,10 +83,10 @@ LogMessageStream::~LogMessageStream() {
 
 
 /* ********************************************************************************************* *
- * Implementation of LogHandler
+ * Implementation of LogHandlerObj
  * ********************************************************************************************* */
 LogHandlerObj::LogHandlerObj(LogMessage::Level level)
-  : _minLevel(level)
+  : stochbb::Object(), _minLevel(level)
 {
   // pass...
 }
@@ -93,9 +95,47 @@ LogHandlerObj::~LogHandlerObj() {
   // pass...
 }
 
+void
+LogHandlerObj::mark() {
+  if (isMarked()) { return; }
+  stochbb::Object::mark();
+}
+
 
 /* ********************************************************************************************* *
- * Implementation of IOLogHandler
+ * Implementation of LogHandler
+ * ********************************************************************************************* */
+LogHandler::LogHandler(LogHandlerObj *obj)
+  : Container(obj), _loghandler(obj)
+{
+  // pass...
+}
+
+LogHandler::LogHandler(const LogHandler &other)
+  : Container(other), _loghandler(other._loghandler)
+{
+  // pass...
+}
+
+LogHandler::~LogHandler() {
+  // pass...
+}
+
+LogHandler &
+LogHandler::operator =(const LogHandler &other) {
+  stochbb::Container::operator =(other);
+  _loghandler = other._loghandler;
+  return *this;
+}
+
+void
+LogHandler::handleMessage(const LogMessage &msg) {
+  _loghandler->handleMessage(msg);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of IOLogHandlerObj
  * ********************************************************************************************* */
 IOLogHandlerObj::IOLogHandlerObj(std::ostream &stream, LogMessage::Level level)
   : LogHandlerObj(level), _stream(stream)
@@ -129,6 +169,28 @@ IOLogHandlerObj::handleMessage(const LogMessage &msg) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of IOLogHandler
+ * ********************************************************************************************* */
+IOLogHandler::IOLogHandler(std::ostream &stream, LogMessage::Level level)
+  : LogHandler(new IOLogHandlerObj(stream, level))
+{
+  // pass...
+}
+
+IOLogHandler::IOLogHandler(const IOLogHandler &other)
+  : LogHandler(other)
+{
+  // pass...
+}
+
+IOLogHandler &
+IOLogHandler::operator =(const IOLogHandler &other) {
+  LogHandler::operator =(other);
+  return *this;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of Logger
  * ********************************************************************************************* */
 Logger *Logger::_instance = 0;
@@ -140,7 +202,10 @@ Logger::Logger()
 }
 
 Logger::~Logger() {
-
+  std::list<LogHandlerObj *>::iterator handler = _handler.begin();
+  for (; handler != _handler.end(); handler++) {
+    (*handler)->unref();
+  }
 }
 
 Logger *
@@ -161,6 +226,8 @@ Logger::log(const LogMessage &msg) {
 }
 
 void
-Logger::addHandler(LogHandlerObj *handler) {
-  Logger().get()->_handler.push_back(handler);
+Logger::addHandler(const LogHandler &handler) {
+  handler->ref();
+  Logger().get()->_handler.push_back(
+        reinterpret_cast<LogHandlerObj *>(*handler));
 }

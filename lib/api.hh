@@ -5,8 +5,6 @@
  * objects. For this GC to work, all directly reachable objects are held within containers (classes
  * derived from @c stochbb::Container). These container classes form the API of StochBB and are
  * listed below.
- *
- * @todo Implement CompoundWeibull-distributed RVs.
  */
 #ifndef __SBB_API_HH__
 #define __SBB_API_HH__
@@ -599,6 +597,5 @@ protected:
 }
 
 #include "operators.hh"
-#include "logger.hh"
 
 #endif // __SBB_API_HH__

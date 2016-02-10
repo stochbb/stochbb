@@ -62,12 +62,6 @@ public:
   virtual void print(std::ostream &stream) const;
 };
 
-/** Prints a textual representation of the density.
- * @ingroup internal */
-inline std::ostream &operator<<(std::ostream &stream, const DensityObj &density) {
-  density.print(stream); return stream;
-}
-
 
 /** Implements the base class of all densities of atomic random variables.
  * As atomic variables do not depend on other random variables, it is possible to sample them

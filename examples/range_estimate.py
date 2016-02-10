@@ -2,9 +2,10 @@ from numpy import *
 import stochbb
 from matplotlib import pylab
 
-Tmin, Tmax, N = 0, 600, 1000;
+Tmin, Tmax, N = 0, 700, 1000;
 t = linspace(Tmin, Tmax, N)
 
+stochbb.Logger.addHandler(stochbb.IOLogHandler())
 
 X = stochbb.gamma(10,10);
 Y = stochbb.gamma(10,20);

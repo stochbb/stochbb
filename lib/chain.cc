@@ -4,6 +4,8 @@
 #include <list>
 #include <algorithm>
 #include <complex>
+#include "api.hh"
+#include "logger.hh"
 
 
 using namespace stochbb;
@@ -56,7 +58,7 @@ convolution_can_combine(const Density &a, const Density &b) {
 // convolution_can_combine). Returns a new reference to a convolution object
 Density
 convolution_combine(const Density &a, const Density &b) {
-  logDebug() << "Convolve densities " << a << " and " << b;
+  //logDebug() << "Convolve densities " << a << " and " << b;
   if (DeltaDensityObj *delta_a = dynamic_cast<DeltaDensityObj *>(*a)) {
     // If LHS is delta -> turn into affine trafo
     return b.affine(1, delta_a->delay());
@@ -104,7 +106,7 @@ stochbb::convolve(const std::vector<Density> &densities, double scale, double sh
   // Sort densities w.r.t type and parameters
   std::sort(dens.begin(), dens.end(), density_compare);
 
-  logDebug() << "Try to convolve " << dens.size() << " densities...";
+  //logDebug() << "Try to convolve " << dens.size() << " densities...";
   // Try to combine some of the densities
   std::vector<Density>::iterator last = dens.begin();
   std::vector<Density>::iterator current = dens.begin(); current++;
@@ -119,7 +121,7 @@ stochbb::convolve(const std::vector<Density> &densities, double scale, double sh
       last++; current++;
     }
   }
-  logDebug() << "... done.";
+  //logDebug() << "... done.";
 
   if (1 == dens.size()) {
     // If only one density is left -> unpack

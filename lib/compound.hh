@@ -123,12 +123,12 @@ public:
   GammaCompoundDensityObj(const Var &k, const Var &theta, double shift=0) throw (AssumptionError);
   virtual ~GammaCompoundDensityObj();
 
-  virtual void mark();
+  void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual Density affine(double scale, double shift) const;
-  virtual void rangeEst(double alpha, double &a, double &b) const;
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
 
 protected:
   /** Prepares the numerical itergration on construction. If one of the parameter densities is a
@@ -169,7 +169,7 @@ public:
 
   void mark();
 
-  virtual Density density();
+  Density density();
 
 protected:
   /** A reference to the distribution. */

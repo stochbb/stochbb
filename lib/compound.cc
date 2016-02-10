@@ -1,6 +1,7 @@
 #include "compound.hh"
 #include "operators.hh"
 #include "math.hh"
+#include "logger.hh"
 
 using namespace stochbb;
 
@@ -33,9 +34,11 @@ NormalCompoundDensityObj::NormalCompoundDensityObj(DensityObj *mu, DensityObj *s
 }
 
 NormalCompoundDensityObj::NormalCompoundDensityObj(const Var &mu, const Var &sigma) throw (AssumptionError)
-  : DensityObj(), _mu(*mu->density()), _sigma(*sigma->density()), _muMin(0), _ddMu(0), _dmu(),
+  : DensityObj(), _mu(0), _sigma(0), _muMin(0), _ddMu(0), _dmu(),
     _sigMin(0), _ddSig(0), _dsigma()
 {
+  _mu = *mu->density();
+  _sigma = *sigma->density();
   // Test for independence
   if (! mu.mutuallyIndep(sigma)) {
     AssumptionError err;
@@ -82,8 +85,8 @@ void
 NormalCompoundDensityObj::mark() {
   if (isMarked()) { return; }
   DensityObj::mark();
-  _mu->mark();
-  _sigma->mark();
+  if (_mu) _mu->mark();
+  if (_sigma) _sigma->mark();
 }
 
 void
@@ -183,16 +186,20 @@ GammaCompoundDensityObj::GammaCompoundDensityObj(DensityObj *k, DensityObj *thet
 }
 
 GammaCompoundDensityObj::GammaCompoundDensityObj(const Var &k, const Var &theta, double shift) throw (AssumptionError)
-  : DensityObj(), _k(*k->density()), _theta(*theta->density()), _shift(shift), _kMin(0), _ddK(0), _dk(),
+  : DensityObj(), _k(0), _theta(0), _shift(shift), _kMin(0), _ddK(0), _dk(),
     _thetaMin(0), _ddTheta(0), _dtheta()
 {
+  _k = *k->density();
+  _theta = *theta->density();
   // Test for independence
   if (! k.mutuallyIndep(theta)) {
     AssumptionError err;
     err << "Cannot construct gamma-compound parameters are not independent.";
     throw err;
   }
-
+  std::stringstream buffer;
+  buffer << "Create Gamma compound with k=" << k << ", theta=" << theta << ".";
+  logDebug() << buffer.str();
   _init_int();
 }
 
@@ -231,8 +238,8 @@ void
 GammaCompoundDensityObj::mark() {
   if (isMarked()) { return; }
   DensityObj::mark();
-  _k->mark();
-  _theta->mark();
+  if (_k) _k->mark();
+  if (_theta) _theta->mark();
 }
 
 void
@@ -339,9 +346,11 @@ WeibullCompoundDensityObj::WeibullCompoundDensityObj(DensityObj *k, DensityObj *
 }
 
 WeibullCompoundDensityObj::WeibullCompoundDensityObj(const Var &k, const Var &lambda, double shift) throw (AssumptionError)
-  : DensityObj(), _k(*k->density()), _lambda(*lambda->density()), _shift(shift), _kMin(0), _ddK(0), _dk(),
+  : DensityObj(), _k(0), _lambda(0), _shift(shift), _kMin(0), _ddK(0), _dk(),
     _lambdaMin(0), _ddLambda(0), _dlambda()
 {
+  _k = *k->density();
+  _lambda = *lambda->density();
   // Test for independence
   if (! k.mutuallyIndep(lambda)) {
     AssumptionError err;
@@ -387,8 +396,8 @@ void
 WeibullCompoundDensityObj::mark() {
   if (isMarked()) { return; }
   DensityObj::mark();
-  _k->mark();
-  _lambda->mark();
+  if (_k) _k->mark();
+  if (_lambda) _lambda->mark();
 }
 
 void
