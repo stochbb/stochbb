@@ -1,3 +1,11 @@
+/** @defgroup api Application programming interface
+ * This module collects all classes and functions forming the StochBB API.
+ *
+ * StochBB implements a simple mark & sweep garbage collector (GC) for freeing all unreachable
+ * objects. For this GC to work, all directly reachable objects are held within containers (classes
+ * derived from @c stochbb::Container). These container classes form the API of StochBB and are
+ * listed below.
+ */
 #ifndef __SBB_API_HH__
 #define __SBB_API_HH__
 
@@ -27,7 +35,8 @@ class ExactSamplerObj;
 class MarginalSamplerObj;
 
 
-/** Base class of all container classes. */
+/** Base class of all container classes.
+ * @ingroup api */
 class Container
 {
 public:
@@ -80,7 +89,8 @@ protected:
 };
 
 
-/** Base class of all densities (PDFs). */
+/** Base class of all densities (PDFs).
+ * @ingroup api */
 class Density: public Container
 {
 public:
@@ -129,7 +139,8 @@ protected:
 
 /** The densities of @c AtomicVar.
  * This is the base class of all densities of atomic random variables, that is a random variable
- * that does not depend on others. */
+ * that does not depend on others.
+ * @ingroup api */
 class AtomicDensity: public Density
 {
 public:
@@ -160,7 +171,8 @@ protected:
 };
 
 
-/** Base class of all random variables. */
+/** Base class of all random variables.
+ * @ingroup api */
 class Var: public Container
 {
 public:
@@ -218,7 +230,8 @@ protected:
 };
 
 
-/** A generic random variable derived from a chosen density. */
+/** A generic random variable derived from a chosen density.
+ * @ingroup api */
 class AtomicVar: public Var
 {
 public:
@@ -254,7 +267,8 @@ protected:
 };
 
 
-/** Base class of all derived random variables. */
+/** Base class of all derived random variables.
+ * @ingroup api */
 class DerivedVar: public Var
 {
 public:
@@ -281,7 +295,8 @@ protected:
 
 
 /** Represents an affine transformation of another random variable.
- * That is, \f$Y = a\,X+b\f$. */
+ * That is, \f$Y = a\,X+b\f$.
+ * @ingroup api */
 class AffineTrafo: public DerivedVar
 {
 public:
@@ -313,7 +328,8 @@ protected:
  * This class is called @c Chain as it implements a chain of random processes. Assume the
  * independent random processes \f$X_1\f$ and \f$X_2\f$ and \f$X_1\f$ triggers \f$X_2\f$,
  * than the time of the second process (\f$X_2\f$) to complete is simply the sum of times
- * of both processes. */
+ * of both processes.
+ * @ingroup api */
 class Chain: public DerivedVar
 {
 public:
@@ -340,7 +356,8 @@ protected:
  * \f$Y = \max\{X_1,\dots, X_N\}\f$.
  *
  * In terms of random processes: Consider \f$N\f$ parallel processes \f$X_i,i=1,\dots,N\f$, then
- * this class will represent the random variable of the waiting time of the last process. */
+ * this class will represent the random variable of the waiting time of the last process.
+ * @ingroup api */
 class Maximum: public DerivedVar
 {
 public:
@@ -367,7 +384,8 @@ protected:
  * \f$Y = \min\{X_1,\dots, X_n\}\f$.
  *
  * In terms of random processes: Consider \f$N\f$ parallel processes \f$X_i,i=1,\dots,N\f$, then
- * this class will represent the random variable of the waiting time of the first process completed. */
+ * this class will represent the random variable of the waiting time of the first process completed.
+ * @ingroup api */
 class Minimum: public DerivedVar
 {
 public:
@@ -393,7 +411,8 @@ protected:
 
 
 /** This class implements a mixture of random variables.
- * A mixture is a random process that selects one of its children with a certain probability. */
+ * A mixture is a random process that selects one of its children with a certain probability.
+ * @ingroup api */
 class Mixture: public DerivedVar
 {
 public:
@@ -428,7 +447,8 @@ protected:
  *        Y_2 & else,
  *       \end{cases}
  * \f]
- * is implemented by this class. */
+ * is implemented by this class.
+ * @ingroup api */
 class Conditional: public DerivedVar
 {
 public:
@@ -460,7 +480,8 @@ protected:
  *        X_2 + Y_2 & else,
  *       \end{cases}
  * \f]
- * is implemented by this class. */
+ * is implemented by this class.
+ * @ingroup api */
 class CondChain: public DerivedVar
 {
 public:
@@ -487,7 +508,8 @@ protected:
  * Compounds of random variables are formed by treating the parameters of the distribution of
  * one random variable as random too. For example, assume that the random variable
  *  \f$X|A \sim f(x|A)\f$ and \f$A \sim f(a|\theta)\f$. Then, the distribution of \f$X\f$ is
- * \f$f(x|\theta) = \int f(x|a)\,f(a|\theta)\,da\f$. */
+ * \f$f(x|\theta) = \int f(x|a)\,f(a|\theta)\,da\f$.
+ * @ingroup api */
 class Compound: public DerivedVar
 {
 public:
@@ -518,7 +540,8 @@ protected:
 /** Implements a sampler for several possibly dependent random variables.
  * This class should be used if one is interesed in sampling several random variables
  * simultaneously. If only one variable of a very large system of random variables is sampled,
- * consider also the @c MarginalSampler class. */
+ * consider also the @c MarginalSampler class.
+ * @ingroup api */
 class ExactSampler: public Container
 {
 public:
@@ -561,7 +584,8 @@ protected:
  * This sampler can be used if one wants to sample from a single variable of a large system of
  * dependent random variables where the exact sampling method (see @c ExactSampler) is to slow.
  * This sampler, however, only samples from a marginal. Hence the @c ExactSampler must be used if
- * more than one mutually dependent variables are sampled simultaneously. */
+ * more than one mutually dependent variables are sampled simultaneously.
+ * @ingroup api */
 class MarginalSampler: public Container
 {
 public:

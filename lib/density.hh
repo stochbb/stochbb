@@ -18,7 +18,7 @@ protected:
 public:
   /** Destructor. */
   virtual ~DensityObj();
-  virtual void mark();
+  void mark();
 
   /** Evaluates the density on a regular grid in \f$[Tmin, Tmax)\f$ and
    * stores it into the given output vector. The number of grid points is determined
@@ -45,11 +45,13 @@ public:
   virtual Density affine(double scale, double shift) const = 0;
 
   /** Estimates the range on which the PDF and CDFs need to be evaluated based on the
-   * \f$\alpha\f-quantile of the atomic distributions.  Please note that this value
-   * is not an estimate of the quantile.
-   * @param alpha Specifies the quantiles used for the estimation.
-   * @param a The lower bound estimate for the evaluation.
-   * @param b The upper bound estimate for the evaluation. */
+   * \f$\alpha\f-quantile of atomic distributions. Please note that this value
+   * is not an estimate of \f$\alpha\f$-quantiles of the distribution. It reflects the interval on
+   * which all distributions, this distribution depends on, need to be evaluated for the evaluation
+   * of this distribution.
+   * @param alpha Specifies the quantiles used for the estimation of the evaluation range.
+   * @param a The lower bound estimate for the evaluation range.
+   * @param b The upper bound estimate for the evaluation range. */
   virtual void rangeEst(double alpha, double &a, double &b) const = 0;
 
   /** Comparison operator between densities. This implementation compares only by type.
@@ -80,9 +82,11 @@ public:
   /** Destructor. */
   virtual ~AtomicDensityObj();
 
-  virtual void mark();
+  void mark();
 
-  /** Samples from the density. */
+  /** Samples from the atomic density. Only atomic densities, that is densities which do not depend
+   * on other densities, can be sampled directly. For all other densities consider the
+   * @c ExactSampler or @c MarginalSampler classes. */
   virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const = 0;
 };
 
@@ -95,17 +99,16 @@ public:
   DeltaDensityObj(double delay);
   /** Destructor. */
   virtual ~DeltaDensityObj();
-  virtual void mark();
+  void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual Density affine(double scale, double shift) const;
-  virtual void rangeEst(double alpha, double &a, double &b) const;
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
 
-  /** Compares densities. */
-  virtual int compare(const DensityObj &other) const;
-  virtual void print(std::ostream &stream) const;
+  int compare(const DensityObj &other) const;
+  void print(std::ostream &stream) const;
 
   /** Retruns the delay of the delta distribution. */
   inline double delay() const { return _delay; }
@@ -120,21 +123,22 @@ protected:
 class UniformDensityObj: public AtomicDensityObj
 {
 public:
-  /** Constructor. */
+  /** Constructs a uniform distribution on the interval \f$[a,b]\f$.
+   * @param a Specifies the lower bound of the interval.
+   * @param b Specifies the upper bound of the interval. */
   UniformDensityObj(double a, double b);
   /** Destructor. */
   virtual ~UniformDensityObj();
-  virtual void mark();
+  void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual Density affine(double scale, double shift) const;
-  virtual void rangeEst(double alpha, double &a, double &b) const;
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
 
-  /** Compares densities. */
-  virtual int compare(const DensityObj &other) const;
-  virtual void print(std::ostream &stream) const;
+  int compare(const DensityObj &other) const;
+  void print(std::ostream &stream) const;
 
   /** Returns the lower-bound of the uniform distribution. */
   inline double a() const { return _a; }
@@ -149,7 +153,12 @@ protected:
 };
 
 
-/** Implements the normal distribution. */
+/** Implements the normal distribution.
+ * That is
+ * \f[
+ *  \phi(x, \mu, \sigma) = \frac{\exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)}{\sqrt{2\pi}\sigma}\,.
+ * \f]
+ */
 class NormalDensityObj: public AtomicDensityObj
 {
 public:
@@ -157,17 +166,16 @@ public:
   NormalDensityObj(double mean, double stddev);
   /** Destructor. */
   virtual ~NormalDensityObj();
-  virtual void mark();
+  void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual Density affine(double scale, double shift) const;
-  virtual void rangeEst(double alpha, double &a, double &b) const;
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
 
-  /** Compares densities. */
-  virtual int compare(const DensityObj &other) const;
-  virtual void print(std::ostream &stream) const;
+  int compare(const DensityObj &other) const;
+  void print(std::ostream &stream) const;
 
   /** Returns the mean of the normal distribution. */
   inline double mu() const { return _mu; }
@@ -182,7 +190,7 @@ protected:
 };
 
 
-/** Implements the Gamma distribution. */
+/** Implements the (shifted) Gamma distribution. */
 class GammaDensityObj: public AtomicDensityObj
 {
 public:
@@ -190,17 +198,16 @@ public:
   GammaDensityObj(double k, double theta, double shift=0);
   /** Destructor. */
   virtual ~GammaDensityObj();
-  virtual void mark();
+  void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual Density affine(double scale, double shift) const;
-  virtual void rangeEst(double alpha, double &a, double &b) const;
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
 
-  /** Compares densities. */
-  virtual int compare(const DensityObj &other) const;
-  virtual void print(std::ostream &stream) const;
+  int compare(const DensityObj &other) const;
+  void print(std::ostream &stream) const;
 
   /** Returns the shape parameter of the gamma distribution. */
   inline double k() const { return _k; }
@@ -234,17 +241,16 @@ public:
   WeibullDensityObj(double k, double lambda, double shift=0);
   /** Destructor. */
   virtual ~WeibullDensityObj();
-  virtual void mark();
+  void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual Density affine(double scale, double shift) const;
-  virtual void rangeEst(double alpha, double &a, double &b) const;
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
 
-  /** Compares densities. */
-  virtual int compare(const DensityObj &other) const;
-  virtual void print(std::ostream &stream) const;
+  int compare(const DensityObj &other) const;
+  void print(std::ostream &stream) const;
 
   /** Returns the shape parameter of the Weilbull distribution. */
   inline double k() const { return _k; }

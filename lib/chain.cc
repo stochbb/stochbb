@@ -254,6 +254,10 @@ ConvolutionDensityObj::rangeEst(double alpha, double &a, double &b) const {
     amin = std::min(amin, c);
     bmax = std::max(bmax, d);
   }
+  // apply scale & shift on a & b:
+  a = _scale*a+_shift;
+  b = _scale*b+_shift;
+
   // Finally update amin bmax with a,b
   a = std::min(a, amin);
   b = std::max(b, bmax);
@@ -283,6 +287,7 @@ ConvolutionDensityObj::print(std::ostream &stream) const {
     stream << " "; _densities[i]->print(stream);
   }
   stream << " shift=" << _shift
+         << " scale=" << _scale
          << " #" << this << ">";
 }
 

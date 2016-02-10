@@ -29,43 +29,60 @@ public:
 
 
 /** The density object for a compound-normal distribution.
- * This class determines the distribution of the random variable numerically. Depending on the
- * number of gird points at which the parameter distributions are evaluated, this may take a
- * considerable time. */
+ * This class determines the distribution of the random variable numerically. That is
+ * \f[
+ *  f(x) = \int d\mu \int d\sigma\,\phi(x;\mu, \sigma)\,g(\mu)\,h(\sigma)\,,
+ * \f]
+ * where \f$g(\mu)\f$ and \f$h(\sigma)\f$ are the densities of the mean and std. dev. parameters,
+ * repsectively. Numerically, the intergals are approximated by a finite sum, where the integration
+ * interval is determined by the @c DensityObj::rangeEst methods of the parameter densities using
+ * \f$\alpha=0.01\f$. */
 class NormalCompoundDensityObj: public DensityObj
 {
 protected:
-  /** Constructs the density from the given parameter random variables.
+  /** Constructs the compound density from the given parameter random variables.
    * @param mu Specifies the mean random variable.
-   * @param sigma Specifies the standard deviation random variable.
-   * @param scale Specifies the optional scaling, default @c scale=1.
-   * @param shift Specifies the optional shift, default @c shift=0. */
-  NormalCompoundDensityObj(DensityObj *mu, DensityObj *sigma, double scale=1, double shift=0);
+   * @param sigma Specifies the standard deviation random variable.*/
+  NormalCompoundDensityObj(DensityObj *mu, DensityObj *sigma);
 
 public:
-  /** Constructs the density from the given parameter random variables.
+  /** Constructs the compound density from the given random variables.
    * @param mu Specifies the mean random variable.
    * @param sigma Specifies the standard deviation random variable.
-   * @param scale Specifies the optional scaling, default @c scale=1.
-   * @param shift Specifies the optional shift, default @c shift=0. */
-  NormalCompoundDensityObj(const Var &mu, const Var &sigma, double scale=1, double shift=0);
+   * @throws AssumptionError If the parameter variables are not mutually independent. */
+  NormalCompoundDensityObj(const Var &mu, const Var &sigma) throw (AssumptionError);
+  /** Destructor. */
+  virtual ~NormalCompoundDensityObj();
 
-  virtual void mark();
+  void mark();
 
-  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  virtual Density affine(double scale, double shift) const;
-  virtual void rangeEst(double alpha, double &a, double &b) const;
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
+
+protected:
+  /** Prepares the numerical itergration on construction. If one of the parameter densities is a
+   * delta density, the integration over this parameter is performed "analytically". */
+  void _init_int();
 
 protected:
   /** A reference to the distribution of the mean parameter. */
   DensityObj *_mu;
   /** A reference to the distribution of the standard deviation parameter. */
   DensityObj *_sigma;
-  /** Scale of the affine transform. */
-  double _scale;
-  /** Shift of the affine transform. */
-  double _shift;
+  /** Lower bound of the integration interval over \f$\mu\f$. */
+  double _muMin;
+  /** Integration stepsize over \f$\mu\f$. */
+  double _ddMu;
+  /** The density of \f$\mu\f$ evaluated on a regular grid from @c _muMin with step size @c _ddMu. */
+  Eigen::VectorXd _dmu;
+  /** Lower bound of the integration interval over \f$\sigma\f$. */
+  double _sigMin;
+  /** Integration stepsize over \f$\sigma\f$. */
+  double _ddSig;
+  /** The density of \f$\sigma\f$ evaluated on a regular grid from @c _sigMin with step size @c _ddSig. */
+  Eigen::VectorXd _dsigma;
 };
 
 
@@ -92,26 +109,25 @@ protected:
 
 
 /** The density object for a compound-gamma distribution.
- * This class determines the distribution of the random variable numerically. Depending on the
- * number of gird points at which the parameter distributions are evaluated, this may take a
- * considerable time. */
+ * This class determines the distribution of the random variable numerically by integrating over
+ * the densities of the specified parameter random variables.
+ */
 class GammaCompoundDensityObj: public DensityObj
 {
 protected:
   /** Constructs the density from the given parameter distributions.
    * @param k Specifies the shape parameter random variable.
    * @param theta Specifies the scale parameter random variable.
-   * @param scale Specifies the optional scaling, default @c scale=1.
    * @param shift Specifies the optional shift, default @c shift=0. */
-  GammaCompoundDensityObj(DensityObj *k, DensityObj *theta, double scale=1, double shift=0);
+  GammaCompoundDensityObj(DensityObj *k, DensityObj *theta, double shift=0);
 
 public:
   /** Constructs the density from the given parameter distributions.
    * @param k Specifies the shape parameter random variable.
    * @param theta Specifies the scale parameter random variable.
-   * @param scale Specifies the optional scaling, default @c scale=1.
    * @param shift Specifies the optional shift, default @c shift=0. */
-  GammaCompoundDensityObj(const Var &k, const Var &theta, double scale=1, double shift=0);
+  GammaCompoundDensityObj(const Var &k, const Var &theta, double shift=0) throw (AssumptionError);
+  virtual ~GammaCompoundDensityObj();
 
   virtual void mark();
 
@@ -121,14 +137,30 @@ public:
   virtual void rangeEst(double alpha, double &a, double &b) const;
 
 protected:
+  /** Prepares the numerical itergration on construction. If one of the parameter densities is a
+   * delta density, the integration over this parameter is performed "analytically". */
+  void _init_int();
+
+protected:
   /** The distribution of the shape parameter. */
   DensityObj *_k;
   /** The distribution of the scale parameter. */
   DensityObj *_theta;
-  /** Scale of the affine transform. */
-  double _scale;
   /** Shift of the affine transform. */
   double _shift;
+  /** Lower bound of the integration interval over \f$k\f$. */
+  double _kMin;
+  /** Integration stepsize over \f$k\f$. */
+  double _ddK;
+  /** The density of \f$k\f$ evaluated on a regular grid from @c _kMin with step size @c _ddK. */
+  Eigen::VectorXd _dk;
+  /** Lower bound of the integration interval over \f$\theta\f$. */
+  double _thetaMin;
+  /** Integration stepsize over \f$\theta\f$. */
+  double _ddTheta;
+  /** The density of \f$\theta\f$ evaluated on a regular grid from @c _thetaMin with step size @c _ddTheta. */
+  Eigen::VectorXd _dtheta;
+
 };
 
 

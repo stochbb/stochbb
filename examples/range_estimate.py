@@ -8,7 +8,7 @@ t = linspace(Tmin, Tmax, N)
 
 X = stochbb.gamma(10,10);
 Y = stochbb.gamma(10,20);
-Z = X+Y;
+Z = X+Y+100;
 print X.density().rangeEst(0.01)
 print Y.density().rangeEst(0.01)
 print Z.density().rangeEst(0.01)
