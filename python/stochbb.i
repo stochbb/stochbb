@@ -193,10 +193,10 @@ protected:
 class ExactSampler: public Container
 {
 public:
-  ExactSampler(const Var &X);
-  ExactSampler(const Var &X1, const Var &X2);
-  ExactSampler(const Var &X1, const Var &X2, const Var &X3);
-  ExactSampler(const std::vector<Var> &variables);
+  ExactSampler(const Var &X) throw (stochbb::TypeError);
+  ExactSampler(const Var &X1, const Var &X2) throw (stochbb::TypeError);
+  ExactSampler(const Var &X1, const Var &X2, const Var &X3) throw (stochbb::TypeError);
+  ExactSampler(const std::vector<Var> &variables) throw (stochbb::TypeError);
 
   void sample(Eigen::MatrixXd &out) const;
 };
@@ -237,18 +237,18 @@ Var gamma(const Var &k, double theta);
 Var gamma(const Var &k, const Var &theta);
 
 Var weibull(double k, double lambda);
-
+Var weibull(const Var& k, double lambda);
+Var weibull(double k, const Var& lambda);
+Var weibull(const Var& k, const Var& lambda);
 
 Var affine(const Var &var, double scale, double shift);
 
 Var chain(const std::vector<Var> &vars) throw( Error );
 
-Var minimum(const Var &X);
 Var minimum(const Var &X1, const Var &X2) throw( Error );
 Var minimum(const Var &X1, const Var &X2, const Var &X3) throw( Error );
 Var minimum(const std::vector<Var> &variables) throw( Error );
 
-Var maximum(const Var &X);
 Var maximum(const Var &X1, const Var &X2) throw( Error );
 Var maximum(const Var &X1, const Var &X2, const Var &X3) throw( Error );
 Var maximum(const std::vector<Var> &variables) throw( Error );

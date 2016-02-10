@@ -90,18 +90,6 @@ public:
 
   virtual void print(std::ostream &stream) const;
 
-public:
-  /** Constructs a delta distributed random variable. */
-  static AtomicVarObj *delta(double delay, const std::string &name="");
-  /** Constructs a unifor distributed random variable. */
-  static AtomicVarObj *unif(double a, double b, const std::string &name="");
-  /** Constructs a normal distributed random variable. */
-  static AtomicVarObj *norm(double mu, double sigma, const std::string &name="");
-  /** Constructs a gamma distributed random variable. */
-  static AtomicVarObj *gamma(double k, double theta, const std::string &name="");
-  /** Constructs a weibull distributed random variable. */
-  static AtomicVarObj *weibull(double k, double theta, const std::string &name="");
-
 protected:
   /** The density object. */
   AtomicDensityObj *_density;

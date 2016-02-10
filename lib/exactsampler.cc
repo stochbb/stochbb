@@ -22,7 +22,7 @@ inline size_t _find_index(double p, size_t a, size_t b, const std::vector<double
   return b;
 }
 
-ExactSamplerObj::ExactSamplerObj(const Var &X)
+ExactSamplerObj::ExactSamplerObj(const Var &X) throw (TypeError)
   : Object(), _outvars(), _queue(), _varmap(), _sampler()
 {
   _queue.reserve(2);
@@ -32,7 +32,7 @@ ExactSamplerObj::ExactSamplerObj(const Var &X)
   _outvars.push_back(*X);
 }
 
-ExactSamplerObj::ExactSamplerObj(const Var &X1, const Var &X2)
+ExactSamplerObj::ExactSamplerObj(const Var &X1, const Var &X2) throw (TypeError)
   : Object(), _outvars(), _queue(), _varmap(), _sampler()
 {
   _queue.reserve(4);
@@ -44,7 +44,7 @@ ExactSamplerObj::ExactSamplerObj(const Var &X1, const Var &X2)
   _outvars.push_back(*X2);
 }
 
-ExactSamplerObj::ExactSamplerObj(const Var &X1, const Var &X2, const Var &X3)
+ExactSamplerObj::ExactSamplerObj(const Var &X1, const Var &X2, const Var &X3) throw (TypeError)
   : Object(), _outvars(), _queue(), _varmap(), _sampler()
 {
   _queue.reserve(6);
@@ -58,7 +58,7 @@ ExactSamplerObj::ExactSamplerObj(const Var &X1, const Var &X2, const Var &X3)
   _outvars.push_back(*X3);
 }
 
-ExactSamplerObj::ExactSamplerObj(const std::vector<Var> &variables)
+ExactSamplerObj::ExactSamplerObj(const std::vector<Var> &variables) throw (TypeError)
   : Object(), _outvars(), _queue(), _varmap(), _sampler()
 {
   _queue.reserve(2*variables.size());
@@ -94,7 +94,7 @@ ExactSamplerObj::sample(Eigen::Ref<Eigen::MatrixXd> out) {
 }
 
 void
-ExactSamplerObj::_add_to_queue(VarObj *var) {
+ExactSamplerObj::_add_to_queue(VarObj *var) throw (TypeError) {
   // Check if variable is already in the queue
   if (0 != _varmap.count(var)) { return; }
   // If not add to queue
@@ -111,7 +111,7 @@ ExactSamplerObj::_add_to_queue(VarObj *var) {
 }
 
 ExactSamplerObj::sampler_f
-ExactSamplerObj::_choose_sampler(VarObj *var) {
+ExactSamplerObj::_choose_sampler(VarObj *var) throw (TypeError) {
   // dispatch by var type
   if (dynamic_cast<AtomicVarObj *>(var)) {
     return ExactSamplerObj::_sample_atomic;
@@ -255,11 +255,22 @@ ExactSamplerObj::_sample_comp_normal(ExactSamplerObj *self, VarObj *var, Eigen::
 
 void
 ExactSamplerObj::_sample_comp_gamma(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
-  NormalCompoundObj *cnorm = static_cast<NormalCompoundObj *>(var);
+  GammaCompoundObj *cgamma = static_cast<GammaCompoundObj *>(var);
   size_t out_idx = self->_varmap[var];
   for (int i=0; i<out.rows(); i++) {
-    double k = out(i, self->_varmap[*cnorm->variable(0)]);
-    double theta = out(i, self->_varmap[*cnorm->variable(1)]);
+    double k = out(i, self->_varmap[*cgamma->variable(0)]);
+    double theta = out(i, self->_varmap[*cgamma->variable(1)]);
     out(i, out_idx) = RNG::gamma(k, theta);
+  }
+}
+
+void
+ExactSamplerObj::_sample_comp_weibull(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
+  WeibullCompoundObj *cweibull = static_cast<WeibullCompoundObj *>(var);
+  size_t out_idx = self->_varmap[var];
+  for (int i=0; i<out.rows(); i++) {
+    double k = out(i, self->_varmap[*cweibull->variable(0)]);
+    double lambda = out(i, self->_varmap[*cweibull->variable(1)]);
+    out(i, out_idx) = RNG::gamma(k, lambda);
   }
 }

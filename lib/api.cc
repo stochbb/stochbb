@@ -143,31 +143,6 @@ AtomicVar::operator =(const AtomicVar &other) {
   return *this;
 }
 
-AtomicVar
-AtomicVar::delta(double delay, const std::string &name) {
-  return AtomicVarObj::delta(delay, name);
-}
-
-AtomicVar
-AtomicVar::unif(double a, double b, const std::string &name) {
-  return AtomicVarObj::unif(a,b, name);
-}
-
-AtomicVar
-AtomicVar::norm(double mu, double sigma, const std::string &name) {
-  return AtomicVarObj::norm(mu, sigma, name);
-}
-
-AtomicVar
-AtomicVar::gamma(double k, double theta, const std::string &name) {
-  return AtomicVarObj::gamma(k, theta, name);
-}
-
-AtomicVar
-AtomicVar::weibull(double k, double lambda, const std::string &name) {
-  return AtomicVarObj::weibull(k, lambda, name);
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of Density container
@@ -506,16 +481,6 @@ Compound::operator =(const Compound &other) {
   DerivedVar::operator =(other);
   _compound = other._compound;
   return *this;
-}
-
-Compound
-Compound::norm(const Var &mu, const Var &sigma, const std::string &name) {
-  return CompoundObj::norm(mu, sigma, name);
-}
-
-Compound
-Compound::gamma(const Var &k, const Var &theta, const std::string &name) {
-  return CompoundObj::gamma(k, theta, name);
 }
 
 

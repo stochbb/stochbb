@@ -75,31 +75,6 @@ AtomicVarObj::print(std::ostream &stream) const {
   stream << " #" << (void *)this << ">";
 }
 
-AtomicVarObj *
-AtomicVarObj::delta(double delay, const std::string &name) {
-  return new AtomicVarObj(new DeltaDensityObj(delay), name);
-}
-
-AtomicVarObj *
-AtomicVarObj::unif(double a, double b, const std::string &name) {
-  return new AtomicVarObj(new UniformDensityObj(a, b), name);
-}
-
-AtomicVarObj *
-AtomicVarObj::norm(double mu, double sigma, const std::string &name) {
-  return new AtomicVarObj(new NormalDensityObj(mu, sigma), name);
-}
-
-AtomicVarObj *
-AtomicVarObj::gamma(double k, double theta, const std::string &name) {
-  return new AtomicVarObj(new GammaDensityObj(k, theta), name);
-}
-
-AtomicVarObj *
-AtomicVarObj::weibull(double k, double lambda, const std::string &name) {
-  return new AtomicVarObj(new WeibullDensityObj(k, lambda), name);
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of DerivedVarObj

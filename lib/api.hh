@@ -5,6 +5,8 @@
  * objects. For this GC to work, all directly reachable objects are held within containers (classes
  * derived from @c stochbb::Container). These container classes form the API of StochBB and are
  * listed below.
+ *
+ * @todo Implement CompoundWeibull-distributed RVs.
  */
 #ifndef __SBB_API_HH__
 #define __SBB_API_HH__
@@ -139,8 +141,7 @@ protected:
 
 /** The densities of @c AtomicVar.
  * This is the base class of all densities of atomic random variables, that is a random variable
- * that does not depend on others.
- * @ingroup api */
+ * that does not depend on others. */
 class AtomicDensity: public Density
 {
 public:
@@ -230,8 +231,7 @@ protected:
 };
 
 
-/** A generic random variable derived from a chosen density.
- * @ingroup api */
+/** A generic random variable derived from a chosen density. */
 class AtomicVar: public Var
 {
 public:
@@ -249,17 +249,6 @@ public:
   AtomicVar(const AtomicVar &other);
   /** Assignement operator. */
   AtomicVar &operator=(const AtomicVar &other);
-
-  /** Constructs a delta-distributed "random" variable. */
-  static AtomicVar delta(double delay, const std::string &name="");
-  /** Constructs a uniformly distributed random variable. */
-  static AtomicVar unif(double a, double b, const std::string &name="");
-  /** Constructs a normal distributed random variable. */
-  static AtomicVar norm(double mu, double sigma, const std::string &name="");
-  /** Constructs a gamma distributed random variable. */
-  static AtomicVar gamma(double k, double theta, const std::string &name="");
-  /** Constructs a weibull distributed random variable. */
-  static AtomicVar weibull(double k, double lambda, const std::string &name="");
 
 protected:
   /** Holds the @c GenericVarObj. */
@@ -523,13 +512,6 @@ public:
   Compound(const Compound &other);
   /** Assignment operator. */
   Compound &operator =(const Compound &other);
-
-  /** Constructs a compound random variable from a normal distribution where
-   * \f$\mu\f$ and \f$\sigma\f$ are given by the specified random variables. */
-  static Compound norm(const Var &mu, const Var &sigma, const std::string &name="");
-  /** Constructs a compound random variable from a gamma distribution where
-   * \f$k\f$ and \f$\theta\f$ are given by the specified random variables. */
-  static Compound gamma(const Var &k, const Var &theta, const std::string &name="");
 
 protected:
   /** The reference to the @c CompoundObj instance. */

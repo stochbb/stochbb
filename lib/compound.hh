@@ -3,6 +3,8 @@
 
 #include "api.hh"
 #include "randomvariable.hh"
+#include <Eigen/Eigen>
+
 
 namespace stochbb {
 
@@ -14,14 +16,6 @@ protected:
    * @param vars Specifies the variables, the compound depends on.
    * @param name Specifies the optional name for the random variable. */
   CompoundObj(const std::vector<Var> &vars, const std::string &name);
-
-public:
-  /** Constructs a compound-normal random variable with the specified random variables
-   * for the mean and standard deviation. */
-  static Compound norm(const Var &mu, const Var &sigma, const std::string &name="");
-  /** Constructs a compound-gamma random variable with the specified random variables
-   * for the shape and scale parameters. */
-  static Compound gamma(const Var &k, const Var &theta, const std::string &name="");
 
 public:
   virtual void mark();
@@ -180,6 +174,82 @@ public:
 protected:
   /** A reference to the distribution. */
   GammaCompoundDensityObj *_density;
+};
+
+
+/** The density object for a compound-weibull distribution.
+ * This class determines the distribution of the random variable numerically by integrating over
+ * the densities of the specified parameter random variables.
+ */
+class WeibullCompoundDensityObj: public DensityObj
+{
+protected:
+  /** Constructs the density from the given parameter distributions.
+   * @param k Specifies the shape parameter random variable.
+   * @param lambda Specifies the scale parameter random variable.
+   * @param shift Specifies the optional shift, default @c shift=0. */
+  WeibullCompoundDensityObj(DensityObj *k, DensityObj *lambda, double shift=0);
+
+public:
+  /** Constructs the density from the given parameter distributions.
+   * @param k Specifies the shape parameter random variable.
+   * @param lambda Specifies the scale parameter random variable.
+   * @param shift Specifies the optional shift, default @c shift=0. */
+  WeibullCompoundDensityObj(const Var &k, const Var &lambda, double shift=0) throw (AssumptionError);
+  /** Destructor. */
+  virtual ~WeibullCompoundDensityObj();
+
+  virtual void mark();
+
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
+
+protected:
+  /** Prepares the numerical itergration on construction. If one of the parameter densities is a
+   * delta density, the integration over this parameter is performed "analytically". */
+  void _init_int();
+
+protected:
+  /** The distribution of the shape parameter. */
+  DensityObj *_k;
+  /** The distribution of the scale parameter. */
+  DensityObj *_lambda;
+  /** Shift of the affine transform. */
+  double _shift;
+  /** Lower bound of the integration interval over \f$k\f$. */
+  double _kMin;
+  /** Integration stepsize over \f$k\f$. */
+  double _ddK;
+  /** The density of \f$k\f$ evaluated on a regular grid from @c _kMin with step size @c _ddK. */
+  Eigen::VectorXd _dk;
+  /** Lower bound of the integration interval over \f$\lambda\f$. */
+  double _lambdaMin;
+  /** Integration stepsize over \f$\lambda\f$. */
+  double _ddLambda;
+  /** The density of \f$\lambda\f$ evaluated on a regular grid from @c _lambdaMin with step size
+   * @c _ddLambda. */
+  Eigen::VectorXd _dlambda;
+
+};
+
+
+/** Implements a compound-Weibull random variable.
+ * That is a Weibull-distributed random variable where the shape and scale parameters are random
+ * variables too. */
+class WeibullCompoundObj: public CompoundObj
+{
+public:
+  /** Constructs the compound-Weibull random variable from the given parameter random variables. */
+  WeibullCompoundObj(const Var &k, const Var &lambda, const std::string &name="");
+
+  void mark();
+  virtual Density density();
+
+protected:
+  /** A reference to the distribution. */
+  WeibullCompoundDensityObj *_density;
 };
 
 }

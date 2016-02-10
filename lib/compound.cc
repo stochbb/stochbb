@@ -20,16 +20,6 @@ CompoundObj::mark() {
   DerivedVarObj::mark();
 }
 
-Compound
-CompoundObj::norm(const Var &mu, const Var &sigma, const std::string &name) {
-  return new NormalCompoundObj(mu, sigma, name);
-}
-
-Compound
-CompoundObj::gamma(const Var &k, const Var &theta, const std::string &name) {
-  return new GammaCompoundObj(k, theta, name);
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of NormalCompoundDensityObj
@@ -223,7 +213,7 @@ GammaCompoundDensityObj::_init_int() {
     _k->eval(_kMin, kMax, _dk);
   }
 
-  // Check if sigma is a delta distribution
+  // Check if theta is a delta distribution
   if (DeltaDensityObj *delta_theta = dynamic_cast<DeltaDensityObj *>(_theta)) {
     _dtheta.resize(1); _dtheta[0] = 1; _ddTheta = 1; _thetaMin = delta_theta->delay();
   } else {
@@ -261,8 +251,7 @@ GammaCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::Vector
     for (int l=0; l<_dk.size(); l++, k+=_ddK) {
       double theta = _thetaMin;
       for (int m=0; m<_dtheta.size(); m++, theta+=_ddTheta) {
-        out(i) += _ddK*_ddTheta * _dk[l] * _dtheta[m] *
-            std::exp((k-1)*std::log(t) - t/theta -std::lgamma(k) -k*std::log(theta));
+        out(i) += _ddK*_ddTheta * _dk[l] * _dtheta[m] * stochbb::dgamma(t, k, theta);
       }
     }
   }
@@ -283,8 +272,7 @@ GammaCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Vec
     for (int l=0; l<_dk.size(); l++, k+=_ddK) {
       double theta = _thetaMin;
       for (int m=0; m<_dtheta.size(); m++, theta+=_ddTheta) {
-        out(i) += _ddK*_ddTheta * _dk[l] * _dtheta[m] *
-            stochbb::gamma_li(k, t/theta);
+        out(i) += _ddK*_ddTheta * _dk[l] * _dtheta[m] * stochbb::pgamma(t, k, theta);
       }
     }
   }
@@ -337,6 +325,161 @@ GammaCompoundObj::mark() {
 Density
 GammaCompoundObj::density() {
   _density->mark(); return _density;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of WeibullCompoundDensityObj
+ * ********************************************************************************************* */
+WeibullCompoundDensityObj::WeibullCompoundDensityObj(DensityObj *k, DensityObj *lambda, double shift)
+  : DensityObj(), _k(k), _lambda(lambda), _shift(shift), _kMin(0), _ddK(0), _dk(),
+    _lambdaMin(0), _ddLambda(0), _dlambda()
+{
+  _init_int();
+}
+
+WeibullCompoundDensityObj::WeibullCompoundDensityObj(const Var &k, const Var &lambda, double shift) throw (AssumptionError)
+  : DensityObj(), _k(*k->density()), _lambda(*lambda->density()), _shift(shift), _kMin(0), _ddK(0), _dk(),
+    _lambdaMin(0), _ddLambda(0), _dlambda()
+{
+  // Test for independence
+  if (! k.mutuallyIndep(lambda)) {
+    AssumptionError err;
+    err << "Cannot construct Weibull-compound parameters are not independent.";
+    throw err;
+  }
+
+  _init_int();
+}
+
+void
+WeibullCompoundDensityObj::_init_int() {
+  double kMax, lambdaMax;
+  // Get intergration range for k
+  _k->rangeEst(0.01, _kMin, kMax);
+  // Get intergration range for theta
+  _lambda->rangeEst(0.01, _lambdaMin, lambdaMax);
+
+  // Check if theta is a delta distribution
+  if (DeltaDensityObj *delta_k = dynamic_cast<DeltaDensityObj *>(_k)) {
+    _dk.resize(1); _dk[0] = 1; _ddK = 1; _kMin = delta_k->delay();
+  } else {
+    _dk.resize(100);
+    _ddK = (kMax-_kMin)/100;
+    _k->eval(_kMin, kMax, _dk);
+  }
+
+  // Check if lambda is a delta distribution
+  if (DeltaDensityObj *delta_lambda = dynamic_cast<DeltaDensityObj *>(_lambda)) {
+    _dlambda.resize(1); _dlambda[0] = 1; _ddLambda = 1; _lambdaMin = delta_lambda->delay();
+  } else {
+    _dlambda.resize(100);
+    _ddLambda = (lambdaMax-_lambdaMin)/100;
+    _lambda->eval(_lambdaMin, lambdaMax, _dlambda);
+  }
+}
+
+WeibullCompoundDensityObj::~WeibullCompoundDensityObj() {
+  // pass...
+}
+
+void
+WeibullCompoundDensityObj::mark() {
+  if (isMarked()) { return; }
+  DensityObj::mark();
+  _k->mark();
+  _lambda->mark();
+}
+
+void
+WeibullCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  out.setZero();
+
+  // Apply affine transform
+  Tmin = Tmin-_shift;
+  Tmax = Tmax-_shift;
+
+  // For each time t
+  double t=Tmin, dt = (Tmax-Tmin)/out.size();
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    // Perform numerical integral over coeffs
+    double k = _kMin;
+    for (int l=0; l<_dk.size(); l++, k+=_ddK) {
+      double lambda = _lambdaMin;
+      for (int m=0; m<_dlambda.size(); m++, lambda+=_ddLambda) {
+        out(i) += _ddK*_ddLambda * _dk[l] * _dlambda[m] * stochbb::dweibull(t, k, lambda);
+      }
+    }
+  }
+}
+
+void
+WeibullCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  out.setZero();
+  // Apply affine transform
+  Tmin = Tmin-_shift;
+  Tmax = Tmax-_shift;
+  // For each time t
+  double t=Tmin, dt = (Tmax-Tmin)/out.size();
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    // Perform numerical integral over coeffs
+    double k = _kMin;
+    for (int l=0; l<_dk.size(); l++, k+=_ddK) {
+      double lambda = _lambdaMin;
+      for (int m=0; m<_dlambda.size(); m++, lambda+=_ddLambda) {
+        out(i) += _ddK*_ddLambda * _dk[l] * _dlambda[m] * stochbb::pweibull(t, k, lambda);
+      }
+    }
+  }
+}
+
+Density
+WeibullCompoundDensityObj::affine(double scale, double shift) const {
+  return new WeibullCompoundDensityObj(_k, *_lambda->affine(scale, 0), scale*_shift+shift);
+}
+
+void
+WeibullCompoundDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  // Get quantiles for parameter distributions
+  double a_k, b_k, a_lambda, b_lambda;
+  _k->rangeEst(alpha, a_k, b_k);
+  _lambda->rangeEst(alpha, a_lambda, b_lambda);
+  // Get maximum quantiles
+  a = qweibull(alpha, a_k, a_lambda);
+  b = qweibull(1-alpha, b_k, b_lambda);
+  // Apply affine trafo on a & b;
+  a = a+_shift;
+  b = b+_shift;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of WeibullCompoundObj
+ * ********************************************************************************************* */
+WeibullCompoundObj::WeibullCompoundObj(const Var &k, const Var &lambda, const std::string &name)
+  : CompoundObj(std::vector<Var> {k, lambda}, name), _density(0)
+{
+  // Test for independence
+  if (! k.mutuallyIndep(lambda)) {
+    AssumptionError err;
+    err << "Cannot construct Weibull-compound parameters are not independent.";
+    throw err;
+  }
+
+  _density = new WeibullCompoundDensityObj(k, lambda);
+  _density->unref();
+}
+
+void
+WeibullCompoundObj::mark() {
+  if (isMarked()) { return; }
+  CompoundObj::mark();
+  if (_density) { _density->mark(); }
+}
+
+Density
+WeibullCompoundObj::density() {
+  _density->ref(); return _density;
 }
 
 

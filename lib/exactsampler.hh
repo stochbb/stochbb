@@ -18,13 +18,13 @@ class ExactSamplerObj : public Object
 {
 public:
   /** Constructor for the given random variable. */
-  ExactSamplerObj(const Var &X);
+  ExactSamplerObj(const Var &X) throw (TypeError);
   /** Constructor for the given random variables. */
-  ExactSamplerObj(const Var &X1, const Var &X2);
+  ExactSamplerObj(const Var &X1, const Var &X2) throw (TypeError);
   /** Constructor for the given random variables. */
-  ExactSamplerObj(const Var &X1, const Var &X2, const Var &X3);
+  ExactSamplerObj(const Var &X1, const Var &X2, const Var &X3) throw (TypeError);
   /** Constructor for the given random variables. */
-  ExactSamplerObj(const std::vector<Var> &variables);
+  ExactSamplerObj(const std::vector<Var> &variables) throw (TypeError);
 
   virtual void mark();
 
@@ -38,9 +38,9 @@ protected:
   typedef void (*sampler_f)(ExactSamplerObj *, VarObj *, Eigen::MatrixXd &out);
 
   /** Assembles the sampling queue recusrively. */
-  void _add_to_queue(VarObj *var);
+  void _add_to_queue(VarObj *var) throw (TypeError);
   /** Chooses the correct sampler for the given variable. */
-  sampler_f _choose_sampler(VarObj *var);
+  sampler_f _choose_sampler(VarObj *var) throw (TypeError);
   /** Samples from an atomic random variable. */
   static void _sample_atomic(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
   /** Samples from an affine transformed random variable. */
@@ -61,6 +61,8 @@ protected:
   static void _sample_comp_normal(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
   /** Samples from a compound-gamma random variable. */
   static void _sample_comp_gamma(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
+  /** Samples from a compound-Weibull random variable. */
+  static void _sample_comp_weibull(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
 
 protected:
   /** The variables selected for output. */

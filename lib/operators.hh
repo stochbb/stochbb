@@ -9,85 +9,213 @@ namespace stochbb {
 
 /** Tests if the vector of variables are mutually independent.
  * @param vars The vector of variables.
- * @returns @c true If the given variables are mutually independent. */
+ * @returns @c true If the given variables are mutually independent.
+ * @ingroup api */
 bool independent(const std::vector<Var> &vars);
 
-/** Constructs a delta-distributed random variable (constant) located as the given value. */
+/** Constructs a delta-distributed random variable (constant) located as the given value.
+ * @ingroup api */
 Var delta(double value);
 
-/** Constructs a uniformly-distributed random variable on the interval [a,b]. */
-Var uniform(double a, double b);
+/** Constructs a uniformly-distributed random variable on the interval [a,b].
+ * @ingroup api */
+Var uniform(double a, double b, const std::string &name="");
 
-/** Constructs a normal-distributed random variable for the given mean and standard deviation. */
+/** Constructs a normal-distributed random variable for the given mean and standard deviation.
+ * @ingroup api */
 Var normal(double mu, double sigma, const std::string &name="");
 /** Constructs a compound-normal distributed random variable for the given mean and
- * standard deviation. Where the mean is a random variable too. */
+ * standard deviation. Where the mean is a random variable too.
+ * @ingroup api */
 Var normal(const Var &mu, double sigma, const std::string &name="");
 /** Constructs a compound-normal distributed random variable for the given mean and
- * standard deviation. Where the standard deviation is a random variable too. */
+ * standard deviation. Where the standard deviation is a random variable too.
+ * @ingroup api */
 Var normal(double mu, const Var &sigma, const std::string &name="");
 /** Constructs a compound-normal distributed random variable for the given mean and
- * standard deviation. Where both, the mean and standard deviation are a random variables. */
+ * standard deviation. Where both, the mean and standard deviation are a random variables.
+ * @ingroup api */
 Var normal(const Var& mu, const Var &sigma, const std::string &name="");
 
-/** Constructs a gamma-distributed random variable for the given shape and scale parameters. */
+/** Constructs a gamma-distributed random variable for the given shape and scale parameters.
+ * @ingroup api */
 Var gamma(double k, double theta, const std::string &name="");
 /** Constructs a compound-gamma distributed random variable for the given shape and scale parameters.
- * Where the shape parameter is a random variable too. */
+ * Where the shape parameter is a random variable too.
+ * @ingroup api */
 Var gamma(const Var &k, double theta, const std::string &name="");
 /** Constructs a compound-gamma distributed random variable for the given shape and scale parameters.
- * Where the scale parameter is a random variable too. */
+ * Where the scale parameter is a random variable too.
+ * @ingroup api */
 Var gamma(double k, const Var &theta, const std::string &name="");
 /** Constructs a compound-gamma distributed random variable for the given shape and scale parameters.
- * Where both, the shape and scale parameter are random variables. */
+ * Where both, the shape and scale parameter are random variables.
+ * @ingroup api */
 Var gamma(const Var& k, const Var &theta, const std::string &name="");
 
-/** Constructs a Weibull-distributed random variable for the given shape and scale parameters. */
-Var weibull(double k, double theta, const std::string &name="");
-
-/// @todo Implmenet CompoundWeibull distributed RVs.
+/** Constructs a Weibull-distributed random variable for the given shape and scale parameters.
+ * @ingroup api */
+Var weibull(double k, double lambda, const std::string &name="");
+/** Constructs a compound Weibull-distributed random variable for the given shape and scale parameters.
+ * @ingroup api */
+Var weibull(const Var& k, double lambda, const std::string &name="");
+/** Constructs a compound Weibull-distributed random variable for the given shape and scale parameters.
+ * @ingroup api */
+Var weibull(double k, const Var& lambda, const std::string &name="");
+/** Constructs a compound Weibull-distributed random variable for the given shape and scale parameters.
+ * @ingroup api */
+Var weibull(const Var& k, const Var& lambda, const std::string &name="");
 
 /** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
- * @param vars */
+ * That is
+ * \f[
+ *  Y = \sum_i X_i\,.
+ * \f]
+ *
+ * @param vars Specifies the RVs to sum.
+ * @ingroup api */
 Var chain(const std::vector<Var> &vars);
 
+/** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
+ * That is
+ * \f[
+ *  Y = X_1+X_2\,.
+ * \f]
+ * @ingroup api */
+Var chain(const Var &X1, const Var &X2);
+
+/** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
+ * That is
+ * \f[
+ *  Y = X_1+X_2+X_3\,.
+ * \f]
+ * @ingroup api */
+Var chain(const Var &X1, const Var &X2, const Var &X3);
+
 /** Constructs a random variable \f$Y\f$ as the minimum of the given random variables.
- * In contrast to the @c MinimumObj, it handles partial dependency between the random variables
- * if they are formed as sums of independent random variables by first separating the common
- * part. For example
+ * That is
+ * \f[
+ *  Y = min(X_1, X_2, ..., X_N)\,.
+ * \f]
+ *
+ * In contrast to the direct instantiation of the @c Minimum class, it handles partial dependency
+ * between the random variables if they are formed as sums of independent random variables by first
+ * separating the common part. For example
  * \f[
  *  Y = min(X_1+X_2,X_1+X_3) \longrightarrow Y = X_1+min(X_2,X_3)\,,
  * \f]
- * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables. */
+ * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
+ * @ingroup api */
 Var minimum(const std::vector<Var> &variables);
-Var minimum(const Var &X);
+
+/** Constructs a random variable \f$Y\f$ as the minimum of the given random variables.
+ * That is
+ * \f[
+ *  Y = min(X_1, X_2)\,.
+ * \f]
+ *
+ * In contrast to the direct instantiation of the @c Minimum class, it handles partial dependency
+ * between the random variables if they are formed as sums of independent random variables by first
+ * separating the common part. For example
+ * \f[
+ *  Y = min(X_1+X_2,X_1+X_3) \longrightarrow Y = X_1+min(X_2,X_3)\,,
+ * \f]
+ * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
+ * @ingroup api */
 Var minimum(const Var &X1, const Var &X2);
+
+/** Constructs a random variable \f$Y\f$ as the minimum of the given random variables.
+ * That is
+ * \f[
+ *  Y = min(X_1, X_2, X_3)\,.
+ * \f]
+ *
+ * In contrast to the direct instantiation of the @c Minimum class, it handles partial dependency
+ * between the random variables if they are formed as sums of independent random variables by first
+ * separating the common part. For example
+ * \f[
+ *  Y = min(X_1+X_2,X_1+X_3) \longrightarrow Y = X_1+min(X_2,X_3)\,,
+ * \f]
+ * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
+ * @ingroup api */
 Var minimum(const Var &X1, const Var &X2, const Var &X3);
 
 /** Constructs a random variable \f$Y\f$, as the maximum of the given random variables.
- * In contrast to the @c MaximumObj, it handles partial dependency between the random variables
- * if they are formed as sums of independent random variables by first separating the common
- * part. For example
+ * That is
+ * \f[
+ *  Y = max(X_1, X_2, ..., X_N)\,.
+ * \f]
+ *
+ * In contrast to the direct instantiation of the @c Maximum class, it handles partial dependency
+ * between the random variables if they are formed as sums of independent random variables by first
+ * separating the common part. For example
  * \f[
  *  Y = max(X_1+X_2,X_1+X_3) \longrightarrow Y = X_1+max(X_2,X_3)\,,
  * \f]
- * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables. */
+ * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
+ * @ingroup api */
 Var maximum(const std::vector<Var> &variables);
-Var maximum(const Var &X);
+
+/** Constructs a random variable \f$Y\f$, as the maximum of the given random variables.
+ * That is
+ * \f[
+ *  Y = max(X_1, X_2)\,.
+ * \f]
+ *
+ * In contrast to the direct instantiation of the @c Maximum class, it handles partial dependency
+ * between the random variables if they are formed as sums of independent random variables by first
+ * separating the common part. For example
+ * \f[
+ *  Y = max(X_1+X_2,X_1+X_3) \longrightarrow Y = X_1+max(X_2,X_3)\,,
+ * \f]
+ * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
+ * @ingroup api */
 Var maximum(const Var &X1, const Var &X2);
+
+/** Constructs a random variable \f$Y\f$, as the maximum of the given random variables.
+ * That is
+ * \f[
+ *  Y = max(X_1, X_2, X_3)\,.
+ * \f]
+ *
+ * In contrast to the direct instantiation of the @c Maximum class, it handles partial dependency
+ * between the random variables if they are formed as sums of independent random variables by first
+ * separating the common part. For example
+ * \f[
+ *  Y = max(X_1+X_2,X_1+X_3) \longrightarrow Y = X_1+max(X_2,X_3)\,,
+ * \f]
+ * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
+ * @ingroup api */
 Var maximum(const Var &X1, const Var &X2, const Var &X3);
 
-/** Constructs an affine transform of the given variable. */
+/** Constructs an affine transformed of the given variable.
+ * @ingroup api */
 Var affine(const Var &var, double scale, double shift);
 
-/** Constructs a mixture of the given variables with assiciated weights. */
+/** Constructs a mixture of the given variables with assiciated weights.
+ * @ingroup api */
 Var mixture(double wX1, const Var &X1, double wX2, const Var &X2);
-/** Constructs a mixture of the given variables with assiciated weights. */
+
+/** Constructs a mixture of the given variables with assiciated weights.
+ * @ingroup api */
 Var mixture(double wX1, const Var &X1, double wX2, const Var &X2, double wX3, const Var &X3);
-/** Constructs a mixture of the given variables with assiciated weights. */
+
+/** Constructs a mixture of the given variables with assiciated weights.
+ * @ingroup api */
 Var mixture(const std::vector<double> &weights, const std::vector<Var> &variables);
 
+/** Constructs a conditional random variable. That is
+ * \f[
+ *  Z = \begin{cases}Y_1 & if\, X_1<X_2 \\ Y_2 & else.\end{cases}
+ * \f]
+ * @ingroup api */
 Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
+
+/** Constructs a conditional chained random variable. That is
+ * \f[
+ *  Z = \begin{cases}X_1+Y_1 & if\, X_1<X_2 \\ X_2+Y_2 & else.\end{cases}
+ * \f]
+ * @ingroup api */
 Var condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
 }
 

@@ -7,7 +7,8 @@
 
 namespace stochbb {
 
-/** Base class of all exceptions. */
+/** Base class of all exceptions.
+ * @ingroup api */
 class Error: public std::exception, public std::stringstream
 {
 public:
@@ -22,7 +23,8 @@ public:
 };
 
 
-/** This exception gets thrown if the parser fails. */
+/** This exception gets thrown if the parser fails.
+ * @ingroup api */
 class ParserError: public Error
 {
 public:
@@ -35,7 +37,8 @@ public:
 };
 
 /** This exception gets thrown if an assumption (usually about independence)
- * is not met. */
+ * is not met.
+ * @ingroup api */
 class AssumptionError: public Error
 {
 public:
@@ -48,7 +51,8 @@ public:
 };
 
 
-/** This exception gets thrown if an unexpected object type is found. */
+/** This exception gets thrown if an unexpected object type is found.
+ * @ingroup api */
 class TypeError: public Error
 {
 public:

@@ -5,6 +5,7 @@
 #include "minmax.hh"
 #include "mixture.hh"
 #include "conditional.hh"
+#include "compound.hh"
 #include "logger.hh"
 
 using namespace stochbb;
@@ -15,15 +16,15 @@ using namespace stochbb;
  * ********************************************************************************************* */
 Var
 stochbb::delta(double value) {
-  return AtomicVar::delta(value);
+  return new AtomicVarObj(new DeltaDensityObj(value));
 }
 
 /* ********************************************************************************************* *
  * Implementation of sbb::uniform()
  * ********************************************************************************************* */
 Var
-stochbb::uniform(double a, double b) {
-  return AtomicVar::unif(a, b);
+stochbb::uniform(double a, double b, const std::string &name) {
+  return new AtomicVarObj(new UniformDensityObj(a,b), name);
 }
 
 /* ********************************************************************************************* *
@@ -31,7 +32,7 @@ stochbb::uniform(double a, double b) {
  * ********************************************************************************************* */
 Var
 stochbb::normal(double mu, double sigma, const std::string &name) {
-  return AtomicVarObj::norm(mu, sigma, name);
+  return new AtomicVarObj(new NormalDensityObj(mu,sigma), name);
 }
 
 Var
@@ -41,7 +42,7 @@ stochbb::normal(const Var &mu, double sigma, const std::string &name) {
     return stochbb::normal(delta->delay(), sigma, name);
   }
   // Otherwise assemble CompoundVar
-  return Compound::norm(mu, AtomicVar::delta(sigma), name);
+  return new NormalCompoundObj(mu, delta(sigma), name);
 }
 
 Var
@@ -51,7 +52,7 @@ stochbb::normal(double mu, const Var &sigma, const std::string &name) {
     return stochbb::normal(mu, delta->delay(), name);
   }
   // Otherwise assemble CompoundVar
-  return Compound::norm(AtomicVar::delta(mu), sigma, name);
+  return new NormalCompoundObj(delta(mu), sigma, name);
 }
 
 Var
@@ -65,7 +66,7 @@ stochbb::normal(const Var &mu, const Var &sigma, const std::string &name) {
     return stochbb::normal(mu, delta->delay(), name);
   }
   // Otherwise assemble CompoundVar
-  return Compound::norm(mu, sigma, name);
+  return new NormalCompoundObj(mu, sigma, name);
 }
 
 
@@ -74,7 +75,7 @@ stochbb::normal(const Var &mu, const Var &sigma, const std::string &name) {
  * ********************************************************************************************* */
 Var
 stochbb::gamma(double k, double theta, const std::string &name) {
-  return AtomicVar::gamma(k, theta, name);
+  return new AtomicVarObj(new GammaDensityObj(k, theta), name);
 }
 
 Var
@@ -84,7 +85,7 @@ stochbb::gamma(const Var &k, double theta, const std::string &name) {
     return stochbb::gamma(delta->delay(), theta, name);
   }
   // Otherwise assemble CompoundVar
-  return Compound::gamma(k, AtomicVar::delta(theta), name);
+  return new GammaCompoundObj(k, delta(theta), name);
 }
 
 Var
@@ -94,7 +95,7 @@ stochbb::gamma(double k, const Var &theta, const std::string &name) {
     return stochbb::gamma(k, delta->delay(), name);
   }
   // Otherwise assemble CompoundVar
-  return Compound::gamma(AtomicVar::delta(k), theta, name);
+  return new GammaCompoundObj(delta(k), theta, name);
 }
 
 Var
@@ -108,7 +109,7 @@ stochbb::gamma(const Var &k, const Var &theta, const std::string &name) {
     return stochbb::gamma(k, delta->delay(), name);
   }
   // Otherwise assemble CompoundVar
-  return Compound::gamma(k, theta, name);
+  return new GammaCompoundObj(k, theta, name);
 }
 
 
@@ -116,17 +117,42 @@ stochbb::gamma(const Var &k, const Var &theta, const std::string &name) {
  * Implementation of sbb::weibull()
  * ********************************************************************************************* */
 Var
-stochbb::weibull(double k, double theta, const std::string &name) {
-  return AtomicVar::weibull(k, theta, name);
+stochbb::weibull(double k, double lambda, const std::string &name) {
+  return new AtomicVarObj(new WeibullDensityObj(k, lambda), name);
 }
+
+Var
+stochbb::weibull(const Var &k, double lambda, const std::string &name) {
+  if (DeltaDensityObj *delta_k = dynamic_cast<DeltaDensityObj *>(*k.density())) {
+    return stochbb::weibull(delta_k->delay(), lambda);
+  }
+  return new WeibullCompoundObj(k, delta(lambda), name);
+}
+
+Var
+stochbb::weibull(double k, const Var &lambda, const std::string &name) {
+  if (DeltaDensityObj *delta_lambda = dynamic_cast<DeltaDensityObj *>(*lambda.density())) {
+    return stochbb::weibull(k, delta_lambda->delay());
+  }
+  return new WeibullCompoundObj(delta(k), lambda, name);
+}
+
+Var
+stochbb::weibull(const Var &k, const Var& lambda, const std::string &name) {
+  if (DeltaDensityObj *delta_k = dynamic_cast<DeltaDensityObj *>(*k.density())) {
+    return stochbb::weibull(delta_k->delay(), lambda);
+  }
+  if (DeltaDensityObj *delta_lambda = dynamic_cast<DeltaDensityObj *>(*lambda.density())) {
+    return stochbb::weibull(k, delta_lambda->delay());
+  }
+  return new WeibullCompoundObj(k, lambda, name);
+}
+
+
 
 /* ********************************************************************************************* *
  * Implementation of minimum
  * ********************************************************************************************* */
-Var stochbb::minimum(const Var &X) {
-  return minimum(std::vector<Var> {X});
-}
-
 Var stochbb::minimum(const Var &X1, const Var &X2) {
   return minimum(std::vector<Var> {X1, X2});
 }
@@ -219,10 +245,6 @@ stochbb::minimum(const std::vector<Var> &variables) {
 /* ********************************************************************************************* *
  * Implementation of maximum
  * ********************************************************************************************* */
-Var stochbb::maximum(const Var &X) {
-  return maximum(std::vector<Var> {X});
-}
-
 Var stochbb::maximum(const Var &X1, const Var &X2) {
   return maximum(std::vector<Var> {X1, X2});
 }
@@ -361,6 +383,16 @@ stochbb::chain(const std::vector<Var> &vars) {
   }
 
   return Chain(variables);
+}
+
+Var
+stochbb::chain(const Var &X1, const Var &X2) {
+  return chain(std::vector<Var> {X1, X2});
+}
+
+Var
+stochbb::chain(const Var &X1, const Var &X2, const Var &X3) {
+  return chain(std::vector<Var> {X1, X2, X3});
 }
 
 
