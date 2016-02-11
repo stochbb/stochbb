@@ -24,12 +24,19 @@ import_array();
 
 namespace stochbb {
 
+/*
+ * Exceptions.
+ */
 class Error { };
 %extend Error {
   std::string __str__() {
     return self->str();
   }
 }
+
+class TypeError: public Error { };
+class AssumptionError: public Error { };
+
 
 class Container
 {

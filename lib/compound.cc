@@ -94,6 +94,7 @@ NormalCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::Vecto
   out.setZero();
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
+#pragma omp for
   for (int i=0; i<out.size(); i++, t+=dt) {
     // Perform numerical integral over coeffs
     double mu = _muMin;
@@ -113,6 +114,7 @@ NormalCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Ve
   out.setZero();
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
+#pragma omp for
   for (int i=0; i<out.size(); i++, t+=dt) {
     // Perform numerical integral over coeffs
     double mu = _muMin;
@@ -252,6 +254,7 @@ GammaCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::Vector
 
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
+#pragma omp for
   for (int i=0; i<out.size(); i++, t+=dt) {
     // Perform numerical integral over coeffs
     double k = _kMin;
@@ -273,6 +276,7 @@ GammaCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::Vec
   Tmax = Tmax-_shift;
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
+#pragma omp for
   for (int i=0; i<out.size(); i++, t+=dt) {
     // Perform numerical integral over coeffs
     double k = _kMin;
@@ -410,6 +414,7 @@ WeibullCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::Vect
 
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
+#pragma omp for
   for (int i=0; i<out.size(); i++, t+=dt) {
     // Perform numerical integral over coeffs
     double k = _kMin;
@@ -430,6 +435,7 @@ WeibullCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::V
   Tmax = Tmax-_shift;
   // For each time t
   double t=Tmin, dt = (Tmax-Tmin)/out.size();
+#pragma omp for
   for (int i=0; i<out.size(); i++, t+=dt) {
     // Perform numerical integral over coeffs
     double k = _kMin;

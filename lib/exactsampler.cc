@@ -8,6 +8,7 @@
 #include "conditional.hh"
 #include "exception.hh"
 #include "rng.hh"
+#include "logger.hh"
 
 #include <algorithm>
 using namespace stochbb;
@@ -84,7 +85,7 @@ ExactSamplerObj::sample(Eigen::Ref<Eigen::MatrixXd> out) {
   // Allocate sample cache
   Eigen::MatrixXd samples(out.rows(), _queue.size());
   // Sample all variables in reverse order
-  for (int i=(_queue.size()-1); i>=0; i--) {
+  for (size_t i=0; i<_queue.size(); i++) {
     _sampler[i](this, _queue[i], samples);
   }
   // Collect selected variables and store them into out
@@ -97,17 +98,19 @@ void
 ExactSamplerObj::_add_to_queue(VarObj *var) throw (TypeError) {
   // Check if variable is already in the queue
   if (0 != _varmap.count(var)) { return; }
-  // If not add to queue
-  _varmap[var] = _queue.size();
-  _queue.push_back(var);
-  // Select sampler for the random variable
-  _sampler.push_back(_choose_sampler(var));
+
   // if the variable is a derived variable -> process direct children recusively
   if (DerivedVarObj *derived = dynamic_cast<DerivedVarObj *>(var)) {
     for (size_t i=0; i<derived->numVariables(); i++) {
       _add_to_queue(*derived->variable(i));
     }
   }
+
+  // If add to queue
+  _varmap[var] = _queue.size();
+  _queue.push_back(var);
+  // Select sampler for the random variable
+  _sampler.push_back(_choose_sampler(var));
 }
 
 ExactSamplerObj::sampler_f
@@ -115,6 +118,8 @@ ExactSamplerObj::_choose_sampler(VarObj *var) throw (TypeError) {
   // dispatch by var type
   if (dynamic_cast<AtomicVarObj *>(var)) {
     return ExactSamplerObj::_sample_atomic;
+  } else if (dynamic_cast<AffineTrafoObj *>(var)) {
+    return ExactSamplerObj::_sample_affine;
   } else if (dynamic_cast<ChainObj *>(var)) {
     return ExactSamplerObj::_sample_chain;
   } else if (dynamic_cast<MinimumObj *>(var)) {
@@ -131,11 +136,14 @@ ExactSamplerObj::_choose_sampler(VarObj *var) throw (TypeError) {
     return ExactSamplerObj::_sample_comp_normal;
   } else if (dynamic_cast<GammaCompoundObj *>(var)) {
     return ExactSamplerObj::_sample_comp_gamma;
+  } else if (dynamic_cast<WeibullCompoundObj *>(var)) {
+    return ExactSamplerObj::_sample_comp_weibull;
   }
 
   TypeError err;
-  err << "Cannot create sampler for RV " << var
-      << ": Unknown type.";
+  err << "Cannot create sampler for RV ";
+  var->print(err);
+  err << ": Unknown type.";
   throw err;
 }
 
