@@ -241,6 +241,11 @@ Var gamma(double k, const Var &theta);
 Var gamma(const Var &k, double theta);
 Var gamma(const Var &k, const Var &theta);
 
+Var invgamma(double alpha, double beta);
+Var invgamma(double alpha, const Var &beta);
+Var invgamma(const Var &alpha, double beta);
+Var invgamma(const Var &alpha, const Var &beta);
+
 Var weibull(double k, double lambda);
 Var weibull(const Var& k, double lambda);
 Var weibull(double k, const Var& lambda);
@@ -272,6 +277,10 @@ double qnorm(double p);
 double dgamma(double x, double k, double theta);
 double pgamma(double x, double k, double theta);
 double qgamma(double p, double k, double theta);
+
+double dinvgamma(double x, double k, double theta);
+double pinvgamma(double x, double k, double theta);
+double qinvgamma(double p, double k, double theta);
 
 double dweibull(double x, double k, double theta);
 double pweibull(double x, double k, double theta);

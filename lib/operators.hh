@@ -53,6 +53,22 @@ Var gamma(double k, const Var &theta, const std::string &name="");
  * @ingroup api */
 Var gamma(const Var& k, const Var &theta, const std::string &name="");
 
+/** Constructs an inverse gamma-distributed random variable for the given shape and scale parameters.
+ * @ingroup api */
+Var invgamma(double alpha, double beta, const std::string &name="");
+/** Constructs a compound inverse gamma distributed random variable for the given shape and scale
+ * parameters. Where the shape parameter is a random variable too.
+ * @ingroup api */
+Var invgamma(const Var &alpha, double beta, const std::string &name="");
+/** Constructs a compound inverse gamma distributed random variable for the given shape and scale
+ * parameters. Where the scale parameter is a random variable too.
+ * @ingroup api */
+Var invgamma(double alpha, const Var &beta, const std::string &name="");
+/** Constructs a compound inverse gamma distributed random variable for the given shape and scale
+ * parameters. Where both, the shape and scale parameter are random variables.
+ * @ingroup api */
+Var invgamma(const Var& alpha, const Var &beta, const std::string &name="");
+
 /** Constructs a Weibull-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
 Var weibull(double k, double lambda, const std::string &name="");

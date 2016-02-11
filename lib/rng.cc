@@ -73,3 +73,8 @@ RNG::gamma(double a, double b) {
   return b * d * v;
 }
 
+double
+RNG::invgamma(double alpha, double beta) {
+  return 1/gamma(alpha, 1./beta);
+}
+

@@ -252,6 +252,83 @@ protected:
   WeibullCompoundDensityObj *_density;
 };
 
+
+/** The density object for a compound inverse gamma distribution.
+ * This class determines the distribution of the random variable numerically by integrating over
+ * the densities of the specified parameter random variables.
+ */
+class InvGammaCompoundDensityObj: public DensityObj
+{
+protected:
+  /** Constructs the density from the given parameter distributions.
+   * @param alpha Specifies the shape parameter random variable.
+   * @param beta Specifies the scale parameter random variable.
+   * @param shift Specifies the optional shift, default @c shift=0. */
+  InvGammaCompoundDensityObj(DensityObj *alpha, DensityObj *beta, double shift=0);
+
+public:
+  /** Constructs the density from the given parameter distributions.
+   * @param alpha Specifies the shape parameter random variable.
+   * @param beta Specifies the scale parameter random variable.
+   * @param shift Specifies the optional shift, default @c shift=0. */
+  InvGammaCompoundDensityObj(const Var &alpha, const Var &beta, double shift=0) throw (AssumptionError);
+  virtual ~InvGammaCompoundDensityObj();
+
+  void mark();
+
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
+
+protected:
+  /** Prepares the numerical itergration on construction. If one of the parameter densities is a
+   * delta density, the integration over this parameter is performed "analytically". */
+  void _init_int();
+
+protected:
+  /** The distribution of the shape parameter. */
+  DensityObj *_alpha;
+  /** The distribution of the scale parameter. */
+  DensityObj *_beta;
+  /** Shift of the affine transform. */
+  double _shift;
+  /** Lower bound of the integration interval over \f$\alpha\f$. */
+  double _alphaMin;
+  /** Integration stepsize over \f$\alpha\f$. */
+  double _ddAlpha;
+  /** The density of \f$\alpha\f$ evaluated on a regular grid from @c _alphaMin with step size
+   * @c _ddAlpha. */
+  Eigen::VectorXd _dalpha;
+  /** Lower bound of the integration interval over \f$\beta\f$. */
+  double _betaMin;
+  /** Integration stepsize over \f$\beta\f$. */
+  double _ddBeta;
+  /** The density of \f$\beta\f$ evaluated on a regular grid from @c _betaMin with step size @c _ddBeta. */
+  Eigen::VectorXd _dbeta;
+
+};
+
+
+/** Implements a compound inverse gamma random variable.
+ * That is a inverse gamma-distributed random variable where the shape and scale parameters are
+ * random variables too. */
+class InvGammaCompoundObj: public CompoundObj
+{
+public:
+  /** Constructs the compound inverse gamma random variable from the given parameter random
+   * variables. */
+  InvGammaCompoundObj(const Var &alpha, const Var &beta, const std::string &name="");
+
+  void mark();
+
+  Density density();
+
+protected:
+  /** A reference to the distribution. */
+  InvGammaCompoundDensityObj *_density;
+};
+
 }
 
 #endif // COMPOUND_HH

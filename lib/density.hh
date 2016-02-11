@@ -45,7 +45,7 @@ public:
   virtual Density affine(double scale, double shift) const = 0;
 
   /** Estimates the range on which the PDF and CDFs need to be evaluated based on the
-   * \f$\alpha\f-quantile of atomic distributions. Please note that this value
+   * \f$\alpha\f$-quantile of atomic distributions. Please note that this value
    * is not an estimate of \f$\alpha\f$-quantiles of the distribution. It reflects the interval on
    * which all distributions, this distribution depends on, need to be evaluated for the evaluation
    * of this distribution.
@@ -184,7 +184,10 @@ protected:
 };
 
 
-/** Implements the (shifted) Gamma distribution. */
+/** Implements the (shifted) Gamma distribution. That is
+ * \f[
+ *  \Gamma(x; k, \theta) = \frac{x^{k-1}e^{-\frac{x}{\theta}}}{\Gamma(k)\,\theta^k}
+ * \f] */
 class GammaDensityObj: public AtomicDensityObj
 {
 public:
@@ -215,6 +218,45 @@ protected:
   double _k;
   /** The scale parameter. */
   double _theta;
+  /** Shift of the affine transform. */
+  double _shift;
+};
+
+
+/** Implements the (shifted) inverse Gamma distribution. That is
+ * \f[
+ *  \Gamma(x; \alpha, \beta) = \frac{\beta^\alpha x^{-\alpha-1}e^{-\frac{\beta}{a}}}{\Gamma(\alpha)}
+ * \f] */
+class InvGammaDensityObj: public AtomicDensityObj
+{
+public:
+  /** Constructor. */
+  InvGammaDensityObj(double alpha, double beta, double shift=0);
+  /** Destructor. */
+  virtual ~InvGammaDensityObj();
+  void mark();
+
+  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
+  Density affine(double scale, double shift) const;
+  void rangeEst(double alpha, double &a, double &b) const;
+
+  int compare(const DensityObj &other) const;
+  void print(std::ostream &stream) const;
+
+  /** Returns the shape parameter of the inverse gamma distribution. */
+  inline double alpha() const { return _alpha; }
+  /** Returns the scale parameter of the inverse gamma distribution. */
+  inline double beta() const { return _beta; }
+  /** Returns the shift of the distribution. */
+  inline double shift() const { return _shift; }
+
+protected:
+  /** The shape paramter. */
+  double _alpha;
+  /** The scale parameter. */
+  double _beta;
   /** Shift of the affine transform. */
   double _shift;
 };

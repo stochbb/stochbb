@@ -3,9 +3,10 @@
 from numpy import *
 import stochbb;
 from matplotlib import pylab
+import cProfile
 
 # Install Logger
-stochbb.Logger.addHandler(stochbb.IOLogHandler())
+#stochbb.Logger.addHandler(stochbb.IOLogHandler())
 
 #
 # Corpus model
@@ -34,25 +35,28 @@ M = stochbb.gamma(10, 30)
 R = L+S+M
 
 print R, R.density()
-Tmin, Tmax, N = 0, 1200, 10000;
+Tmin, Tmax, N = 0, 1200, 1000;
 t = linspace(Tmin, Tmax, N); dt = float(Tmax-Tmin)/N
 pL = empty(N,); L.density().eval(Tmin, Tmax, pL)
 pS = empty(N,); S.density().eval(Tmin, Tmax, pS)
 pM = empty(N,); M.density().eval(Tmin, Tmax, pM)
-pR = empty(N,); R.density().eval(Tmin, Tmax, pR)
+pR = empty(N,); cProfile.run("R.density().eval(Tmin, Tmax, pR)")
 
-X = empty((10000, 4))
+
+X = empty((100000, 4))
 sam = stochbb.ExactSampler([L,S,M,R])
-sam.sample(X)
+cProfile.run("sam.sample(X)")
 
-pylab.plot(t, pL, label="Lexical")
-pylab.hist(X[:,0], bins=30, normed=True, label="Lexical")
-pylab.plot(t, pS, label="Semantic")
-pylab.hist(X[:,1], bins=30, normed=True, label="Semantic")
-pylab.plot(t, pM, label="Motor")
-pylab.hist(X[:,2], bins=30, normed=True, label="Motor")
-pylab.plot(t, pR, label="Response (L+S+M)")
-pylab.hist(X[:,3], bins=30, normed=True, label="Response (L+S+M)")
-pylab.legend()
+ll, = pylab.plot(t, pL, "b", lw=3)
+pylab.hist(X[:,0], color="b", bins=100, normed=True)
+ls, = pylab.plot(t, pS, "g", lw=3)
+pylab.hist(X[:,1], color="g", bins=100, normed=True)
+lm, = pylab.plot(t, pM, "r", lw=3)
+pylab.hist(X[:,2], color="r", bins=100, normed=True)
+lr, = pylab.plot(t, pR, "c", lw=3)
+pylab.hist(X[:,3], color="c", bins=100, normed=True)
+pylab.legend((ll, ls, lm, lr),
+             ("Lexical", "Semantic", "Motor", "Response (L+S+M)"))
 
+pylab.savefig("example.pdf")
 pylab.show()

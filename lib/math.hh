@@ -34,6 +34,13 @@ double pgamma(double x, double k, double theta);
 /** Inverse CDF of the gamma distribution (quantile function). */
 double qgamma(double p, double k, double theta);
 
+/** PDF of the inverse gamma distribution. */
+double dinvgamma(double x, double alpha, double beta);
+/** CDF of the inverse gamma distribution. */
+double pinvgamma(double x, double alpha, double beta);
+/** Inverse CDF of the inverse gamma distribution (quantile function). */
+double qinvgamma(double p, double alpha, double beta);
+
 /** PDF of the Weibull distribution. */
 double dweibull(double x, double k, double lambda);
 /** CDF of the Weibull distribution. */

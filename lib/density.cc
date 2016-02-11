@@ -372,6 +372,86 @@ GammaDensityObj::print(std::ostream &stream) const {
 
 
 /* ********************************************************************************************* *
+ * Implementation of InvGammaDensityObj
+ * ********************************************************************************************* */
+InvGammaDensityObj::InvGammaDensityObj(double alpha, double beta, double shift)
+  : AtomicDensityObj(), _alpha(alpha), _beta(beta), _shift(shift)
+{
+  // pass...
+}
+
+InvGammaDensityObj::~InvGammaDensityObj() {
+  // pass...
+}
+
+void
+InvGammaDensityObj::mark() {
+  if (isMarked()) { return; }
+  DensityObj::mark();
+}
+
+void
+InvGammaDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  // Apply affine transform on arguments
+  Tmin -= _shift; Tmax -= _shift;
+  double t = Tmin, dt = (Tmax-Tmin)/out.size();
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    out[i] = stochbb::dinvgamma(t, _alpha, _beta);
+  }
+}
+
+void
+InvGammaDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  // Apply affine transform on arguments
+  Tmin -= _shift; Tmax -= _shift;
+  double t = Tmin, dt = (Tmax-Tmin)/out.size();
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    out[i] = stochbb::pinvgamma(t, _alpha, _beta);
+  }
+}
+
+void
+InvGammaDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
+  for (int i=0; i<out.size(); i++) {
+    out[i] = RNG::invgamma(_alpha, _beta)+_shift;
+  }
+}
+
+Density
+InvGammaDensityObj::affine(double scale, double shift) const {
+  return new GammaDensityObj(_alpha, scale*_beta, scale*_shift+shift);
+}
+
+void
+InvGammaDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  a = stochbb::qinvgamma(alpha/2, _alpha, _beta);
+  b = stochbb::qinvgamma(1-alpha/2, _alpha, _beta);
+}
+
+int
+InvGammaDensityObj::compare(const DensityObj &other) const {
+  // Compare types
+  if (int res = DensityObj::compare(other)) { return res; }
+  // Compare uniform densities
+  const InvGammaDensityObj *ogamma = dynamic_cast<const InvGammaDensityObj *>(&other);
+  if (_alpha < ogamma->_alpha) { return -1; }
+  else if (_alpha > ogamma->_alpha) { return 1; }
+  if (_beta < ogamma->_beta) { return -1; }
+  else if (_beta > ogamma->_beta) { return 1; }
+  if (_shift < ogamma->_shift) { return -1; }
+  else if (_shift > ogamma->_shift) { return 1; }
+  return 0;
+}
+
+void
+InvGammaDensityObj::print(std::ostream &stream) const {
+  stream << "<InvGammaDensityObj alpha=" << _alpha << ", beta=" << _beta;
+  if (_shift) { stream << ", shift=" << _shift; }
+  stream << " #" << (void *)this << ">";
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of WeibullDensityObj
  * ********************************************************************************************* */
 WeibullDensityObj::WeibullDensityObj(double k, double lambda, double shift)

@@ -340,6 +340,164 @@ GammaCompoundObj::density() {
 
 
 /* ********************************************************************************************* *
+ * Implementation of InvGammaCompoundDensityObj
+ * ********************************************************************************************* */
+InvGammaCompoundDensityObj::InvGammaCompoundDensityObj(DensityObj *alpha, DensityObj *beta, double shift)
+  : DensityObj(), _alpha(alpha), _beta(beta), _shift(shift), _alphaMin(0), _ddAlpha(0), _dalpha(),
+    _betaMin(0), _ddBeta(0), _dbeta()
+{
+  _init_int();
+}
+
+InvGammaCompoundDensityObj::InvGammaCompoundDensityObj(const Var &alpha, const Var &beta, double shift) throw (AssumptionError)
+  : DensityObj(), _alpha(0), _beta(0), _shift(shift), _alphaMin(0), _ddAlpha(0), _dalpha(),
+    _betaMin(0), _ddBeta(0), _dbeta()
+{
+  _alpha = *alpha->density();
+  _beta = *beta->density();
+  // Test for independence
+  if (! alpha.mutuallyIndep(beta)) {
+    AssumptionError err;
+    err << "Cannot construct inverse gamma-compound: Parameters are not independent.";
+    throw err;
+  }
+  _init_int();
+}
+
+void
+InvGammaCompoundDensityObj::_init_int() {
+  double alphaMax, betaMax;
+  // Get intergration range for alpha
+  _alpha->rangeEst(0.01, _alphaMin, alphaMax);
+  // Get intergration range for beta
+  _beta->rangeEst(0.01, _betaMin, betaMax);
+
+  // Check if alpha is a delta distribution
+  if (DeltaDensityObj *delta_alpha = dynamic_cast<DeltaDensityObj *>(_alpha)) {
+    _dalpha.resize(1); _dalpha[0] = 1; _ddAlpha = 1; _alphaMin = delta_alpha->delay();
+  } else {
+    _dalpha.resize(100);
+    _ddAlpha = (alphaMax-_alphaMin)/100;
+    _alpha->eval(_alphaMin, alphaMax, _dalpha);
+  }
+
+  // Check if beta is a delta distribution
+  if (DeltaDensityObj *delta_beta = dynamic_cast<DeltaDensityObj *>(_beta)) {
+    _dbeta.resize(1); _dbeta[0] = 1; _ddBeta = 1; _betaMin = delta_beta->delay();
+  } else {
+    _dbeta.resize(100);
+    _ddBeta = (betaMax-_betaMin)/100;
+    _beta->eval(_betaMin, betaMax, _dbeta);
+  }
+}
+
+InvGammaCompoundDensityObj::~InvGammaCompoundDensityObj() {
+  // pass...
+}
+
+void
+InvGammaCompoundDensityObj::mark() {
+  if (isMarked()) { return; }
+  DensityObj::mark();
+  if (_alpha) _alpha->mark();
+  if (_beta) _beta->mark();
+}
+
+void
+InvGammaCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  out.setZero();
+
+  // Apply affine transform
+  Tmin = Tmin-_shift;
+  Tmax = Tmax-_shift;
+
+  // For each time t
+  double t=Tmin, dt = (Tmax-Tmin)/out.size();
+#pragma omp for
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    // Perform numerical integral over coeffs
+    double alpha = _alphaMin;
+    for (int l=0; l<_dalpha.size(); l++, alpha+=_ddAlpha) {
+      double beta = _betaMin;
+      for (int m=0; m<_dbeta.size(); m++, beta+=_ddBeta) {
+        out(i) += _ddAlpha*_ddBeta * _dalpha[l] * _dbeta[m] * stochbb::dinvgamma(t, alpha, beta);
+      }
+    }
+  }
+}
+
+void
+InvGammaCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  out.setZero();
+  // Apply affine transform
+  Tmin = Tmin-_shift;
+  Tmax = Tmax-_shift;
+  // For each time t
+  double t=Tmin, dt = (Tmax-Tmin)/out.size();
+#pragma omp for
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    // Perform numerical integral over coeffs
+    double alpha = _alphaMin;
+    for (int l=0; l<_dalpha.size(); l++, alpha+=_ddAlpha) {
+      double beta = _betaMin;
+      for (int m=0; m<_dbeta.size(); m++, beta+=_ddBeta) {
+        out(i) += _ddAlpha*_ddBeta * _dalpha[l] * _dbeta[m] * stochbb::pinvgamma(t, alpha, beta);
+      }
+    }
+  }
+}
+
+Density
+InvGammaCompoundDensityObj::affine(double scale, double shift) const {
+  return new InvGammaCompoundDensityObj(_alpha, *_beta->affine(scale, 0), scale*_shift+shift);
+}
+
+void
+InvGammaCompoundDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  // Get quantiles for parameter distributions
+  double a_alpha, b_alpha, a_beta, b_beta;
+  _alpha->rangeEst(alpha, a_alpha, b_alpha);
+  _beta->rangeEst(alpha, a_beta, b_beta);
+  // Get maximum quantiles
+  a = qinvgamma(alpha, a_alpha, a_beta);
+  b = qinvgamma(1-alpha, b_alpha, b_beta);
+  // Apply affine trafo on a & b;
+  a = a+_shift;
+  b = b+_shift;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of InvGammaCompoundObj
+ * ********************************************************************************************* */
+InvGammaCompoundObj::InvGammaCompoundObj(const Var &alpha, const Var &beta, const std::string &name)
+  : CompoundObj(std::vector<Var> {alpha, beta}, name), _density(0)
+{
+  // Test for independence
+  if (! alpha.mutuallyIndep(beta)) {
+    AssumptionError err;
+    err << "Cannot construct inverse gamma-compound parameters are not independent.";
+    throw err;
+  }
+
+  _density = new InvGammaCompoundDensityObj(alpha, beta);
+  _density->unref();
+}
+
+void
+InvGammaCompoundObj::mark() {
+  if (isMarked()) { return; }
+  CompoundObj::mark();
+  if (_density) { _density->mark(); }
+}
+
+Density
+InvGammaCompoundObj::density() {
+  _density->mark(); return _density;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of WeibullCompoundDensityObj
  * ********************************************************************************************* */
 WeibullCompoundDensityObj::WeibullCompoundDensityObj(DensityObj *k, DensityObj *lambda, double shift)

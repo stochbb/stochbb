@@ -290,6 +290,32 @@ stochbb::qgamma(double p, double k, double theta) {
   return x;
 }
 
+
+double
+stochbb::dinvgamma(double x, double alpha, double beta) {
+  if (x<=0) { return 0; }
+  return std::exp( alpha*std::log(beta) - std::lgamma(alpha) - (alpha+1)*std::log(x) - beta/x );
+}
+
+double
+stochbb::pinvgamma(double x, double alpha, double beta) {
+  if (x<=0) { return 0; }
+  return stochbb::gamma_ui(alpha, beta/x);
+}
+
+double
+stochbb::qinvgamma(double p, double alpha, double beta) {
+  /// @todo Write a better approximation of the gamma-quantile function.
+  // Solve p = pgamma(x, k, theta) by simple Newton
+  double x = beta/(alpha+1);
+  for (size_t i=0; i<100; i++) {
+    double dx = (p-stochbb::pinvgamma(x, alpha, beta))/stochbb::dinvgamma(x, alpha, beta);
+    x += dx;
+  }
+  return x;
+}
+
+
 double
 stochbb::dweibull(double x, double k, double lambda) {
   if (x<0) { return 0; }

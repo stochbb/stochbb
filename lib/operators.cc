@@ -114,6 +114,49 @@ stochbb::gamma(const Var &k, const Var &theta, const std::string &name) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of sbb::invgamma()
+ * ********************************************************************************************* */
+Var
+stochbb::invgamma(double alpha, double beta, const std::string &name) {
+  return new AtomicVarObj(new InvGammaDensityObj(alpha, beta), name);
+}
+
+Var
+stochbb::invgamma(const Var &alpha, double beta, const std::string &name) {
+  // If mu is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*alpha.density())) {
+    return stochbb::invgamma(delta->delay(), beta, name);
+  }
+  // Otherwise assemble CompoundVar
+  return new InvGammaCompoundObj(alpha, delta(beta), name);
+}
+
+Var
+stochbb::invgamma(double alpha, const Var &beta, const std::string &name) {
+  // If sigma is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*beta.density())) {
+    return stochbb::invgamma(alpha, delta->delay(), name);
+  }
+  // Otherwise assemble CompoundVar
+  return new InvGammaCompoundObj(delta(alpha), beta, name);
+}
+
+Var
+stochbb::invgamma(const Var &alpha, const Var &beta, const std::string &name) {
+  // If mu is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*alpha.density())) {
+    return stochbb::invgamma(delta->delay(), beta, name);
+  }
+  // else if sigma is delta distributed -> simplify to atomic random variable
+  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*beta.density())) {
+    return stochbb::invgamma(alpha, delta->delay(), name);
+  }
+  // Otherwise assemble CompoundVar
+  return new InvGammaCompoundObj(alpha, beta, name);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of sbb::weibull()
  * ********************************************************************************************* */
 Var

@@ -26,6 +26,8 @@ public:
   static double norm(double mu, double sigma);
   /** Returns a Gamma(k, theta) distributed random variable. */
   static double gamma(double k, double theta);
+  /** Returns a InvGamma(alpha, beta) distributed random variable. */
+  static double invgamma(double alpha, double beta);
 
 protected:
   /** Factory function. */
