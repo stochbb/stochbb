@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 PROJECT(StochBB)
 
 option(ENABLE_PYTHON "Build python binding" ON)
+option(ENABLE_R "Build R binding" OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 include(InstallHeadersWithDirectory)
