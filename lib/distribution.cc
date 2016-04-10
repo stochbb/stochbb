@@ -120,36 +120,36 @@ GenericAtomicDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of UniformDistObj
  * ********************************************************************************************* */
-UniformDistObj::UniformDistObj()
+UniformDistributionObj::UniformDistributionObj()
   : DistributionObj()
 {
   // pass...
 }
 
-UniformDistObj::~UniformDistObj() {
+UniformDistributionObj::~UniformDistributionObj() {
   // pass...
 }
 
 void
-UniformDistObj::mark() {
+UniformDistributionObj::mark() {
   if (isMarked()) { return; }
   DistributionObj::mark();
 }
 
 size_t
-UniformDistObj::nParams() const {
+UniformDistributionObj::nParams() const {
   return 2;
 }
 
 double
-UniformDistObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+UniformDistributionObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double a=params[0], b=params[1];
   if ((x < a) || (x > b)) { return 0; }
   return 1./(b-a);
 }
 
 double
-UniformDistObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+UniformDistributionObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double a=params[0], b=params[1];
   if (x < a) { return 0.0; }
   else if (x > b) { return 1.0; }
@@ -157,23 +157,35 @@ UniformDistObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) co
 }
 
 void
-UniformDistObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
+UniformDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double a=params[0], b=params[1];
   double d = (b-a)*p/2;
   lower = a+d; upper = b-d;
 }
 
 void
-UniformDistObj::affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const {
+UniformDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const {
   double a = params[0], b = params[1];
   a = scale*a + shift;
   b = scale*b + shift;
   params[0] = std::min(a,b);
-  params[0] = std::max(a,b);
+  params[1] = std::max(a,b);
+}
+
+void
+UniformDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
+  if (scale>0) {
+    params[0] = *(params[0]->affine(scale, shift));
+    params[1] = *(params[1]->affine(scale, shift));
+  } else {
+    params[0] = *(params[0]->affine(scale, shift));
+    params[1] = *(params[1]->affine(scale, shift));
+    std::swap(params[0], params[1]);
+  }
 }
 
 double
-UniformDistObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
+UniformDistributionObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
   double a=params[0], b=params[1];
   return RNG::unif()*(b-a) + a;
 }
@@ -182,46 +194,46 @@ UniformDistObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
 /* ********************************************************************************************* *
  * Implementation of NormalDistObj
  * ********************************************************************************************* */
-NormalDistObj::NormalDistObj()
+NormalDistributionObj::NormalDistributionObj()
   : DistributionObj()
 {
   // pass...
 }
 
-NormalDistObj::~NormalDistObj() {
+NormalDistributionObj::~NormalDistributionObj() {
   // pass...
 }
 
 void
-NormalDistObj::mark() {
+NormalDistributionObj::mark() {
   if (isMarked()) { return; }
   DistributionObj::mark();
 }
 
 size_t
-NormalDistObj::nParams() const {
+NormalDistributionObj::nParams() const {
   return 2;
 }
 
 double
-NormalDistObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+NormalDistributionObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double mu=params[0], sigma=params[1];
   return stochbb::dnorm((x-mu)/sigma);
 }
 
 double
-NormalDistObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+NormalDistributionObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double mu=params[0], sigma=params[1];
   return stochbb::pnorm((x-mu)/sigma);
 }
 
-void NormalDistObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
+void NormalDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double mu=params[0], sigma=params[1];
   lower=mu-stochbb::qnorm(p)*sigma; upper=mu+stochbb::qnorm(p)*sigma;
 }
 
 double
-NormalDistObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
+NormalDistributionObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
   double mu=params[0], sigma=params[1];
   return RNG::norm()*sigma + mu;
 }
@@ -230,46 +242,46 @@ NormalDistObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
 /* ********************************************************************************************* *
  * Implementation of GammaDistObj
  * ********************************************************************************************* */
-GammaDistObj::GammaDistObj()
+GammaDistributionObj::GammaDistributionObj()
   : DistributionObj()
 {
   // pass...
 }
 
-GammaDistObj::~GammaDistObj() {
+GammaDistributionObj::~GammaDistributionObj() {
   // pass...
 }
 
 void
-GammaDistObj::mark() {
+GammaDistributionObj::mark() {
   if (isMarked()) { return; }
   DistributionObj::mark();
 }
 
 size_t
-GammaDistObj::nParams() const {
+GammaDistributionObj::nParams() const {
   return 3;
 }
 
 double
-GammaDistObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+GammaDistributionObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], theta=params[1], shift=params[2];
   return stochbb::dgamma(x-shift, k, theta);
 }
 
 double
-GammaDistObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+GammaDistributionObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], theta=params[1], shift=params[2];
   return stochbb::pgamma(x-shift, k, theta);
 }
 
-void GammaDistObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
+void GammaDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], theta=params[1], shift=params[2];
   lower=shift; upper = stochbb::qgamma(p, k, theta) + shift;
 }
 
 double
-GammaDistObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
+GammaDistributionObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], theta=params[1], shift=params[2];
   return RNG::gamma(k, theta) + shift;
 }
@@ -278,46 +290,46 @@ GammaDistObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
 /* ********************************************************************************************* *
  * Implementation of InvGammaDistObj
  * ********************************************************************************************* */
-InvGammaDistObj::InvGammaDistObj()
+InvGammaDistributionObj::InvGammaDistributionObj()
   : DistributionObj()
 {
   // pass...
 }
 
-InvGammaDistObj::~InvGammaDistObj() {
+InvGammaDistributionObj::~InvGammaDistributionObj() {
   // pass...
 }
 
 void
-InvGammaDistObj::mark() {
+InvGammaDistributionObj::mark() {
   if (isMarked()) { return; }
   DistributionObj::mark();
 }
 
 size_t
-InvGammaDistObj::nParams() const {
+InvGammaDistributionObj::nParams() const {
   return 3;
 }
 
 double
-InvGammaDistObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+InvGammaDistributionObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double alpha=params[0], beta=params[1], shift=params[2];
   return stochbb::dinvgamma(x-shift, alpha, beta);
 }
 
 double
-InvGammaDistObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+InvGammaDistributionObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double alpha=params[0], beta=params[1], shift=params[2];
   return stochbb::pinvgamma(x-shift, alpha, beta);
 }
 
-void InvGammaDistObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
+void InvGammaDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double alpha=params[0], beta=params[1], shift=params[2];
   lower=shift; upper = stochbb::qinvgamma(p, alpha, beta) + shift;
 }
 
 double
-InvGammaDistObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
+InvGammaDistributionObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
   double alpha=params[0], beta=params[1], shift=params[2];
   return RNG::invgamma(alpha, beta) + shift;
 }
@@ -326,46 +338,213 @@ InvGammaDistObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
 /* ********************************************************************************************* *
  * Implementation of WeibullDistObj
  * ********************************************************************************************* */
-WeibullDistObj::WeibullDistObj()
+WeibullDistributionObj::WeibullDistributionObj()
   : DistributionObj()
 {
   // pass...
 }
 
-WeibullDistObj::~WeibullDistObj() {
+WeibullDistributionObj::~WeibullDistributionObj() {
   // pass...
 }
 
 void
-WeibullDistObj::mark() {
+WeibullDistributionObj::mark() {
   if (isMarked()) { return; }
   DistributionObj::mark();
 }
 
 size_t
-WeibullDistObj::nParams() const {
+WeibullDistributionObj::nParams() const {
   return 3;
 }
 
 double
-WeibullDistObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+WeibullDistributionObj::pdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], lambda=params[1], shift=params[2];
   return stochbb::dweibull(x-shift, k, lambda);
 }
 
 double
-WeibullDistObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
+WeibullDistributionObj::cdf(double x, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], lambda=params[1], shift=params[2];
   return stochbb::pweibull(x-shift, k, lambda);
 }
 
-void WeibullDistObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
+void WeibullDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], lambda=params[1], shift=params[2];
   lower = shift; upper = stochbb::qweibull(p, k, lambda) + shift;
 }
 
 double
-WeibullDistObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
+WeibullDistributionObj::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], lambda=params[1], shift=params[2];
   return RNG::invgamma(k, lambda) + shift;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GenericCompoundDensityObj
+ * ********************************************************************************************* */
+GenericCompoundDensityObj::GenericCompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params)
+  : DensityObj(), _distribution(dist), _parameters(params)
+{
+  // pass...
+}
+
+GenericCompoundDensityObj::~GenericCompoundDensityObj() {
+  // pass...
+}
+
+void
+GenericCompoundDensityObj::mark() {
+  if (isMarked()) { return; }
+  DensityObj::mark();
+  _distribution->mark();
+  for (size_t i=0; i<_parameters.size(); i++) {
+    _parameters[i]->mark();
+  }
+}
+
+void
+GenericCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  size_t Nstep = 100;
+  double df = 1;
+
+  // Get parameter values and PDFs
+  Eigen::MatrixXd PDFs(Nstep, _parameters.size());
+  Eigen::MatrixXd params(Nstep, _parameters.size());
+  for (size_t i=0; i<_parameters.size(); i++) {
+    double a, b;
+    _parameters[i]->rangeEst(0.01, a, b);
+
+    double x = a, dx = (b-a)/Nstep;
+    df *= (b-a)/Nstep;
+
+    for (size_t j=0; j<Nstep; j++, x+=dx)
+      params(j,i) = x;
+
+    _parameters[i]->eval(a,b, PDFs.col(i));
+  }
+
+  out.setZero();
+  size_t N = std::pow(Nstep, _parameters.size());
+  Eigen::VectorXd param(_parameters.size());
+  std::vector<size_t> idxs(0, _parameters.size());
+  double x=Tmin, dx=(Tmax-Tmin)/out.size();
+
+  // For each value in [Tmin, Tmax):
+  for (int i=0; i<out.size(); i++, x+=dx) {
+    // "Integrate" over parameter space
+    for (size_t j=0; j<N; j++) {
+      // Get parameter indices
+      _to_param_indices(j, Nstep, idxs);
+      // Get parameter vector and prod of parameter PDFs
+      double dp = 1;
+      for (size_t k=0; k<_parameters.size(); k++) {
+        param[k] = params(idxs[k], k);
+        dp *= PDFs(idxs[k], k);
+      }
+      out(i) += _distribution->pdf(x, param)*dp*df;
+    }
+  }
+}
+
+void
+GenericCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+  size_t Nstep = 100;
+  double df = 1;
+
+  // Get parameter values and PDFs
+  Eigen::MatrixXd PDFs(Nstep, _parameters.size());
+  Eigen::MatrixXd params(Nstep, _parameters.size());
+  for (size_t i=0; i<_parameters.size(); i++) {
+    double a, b;
+    _parameters[i]->rangeEst(0.01, a, b);
+
+    double x = a, dx = (b-a)/Nstep;
+    df *= (b-a)/Nstep;
+
+    for (size_t j=0; j<Nstep; j++, x+=dx)
+      params(j,i) = x;
+
+    _parameters[i]->eval(a,b, PDFs.col(i));
+  }
+
+  out.setZero();
+  size_t N = std::pow(Nstep, _parameters.size());
+  Eigen::VectorXd param(_parameters.size());
+  std::vector<size_t> idxs(0, _parameters.size());
+  double x=Tmin, dx=(Tmax-Tmin)/out.size();
+
+  // For each value in [Tmin, Tmax):
+  for (int i=0; i<out.size(); i++, x+=dx) {
+    // "Integrate" over parameter space
+    for (size_t j=0; j<N; j++) {
+      // Get parameter indices
+      _to_param_indices(j, Nstep, idxs);
+      // Get parameter vector and prod of parameter PDFs
+      double dp = 1;
+      for (size_t k=0; k<_parameters.size(); k++) {
+        param[k] = params(idxs[k], k);
+        dp *= PDFs(idxs[k], k);
+      }
+      out(i) += _distribution->cdf(x, param)*dp*df;
+    }
+  }
+}
+
+void
+GenericCompoundDensityObj::_to_param_indices(size_t i, size_t N, std::vector<size_t> &idxs) const {
+  for (size_t j=0; j<idxs.size(); j++) {
+    idxs[j] = i%N; i /= N;
+  }
+}
+
+Density
+GenericCompoundDensityObj::affine(double scale, double shift) const {
+  GenericCompoundDensityObj *res = new GenericCompoundDensityObj(_distribution, _parameters);
+  _distribution->affine(scale, shift, res->_parameters);
+  return res;
+}
+
+void
+GenericCompoundDensityObj::rangeEst(double alpha, double &a, double &b) const {
+  Eigen::VectorXd A(_parameters.size()), B(_parameters.size());
+  for (size_t i=0; i<_parameters.size(); i++) {
+    _parameters[i]->rangeEst(alpha, A[i], B[i]);
+  }
+  double tmp;
+  _distribution->quantile(a, tmp, alpha, A);
+  _distribution->quantile(tmp, b, alpha, B);
+}
+
+int
+GenericCompoundDensityObj::compare(const DensityObj &other) const {
+  // Compare by density type
+  if (int res = DensityObj::compare(other))
+    return res;
+  // same density class -> cast
+  const GenericCompoundDensityObj &cother = static_cast<const GenericCompoundDensityObj &>(other);
+  // Compare by distribution
+  if (int res = _distribution->compare(*cother._distribution))
+    return res;
+  // Compare by parameter densities
+  for (size_t i=0; i<_parameters.size(); i++) {
+    if (int res = _parameters[i]->compare(*cother._parameters[i]))
+      return res;
+  }
+  return 0;
+}
+
+void
+GenericCompoundDensityObj::print(std::ostream &stream) const {
+  stream << "<CompoundDensity of "; _distribution->print(stream);
+  stream << " with [";
+  _parameters[0]->print(stream);
+  for (size_t i=1; i<_parameters.size(); i++) {
+    stream << ", ";
+    _parameters[i]->print(stream);
+  }
+  stream << "] #" << this << ">";
 }
