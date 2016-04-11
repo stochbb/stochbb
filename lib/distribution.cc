@@ -54,6 +54,22 @@ GenericAtomicDensityObj::mark() {
   if (_distribution) { _distribution->mark(); }
 }
 
+Distribution
+GenericAtomicDensityObj::distribution() const {
+  _distribution->ref();
+  return _distribution;
+}
+
+size_t
+GenericAtomicDensityObj::nParams() const {
+  return _distribution->nParams();
+}
+
+double
+GenericAtomicDensityObj::parameter(size_t i) const {
+  return _params[i];
+}
+
 void
 GenericAtomicDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   double t = Tmin, dt=(Tmax-Tmin)/out.size();
@@ -406,6 +422,23 @@ GenericCompoundDensityObj::mark() {
   }
 }
 
+Distribution
+GenericCompoundDensityObj::distribution() const {
+  _distribution->ref();
+  return _distribution;
+}
+
+size_t
+GenericCompoundDensityObj::nParams() const {
+  return _distribution->nParams();
+}
+
+Density
+GenericCompoundDensityObj::parameter(size_t i) const {
+  _parameters[i]->ref();
+  return _parameters[i];
+}
+
 void
 GenericCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   size_t Nstep = 100;
@@ -431,10 +464,12 @@ GenericCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::Vect
   size_t N = std::pow(Nstep, _parameters.size());
   Eigen::VectorXd param(_parameters.size());
   std::vector<size_t> idxs(0, _parameters.size());
-  double x=Tmin, dx=(Tmax-Tmin)/out.size();
+  double dx=(Tmax-Tmin)/out.size();
 
   // For each value in [Tmin, Tmax):
-  for (int i=0; i<out.size(); i++, x+=dx) {
+#pragma omp for
+  for (int i=0; i<out.size(); i++) {
+    double x = Tmin + i*dx;
     // "Integrate" over parameter space
     for (size_t j=0; j<N; j++) {
       // Get parameter indices
@@ -475,10 +510,12 @@ GenericCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::V
   size_t N = std::pow(Nstep, _parameters.size());
   Eigen::VectorXd param(_parameters.size());
   std::vector<size_t> idxs(0, _parameters.size());
-  double x=Tmin, dx=(Tmax-Tmin)/out.size();
+  double dx=(Tmax-Tmin)/out.size();
 
   // For each value in [Tmin, Tmax):
-  for (int i=0; i<out.size(); i++, x+=dx) {
+#pragma omp for
+  for (int i=0; i<out.size(); i++) {
+    double x = Tmin + i*dx;
     // "Integrate" over parameter space
     for (size_t j=0; j<N; j++) {
       // Get parameter indices

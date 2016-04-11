@@ -1,5 +1,6 @@
 #include "api.hh"
 #include "density.hh"
+#include "distribution.hh"
 #include "randomvariable.hh"
 #include "affinetrafo.hh"
 #include "chain.hh"
@@ -189,6 +190,29 @@ Density::rangeEst(double alpha, double &a, double &b) const {
 int
 Density::compare(const Density &other) const {
   return _density->compare(**other);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of Distribution container
+ * ********************************************************************************************* */
+Distribution::Distribution(DistributionObj *obj)
+  : Container(obj), _distribution(obj)
+{
+  // pass...
+}
+
+Distribution::Distribution(const Distribution &other)
+  : Container(other), _distribution(other._distribution)
+{
+  // pass...
+}
+
+Distribution &
+Distribution::operator=(const Distribution &other) {
+  Container::operator=(other);
+  _distribution = other._distribution;
+  return *this;
 }
 
 

@@ -19,6 +19,7 @@ namespace stochbb {
 
 // Forward declarations
 class DensityObj;
+class DistributionObj;
 class AtomicDensityObj;
 class VarObj;
 class AtomicVarObj;
@@ -98,7 +99,7 @@ public:
   typedef DensityObj ObjectType;
 
 public:
-  /** Packs the given @c DensityObj and taks the reference. */
+  /** Packs the given @c DensityObj and takes the reference. */
   Density(DensityObj *obj);
   /** Copy constructor. */
   Density(const Density &other);
@@ -136,6 +137,34 @@ protected:
   DensityObj *_density;
 };
 
+
+/** Base class of all distributions (families of PDFs).
+ * @ingroup api */
+class Distribution: public Container
+{
+public:
+  /** The object type of the container. */
+  typedef DistributionObj ObjectType;
+
+public:
+  /** Packs the given @c DistributionObj and takes the reference. */
+  Distribution(DistributionObj *obj);
+  /** Copy constructor. */
+  Distribution(const Distribution &other);
+  /** Assigment operator. */
+  Distribution &operator=(const Distribution &other);
+
+  /** Retruns a weak reference to the @c DensityObj. */
+  inline DistributionObj *operator *() const { return _distribution; }
+  /** Retruns a weak reference to the @c DensityObj. */
+  inline DistributionObj *operator ->() const { return _distribution; }
+  /** Retruns a new reference to the @c DensityObj. */
+  inline DistributionObj *ref() const { _object->ref(); return _distribution; }
+
+protected:
+  /** The reference to the @c DistributionObj instance. */
+  DistributionObj *_distribution;
+};
 
 /** The densities of @c AtomicVar.
  * This is the base class of all densities of atomic random variables, that is a random variable

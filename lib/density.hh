@@ -58,7 +58,7 @@ public:
    * The specialization needs to compare also densities within types. */
   virtual int compare(const DensityObj &other) const;
 
-  /** Prints a textual representation of the density object into the given stream. */
+  /** Prints a textual representation of the density object into the given @c stream. */
   virtual void print(std::ostream &stream) const;
 };
 

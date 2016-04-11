@@ -18,9 +18,8 @@ inline int density_compare(const Density &a, const Density &b) {
 /* ********************************************************************************************* *
  * combine densities
  * ********************************************************************************************* */
-// Check if two densities can be combined
-bool
-convolution_can_combine(const Density &a, const Density &b) {
+// Checks if two densities can be combined
+bool convolution_can_combine(const Density &a, const Density &b) {
   // Check by type
   if (dynamic_cast<DeltaDensityObj *>(*a)) {
     // If LHS is a delta distribution -> yes
