@@ -1,5 +1,6 @@
 #include "math.hh"
 #include <limits>
+#include <cstddef>
 
 using namespace stochbb;
 
