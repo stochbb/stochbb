@@ -159,7 +159,7 @@ void
 UniformDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = ((t >= _a) && (t <= _b)) ? 1./(Tmax-Tmin) : 0.0;
+    out[i] = ((t >= _a) && (t <= _b)) ? 1./(_b-_a) : 0.0;
   }
 }
 

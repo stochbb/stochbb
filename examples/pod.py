@@ -28,10 +28,20 @@ Tmin, Tmax, N = 0, 1200, 1200;
 t = linspace(Tmin, Tmax, N);
 Tc = empty(N,); Rc.density().eval(Tmin, Tmax, Tc)
 Te = empty(N,); Re.density().eval(Tmin, Tmax, Te)
+TCc = empty(N,); Rc.density().evalCDF(Tmin, Tmax, TCc)
+TCe = empty(N,); Re.density().evalCDF(Tmin, Tmax, TCe)
 
 
+pylab.subplot(211)
 pc, = pylab.plot(t, Tc, "b", lw=3)
 pe, = pylab.plot(t, Te, "g", lw=3)
+pod = pylab.axvline(d, color="r")
+pylab.legend((pc, pe, pod),
+             ("Control", "Experimental", "PoD"))
+
+pylab.subplot(212)
+pc, = pylab.plot(t, 1-TCc, "b", lw=3)
+pe, = pylab.plot(t, 1-TCe, "g", lw=3)
 pod = pylab.axvline(d, color="r")
 pylab.legend((pc, pe, pod),
              ("Control", "Experimental", "PoD"))
