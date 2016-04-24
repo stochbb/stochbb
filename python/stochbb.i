@@ -41,8 +41,10 @@ class AssumptionError: public Error { };
 class Container
 {
 protected:
+  %feature("autodoc", "1");
   Container();
 
+  %feature("autodoc", "1");
   bool isNull() const;
 };
 
@@ -58,21 +60,25 @@ protected:
 class Density: public Container
 {
 protected:
+  %feature("autodoc", "1");
   Density();
 };
 
 
 %extend Density {
+  %feature("autodoc", "1");
   void eval(double Tmin, double Tmax, double* out, int N) const {
     Eigen::Map<Eigen::VectorXd> outMap(out, N);
     $self->eval(Tmin, Tmax, outMap);
   }
 
+  %feature("autodoc", "1");
   void evalCDF(double Tmin, double Tmax, double* out, int N) const {
     Eigen::Map<Eigen::VectorXd> outMap(out, N);
     $self->evalCDF(Tmin, Tmax, outMap);
   }
 
+  %feature("autodoc", "1");
   void rangeEst(double alpha, double *aout, double *bout) const {
     $self->rangeEst(alpha, *aout, *bout);
   }
@@ -94,18 +100,23 @@ public:
 };
 
 %extend Var {
+  %feature("autodoc", "1");
   Var __add__(Var *other) {
     return *self + *other;
   }
+  %feature("autodoc", "1");
   Var __add__(double b) {
     return *self + b;
   }
+  %feature("autodoc", "1");
   Var __radd__(double b) {
     return *self + b;
   }
+  %feature("autodoc", "1");
   Var __mul__(double a) {
     return (*self)*a;
   }
+  %feature("autodoc", "1");
   Var __rmul__(double a) {
     return (*self)*a;
   }
@@ -222,6 +233,7 @@ public:
 };
 
 %extend ExactSampler {
+  %feature("autodoc", "1");
   void sample(double* out, int Nrow, int Ncol) {
     Eigen::Map<Eigen::MatrixXd> outMap(out, Nrow, Ncol);
     self->sample(outMap);
@@ -236,6 +248,7 @@ public:
 };
 
 %extend MarginalSampler {
+  %feature("autodoc", "1");
   void sample(double* out, int N) {
     Eigen::Map<Eigen::VectorXd> outMap(out, N);
     self->sample(outMap);
@@ -346,34 +359,54 @@ double pweibull(double x, double k, double theta);
 double qweibull(double p, double k, double theta);
 
 %extend Container {
+  %feature("autodoc", "1");
   bool isDensity() const { return self->is<stochbb::Density>(); }
+  %feature("autodoc", "1");
   stochbb::Density asDensity() { return self->as<stochbb::Density>(); }
 
+  %feature("autodoc", "1");
   bool isVar() const { return self->is<stochbb::Var>(); }
+  %feature("autodoc", "1");
   stochbb::Var asVar() { return self->as<stochbb::Var>(); }
 
+  %feature("autodoc", "1");
   bool isDerivedVar() const { return self->is<stochbb::DerivedVar>(); }
+  %feature("autodoc", "1");
   stochbb::DerivedVar asDerivedVar() { return self->as<stochbb::DerivedVar>(); }
 
+  %feature("autodoc", "1");
   bool isAffineTrafo() const { return self->is<stochbb::AffineTrafo>(); }
+  %feature("autodoc", "1");
   stochbb::AffineTrafo asAffineTrafo() { return self->as<stochbb::AffineTrafo>(); }
 
+  %feature("autodoc", "1");
   bool isChain() const { return self->is<stochbb::Chain>(); }
+  %feature("autodoc", "1");
   stochbb::Chain asChain() { return self->as<stochbb::Chain>(); }
 
+  %feature("autodoc", "1");
   bool isMaximum() const { return self->is<stochbb::Maximum>(); }
+  %feature("autodoc", "1");
   stochbb::Maximum asMaximum() { return self->as<stochbb::Maximum>(); }
 
+  %feature("autodoc", "1");
   bool isMinimum() const { return self->is<stochbb::Minimum>(); }
+  %feature("autodoc", "1");
   stochbb::Minimum asMinimum() { return self->as<stochbb::Minimum>(); }
 
+  %feature("autodoc", "1");
   bool isMixture() const { return self->is<stochbb::Mixture>(); }
+  %feature("autodoc", "1");
   stochbb::Mixture asMixture() { return self->as<stochbb::Mixture>(); }
 
+  %feature("autodoc", "1");
   bool isConditional() const { return self->is<stochbb::Conditional>(); }
+  %feature("autodoc", "1");
   stochbb::Conditional asConditional() { return self->as<stochbb::Conditional>(); }
 
+  %feature("autodoc", "1");
   bool isCompound() const { return self->is<stochbb::Compound>(); }
+  %feature("autodoc", "1");
   stochbb::Compound asCompound() { return self->as<stochbb::Compound>(); }
 }
 
@@ -381,22 +414,28 @@ class LogMessage
 {
 public:
   typedef enum {
-    DEBUG = 0,
-    INFO,
-    WARNING,
-    ERROR
+    LDEBUG = 0,
+    LINFO,
+    LWARNING,
+    LERROR
   } Level;
 
 public:
+  %feature("autodoc", "1");
   LogMessage();
+  %feature("autodoc", "1");
   LogMessage(const std::string &filename, int line, Level level, const std::string &message);
+  %feature("autodoc", "1");
   LogMessage(const LogMessage &other);
 
+  %feature("autodoc", "1");
   const std::string &filename() const;
+  %feature("autodoc", "1");
   int linenumber() const;
+  %feature("autodoc", "1");
   Level level() const;
+  %feature("autodoc", "1");
   const std::string &message() const;
-  const std::time_t &timestamp() const;
 };
 
 
@@ -406,6 +445,7 @@ protected:
   LogHandler(LogHandlerObj *obj);
 
 public:
+  %feature("autodoc", "1");
   void handleMessage(const LogMessage &msg);
 };
 
@@ -422,9 +462,12 @@ protected:
   Logger();
 
 public:
-  /** Logs a message. */
+  %feature("autodoc", "1");
+  %feature("docstring", "Logs the given message.");
   static void log(const LogMessage &msg);
-  /** Adds a handler to the logger, the ownership is transferred to the @c Logger. */
+
+  %feature("autodoc", "1");
+  %feature("docstring", "Adds a log handler to the logger.");
   static void addHandler(const LogHandler &handler);
 };
 

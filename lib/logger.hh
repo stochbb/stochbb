@@ -18,10 +18,10 @@ class LogMessage
 public:
   /** Specifies possible log levels. */
   typedef enum {
-    DEBUG = 0,  ///< Debug information.
-    INFO,       ///< Runtime & status information.
-    WARNING,    ///< Warnings and minor issues.
-    ERROR       ///< Errors and other major issues.
+    LDEBUG = 0,  ///< Debug information.
+    LINFO,       ///< Runtime & status information.
+    LWARNING,    ///< Warnings and minor issues.
+    LERROR       ///< Errors and other major issues.
   } Level;
 
 public:
@@ -142,7 +142,7 @@ public:
   /** Constructor.
    * @param level Spicifies the mimimum log level to process.
    * @param stream Specifies the output stream. */
-  IOLogHandlerObj(std::ostream &stream=std::cerr, LogMessage::Level level=LogMessage::DEBUG);
+  IOLogHandlerObj(std::ostream &stream=std::cerr, LogMessage::Level level=LogMessage::LDEBUG);
 
   /** Implements the @c LogHandler interface. */
   void handleMessage(const LogMessage &msg);
@@ -165,7 +165,7 @@ public:
   /** Constructs a new log handler for the to the given stream.
    * @param level Spicifies the mimimum log level to process.
    * @param stream Specifies the output stream. */
-  IOLogHandler(std::ostream &stream=std::cerr, LogMessage::Level level=LogMessage::DEBUG);
+  IOLogHandler(std::ostream &stream=std::cerr, LogMessage::Level level=LogMessage::LDEBUG);
   /** Copy constructor. */
   IOLogHandler(const IOLogHandler &other);
   /** Assignement operator. */
@@ -207,15 +207,15 @@ protected:
 
 /** Convenience macro to create and submit a @c LogMessage with level "DEBUG".
  * @ingroup api */
-#define logDebug()   (stochbb::LogMessageStream(__FILE__, __LINE__, stochbb::LogMessage::DEBUG))
+#define logDebug()   (stochbb::LogMessageStream(__FILE__, __LINE__, stochbb::LogMessage::LDEBUG))
 /** Convenience macro to create and submit a @c LogMessage with level "INFO".
  * @ingroup api */
-#define logInfo()    (stochbb::LogMessageStream(__FILE__, __LINE__, stochbb::LogMessage::INFO))
+#define logInfo()    (stochbb::LogMessageStream(__FILE__, __LINE__, stochbb::LogMessage::LINFO))
 /** Convenience macro to create and submit a @c LogMessage with level "Warning".
  * @ingroup api */
-#define logWarning() (stochbb::LogMessageStream(__FILE__, __LINE__, stochbb::LogMessage::WARNING))
+#define logWarning() (stochbb::LogMessageStream(__FILE__, __LINE__, stochbb::LogMessage::LWARNING))
 /** Convenience macro to create and submit a @c LogMessage with level "ERROR".
  * @ingroup api */
-#define logError()   (stochbb::LogMessageStream(__FILE__, __LINE__, stochbb::LogMessage::ERROR))
+#define logError()   (stochbb::LogMessageStream(__FILE__, __LINE__, stochbb::LogMessage::LERROR))
 
 #endif // LOGGER_H

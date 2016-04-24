@@ -148,6 +148,12 @@ AtomicVar::operator =(const AtomicVar &other) {
 /* ********************************************************************************************* *
  * Implementation of Density container
  * ********************************************************************************************* */
+Density::Density()
+  : Container(), _density(0)
+{
+  // pass...
+}
+
 Density::Density(DensityObj *obj)
   : Container(obj), _density(obj)
 {

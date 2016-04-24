@@ -99,6 +99,8 @@ public:
   typedef DensityObj ObjectType;
 
 public:
+  /** Empty constructor. */
+  Density();
   /** Packs the given @c DensityObj and takes the reference. */
   Density(DensityObj *obj);
   /** Copy constructor. */

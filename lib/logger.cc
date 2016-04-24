@@ -8,7 +8,7 @@ using namespace stochbb;
  * Implementation of LogMessage
  * ********************************************************************************************* */
 LogMessage::LogMessage()
-  : _filename(), _line(0), _level(DEBUG), _message(), _timestamp(-1)
+  : _filename(), _line(0), _level(LDEBUG), _message(), _timestamp(-1)
 {
   // pass...
 }
@@ -155,10 +155,10 @@ void
 IOLogHandlerObj::handleMessage(const LogMessage &msg) {
   if (msg.level() < _minLevel) { return; }
   switch (msg.level()) {
-  case LogMessage::DEBUG: _stream << "DEBUG: "; break;
-  case LogMessage::INFO: _stream << "INFO: "; break;
-  case LogMessage::WARNING: _stream << "WARNING: "; break;
-  case LogMessage::ERROR: _stream << "ERROR: "; break;
+  case LogMessage::LDEBUG: _stream << "DEBUG: "; break;
+  case LogMessage::LINFO: _stream << "INFO: "; break;
+  case LogMessage::LWARNING: _stream << "WARNING: "; break;
+  case LogMessage::LERROR: _stream << "ERROR: "; break;
   }
   std::string basename = msg.filename().substr(msg.filename().find_last_of("/\\") + 1);
   _stream << *std::localtime(&msg.timestamp())
