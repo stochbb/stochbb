@@ -1,0 +1,23 @@
+\name{gamma}
+\alias{gamma}
+\title{
+A gamma distributed random variable
+}
+\description{
+Constructs a gamma distributed random variable. Either as an atomic random variable with fixed
+parameters k & theta, or as a compound random variable if both or one of the parameters is a random
+variable too.
+}
+\usage{
+ gamma(k, theta)
+}
+\examples{
+\dontrun{
+# Random variable X ~ Gamma(1,1)
+X <- gamma(1,1)
+
+# Compound random variable Y ~ gamma(1,X)
+Y <- gamma(1,X)
+
+}
+}
