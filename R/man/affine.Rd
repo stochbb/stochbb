@@ -1,5 +1,4 @@
 \name{affine}
-\alias{derived}
 \alias{affine}
 \alias{\%+\%}
 \title{
@@ -19,6 +18,9 @@ Please note that the \code{\%+\%} operator can also be used to shift a random va
  \item{X}{the random variable.}
  \item{a}{the scaleing.}
  \item{a}{the shift.}
+}
+\seealso{
+ \code{\link{derived}}
 }
 \examples{
 \dontrun{

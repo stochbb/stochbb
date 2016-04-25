@@ -1,5 +1,4 @@
 \name{mixture}
-\alias{derived}
 \alias{mixture}
 \title{
 Represents a mixture of two independent random variables.
@@ -14,4 +13,7 @@ variables.
 \arguments{
  \item{X1, X2}{the random variables to mix.}
  \item{w1, w2}{the relative weights of the random variables.}
+}
+\seealso{
+ \code{\link{derived}}
 }

@@ -1,5 +1,4 @@
 \name{delta}
-\alias{atomic}
 \alias{delta}
 \title{
 A "delta" distributed random variable
@@ -16,4 +15,7 @@ fixed.
 }
 \arguments{
  \item{a}{the fixed value of the "random variable".}
+}
+\seealso{
+ \code{\link{atomic}}
 }

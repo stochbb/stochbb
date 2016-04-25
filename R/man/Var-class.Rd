@@ -14,8 +14,8 @@ Class \code{\linkS4class{Container}}, directly.
 }
 
 \seealso{
- \code{\linkS4class{Density-class}}
- \code{\linkS4class{Container-cass}}
+ \code{\linkS4class{Density}}
+ \code{\linkS4class{Container}}
  \code{\link{atomic}}
  \code{\link{derived}}
 }

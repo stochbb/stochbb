@@ -1,5 +1,4 @@
 \name{minimum}
-\alias{derived}
 \alias{minimum}
 \title{
 Represents the minimum of random independent variables.
@@ -15,7 +14,8 @@ variables. That is \eqn{Z = \min(X_1,...,X_N)}{Z = min(X_1,...,X_N)}.
  \item{X1, X2, ...}{the random variables to get the minimum from.}
 }
 \seealso{
- \code{\link{maximum}}.
+ \code{\link{maximum}}
+ \code{\link{derived}}
 }
 \examples{
 \dontrun{

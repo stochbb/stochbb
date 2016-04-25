@@ -1,5 +1,4 @@
 \name{uniform}
-\alias{atomic}
 \alias{uniform}
 \title{
 A uniform distributed random variable
@@ -9,6 +8,9 @@ Constructs a uniform distributed random variable.
 }
 \usage{
  uniform(a,b)
+}
+\seealso{
+ \code{\link{atomic}}
 }
 \examples{
 \dontrun{

@@ -1,5 +1,4 @@
 \name{weibull}
-\alias{atomic}
 \alias{weibull}
 \title{
 A Weibull distributed random variable
@@ -11,6 +10,9 @@ variable too.
 }
 \usage{
  weibull(k, lambda)
+}
+\seealso{
+ \code{\link{atomic}}
 }
 \examples{
 \dontrun{

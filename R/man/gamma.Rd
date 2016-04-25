@@ -1,5 +1,4 @@
 \name{gamma}
-\alias{atomic}
 \alias{gamma}
 \title{
 A gamma distributed random variable
@@ -15,6 +14,9 @@ variable too.
 \arguments{
  \item{k}{the shape parameter.}
  \item{theta}{the scale parameter.}
+}
+\seealso{
+ \code{\link{atomic}}
 }
 \examples{
 \dontrun{

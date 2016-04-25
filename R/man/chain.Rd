@@ -1,5 +1,4 @@
 \name{chain}
-\alias{derived}
 \alias{chain}
 \alias{\%+\%}
 \title{
@@ -19,7 +18,9 @@ Please note that the \code{\%+\%} operator can also be used to shift a random va
  \item{X1, X2, ...}{the random variables to sum.}
 }
 \seealso{
- \code{\link{affine}}, \code{\link{independent}}.
+ \code{\link{affine}}
+ \code{\link{independent}}
+ \code{\link{derived}}
 }
 \examples{
 \dontrun{

@@ -1,5 +1,4 @@
 \name{maximum}
-\alias{derived}
 \alias{maximum}
 \title{
 Represents the maximum of random independent variables.
@@ -15,7 +14,8 @@ variables. That is \eqn{Z = \max(X_1,...,X_N)}{Z = max(X_1,...,X_N)}.
  \item{X1, X2, ...}{the random variables to get the maximum from.}
 }
 \seealso{
- \code{\link{minimum}}.
+ \code{\link{minimum}}
+ \code{\link{derived}}
 }
 \examples{
 \dontrun{

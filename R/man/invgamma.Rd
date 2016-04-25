@@ -1,5 +1,4 @@
 \name{invgamma}
-\alias{atomic}
 \alias{invgamma}
 \title{
 A inverse gamma distributed random variable
@@ -11,6 +10,9 @@ variable too.
 }
 \usage{
  invgamma(alpha, beta)
+}
+\seealso{
+ \code{\link{atomic}}
 }
 \examples{
 \dontrun{
