@@ -11,11 +11,11 @@ transformed RVs or more or less complex combinations of RVs like \code{\link{cha
 below.
 }
 \seealso{
- \code{\linke{affine}}
- \code{\linke{chain}}
- \code{\linke{minimum}}
- \code{\linke{maximum}}
- \code{\linke{mixture}}
- \code{\linke{conditional}}
- \code{\linke{condchain}}
+ \code{\link{affine}}
+ \code{\link{chain}}
+ \code{\link{minimum}}
+ \code{\link{maximum}}
+ \code{\link{mixture}}
+ \code{\link{conditional}}
+ \code{\link{condchain}}
 }
