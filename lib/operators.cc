@@ -397,6 +397,16 @@ stochbb::independent(const std::vector<Var> &vars) {
   return true;
 }
 
+bool
+stochbb::independent(const Var &a, const Var &b) {
+  return a.mutuallyIndep(b);
+}
+
+bool
+stochbb::independent(const Var &a, const Var &b, const Var &c) {
+  return independent(std::vector<Var> {a, b, c});
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of chain

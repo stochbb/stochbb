@@ -12,6 +12,8 @@ namespace stochbb {
  * @returns @c true If the given variables are mutually independent.
  * @ingroup api */
 bool independent(const std::vector<Var> &vars);
+bool independent(const Var &a, const Var &b);
+bool independent(const Var &a, const Var &b, const Var &c);
 
 /** Constructs a delta-distributed random variable (constant) located as the given value.
  * @ingroup api */

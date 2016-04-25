@@ -12,6 +12,7 @@ RCPP_EXPOSED_CLASS_NODECL(Var);
 using namespace Rcpp;
 
 typedef Eigen::Map<Eigen::VectorXd> MapVec;
+typedef Eigen::Map<Eigen::MatrixXd> MapMat;
 
 
 std::string printContainer(Container *cont) {
@@ -33,89 +34,62 @@ RCPP_MODULE(stochbb) {
 
   class_<Var>("Var")
       .derives<Container>("Container")
-      .property("density", &Var::density);
+      .property("density", &Var::density)
+      .property("name", &Var::name, &Var::setName)
+      .method("mutuallyIndep", &Var::mutuallyIndep)
+      .method("dependsOn", &Var::dependsOn);
+
+  class_<ExactSampler>("ExactSampler")
+      .derives<Container>("Container")
+      .constructor<const Var &>()
+      .constructor<const Var &, const Var &>()
+      .constructor<const Var &, const Var &, const Var &>()
+      .method<void, MapMat>("sample", (void (ExactSampler::*)(MapMat)) &ExactSampler::sample);
+
+  function<bool, const Var &, const Var &>(
+        "independent", (bool (*)(const Var &, const Var &)) &independent);
+  function<bool, const Var &, const Var &, const Var &>(
+        "independent", (bool (*)(const Var &, const Var &, const Var &)) &independent);
 
   function<Var, double>("delta", &delta);
-  function<Var, double, double, const std::string &>(
-        "uniform", &uniform,
-        List::create( _["a"], _["b"], _["name"]=""));
 
   function<Var, double, double, const std::string &>(
-        "normal", &normal,
-        List::create( _["mu"], _["sigma"], _["name"]=""));
-  function<Var, double, const Var &, const std::string &>(
-        "normal", &normal,
-        List::create( _["mu"], _["sigma"], _["name"]=""));
-  function<Var, const Var &, double, const std::string &>(
-        "normal", &normal,
-        List::create( _["mu"], _["sigma"], _["name"]=""));
-  function<Var, const Var &, const Var &, const std::string &>(
-        "normal", &normal,
-        List::create( _["mu"], _["sigma"], _["name"]=""));
+        "uniform", &uniform);
 
   function<Var, double, double, const std::string &>(
-        "gamma", &gamma,
-        List::create( _["k"], _["theta"], _["name"]=""));
-  function<Var, double, const Var &, const std::string &>(
-        "gamma", &gamma,
-        List::create( _["k"], _["theta"], _["name"]=""));
-  function<Var, const Var &, double, const std::string &>(
-        "gamma", &gamma,
-        List::create( _["k"], _["theta"], _["name"]=""));
+        "normalrv", &normal);
   function<Var, const Var &, const Var &, const std::string &>(
-        "gamma", &gamma,
-        List::create( _["k"], _["theta"], _["name"]=""));
+        "compnormalrv", &normal);
 
   function<Var, double, double, const std::string &>(
-        "invgamma", &invgamma,
-        List::create( _["alpha"], _["beta"], _["name"]=""));
-  function<Var, double, const Var &, const std::string &>(
-        "invgamma", &invgamma,
-        List::create( _["alpha"], _["beta"], _["name"]=""));
-  function<Var, const Var &, double, const std::string &>(
-        "invgamma", &invgamma,
-        List::create( _["alpha"], _["beta"], _["name"]=""));
+        "gammarv", &gamma);
   function<Var, const Var &, const Var &, const std::string &>(
-        "invgamma", &invgamma,
-        List::create( _["alpha"], _["beta"], _["name"]=""));
+        "compgammarv", &gamma);
 
   function<Var, double, double, const std::string &>(
-        "weibull", &weibull,
-        List::create( _["k"], _["lambda"], _["name"]=""));
-  function<Var, double, const Var &, const std::string &>(
-        "weibull", &weibull,
-        List::create( _["k"], _["lambda"], _["name"]=""));
-  function<Var, const Var &, double, const std::string &>(
-        "weibull", &weibull,
-        List::create( _["k"], _["lambda"], _["name"]=""));
+        "invgammarv", &invgamma);
   function<Var, const Var &, const Var &, const std::string &>(
-        "weibull", &weibull,
-        List::create( _["k"], _["lambda"], _["name"]=""));
+        "compinvgammarv", &invgamma);
+
+  function<Var, double, double, const std::string &>(
+        "weibullrv", &weibull);
+  function<Var, const Var &, const Var &, const std::string &>(
+        "compweibullrv", &weibull);
 
   function<Var, const Var &, double, double>(
         "affine", &affine);
 
   function<Var, const Var &, const Var &>(
         "chain", (Var (*)(const Var &, const Var &)) &chain);
-  function<Var, const Var &, const Var &, const Var &>(
-        "chain", (Var (*)(const Var &, const Var &, const Var &)) &chain);
 
   function<Var, const Var &, const Var &>(
         "minimum", (Var (*)(const Var &, const Var &)) &minimum);
-  function<Var, const Var &, const Var &, const Var &>(
-        "minimum", (Var (*)(const Var &, const Var &, const Var &)) &minimum);
 
   function<Var, const Var &, const Var &>(
         "maximum", (Var (*)(const Var &, const Var &)) &maximum);
-  function<Var, const Var &, const Var &, const Var &>(
-        "maximum", (Var (*)(const Var &, const Var &, const Var &)) &maximum);
 
   function<Var, double, const Var &, double, const Var &>(
         "mixture", (Var (*)(double, const Var &, double, const Var &)) &mixture);
-  function<Var, double, const Var &, double, const Var &, double, const Var &>(
-        "mixture", (Var (*)(double, const Var &, double, const Var &, double, const Var &)) &mixture);
-
-  Var mixture(double wX1, const Var &X1, double wX2, const Var &X2, double wX3, const Var &X3);
 
   function<Var, const Var &, const Var &, const Var &, const Var &>(
         "conditional", &conditional);
