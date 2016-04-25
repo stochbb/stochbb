@@ -60,6 +60,11 @@ chain <- function(a, b, ...) {
   stochbb::"_chain"(args);
 }
 
+independent <- function(a, b, ...) {
+  args <- c(a, b, ...)
+  stochbb::"_independent"(args);
+}
+
 maximum <- function(a, b, ...) {
   args <- c(a, b, ...)
   stochbb::"_maximum"(args);

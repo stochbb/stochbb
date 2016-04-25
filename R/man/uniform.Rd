@@ -1,4 +1,5 @@
 \name{uniform}
+\alias{atomic}
 \alias{uniform}
 \title{
 A uniform distributed random variable

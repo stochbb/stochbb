@@ -1,4 +1,5 @@
 \name{invgamma}
+\alias{atomic}
 \alias{invgamma}
 \title{
 A inverse gamma distributed random variable

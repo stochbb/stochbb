@@ -1,4 +1,5 @@
 \name{weibull}
+\alias{atomic}
 \alias{weibull}
 \title{
 A Weibull distributed random variable

@@ -1,4 +1,5 @@
 \name{normal}
+\alias{atomic}
 \alias{normal}
 \title{
 A normal distributed random variable
@@ -10,6 +11,10 @@ variable too.
 }
 \usage{
  normal(mu, sigma)
+}
+\arguments{
+ \item{mu}{the mean parameter.}
+ \item{sigma}{the standard deviation parameter.}
 }
 \examples{
 \dontrun{

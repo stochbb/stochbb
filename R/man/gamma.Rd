@@ -1,4 +1,5 @@
 \name{gamma}
+\alias{atomic}
 \alias{gamma}
 \title{
 A gamma distributed random variable
@@ -10,6 +11,10 @@ variable too.
 }
 \usage{
  gamma(k, theta)
+}
+\arguments{
+ \item{k}{the shape parameter.}
+ \item{theta}{the scale parameter.}
 }
 \examples{
 \dontrun{
