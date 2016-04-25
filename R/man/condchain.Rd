@@ -10,7 +10,6 @@ the minumum of the conditional random variables. That is
 
 \deqn{Z = X_1+Y_1 if X_1 < X_2; X_2+Y_2 else.}{Z = X1+Y1 if X1<X2; X2+Y2 else.}
 }
-}
 \usage{
  condchain(X1, X2, Y1, Y2)
 }
