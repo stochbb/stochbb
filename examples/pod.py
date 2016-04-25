@@ -12,10 +12,10 @@ stochbb.Logger.addHandler(stochbb.IOLogHandler())
 # Processing model
 #
 d = 300
-C = stochbb.gamma(5,20)
+C = stochbb.gamma(3,20)
 X1 = stochbb.gamma(10,30)
 D  = stochbb.delta(d)
-X2 = stochbb.gamma(3,50)
+X2 = stochbb.gamma(1,70)
 
 
 # response latency control condition

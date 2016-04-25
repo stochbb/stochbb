@@ -1,3 +1,5 @@
 useDynLib(stochbb)
-exportPattern("^[[:alpha:]]+")
+exportPattern("^.?[[:alpha:]]+")
+export('%+%','%*%')
 import(methods, Rcpp)
+
