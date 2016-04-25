@@ -14,17 +14,17 @@ stochbb.Logger.addHandler(stochbb.IOLogHandler())
 d = 300
 C = stochbb.gamma(3,20)
 X1 = stochbb.gamma(10,30)
-D  = stochbb.delta(d)
-X2 = stochbb.gamma(1,70)
+# shifted gamma
+X2 = stochbb.gamma(1,70) + d
 
 
 # response latency control condition
 #   is simply R = C + X1
-Rc = C+X1
+Rc = C + X1
 # and for the experimental condition
-Re = C+stochbb.minimum(X1, D+X2)
+Re = C + stochbb.minimum(X1, X2)
 
-Tmin, Tmax, N = 0, 1200, 1200;
+Tmin, Tmax, N = 0, 1200, 1000;
 t = linspace(Tmin, Tmax, N);
 Tc = empty(N,); Rc.density().eval(Tmin, Tmax, Tc)
 Te = empty(N,); Re.density().eval(Tmin, Tmax, Te)
