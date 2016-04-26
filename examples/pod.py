@@ -20,18 +20,18 @@ X2 = stochbb.gamma(1,70) + d
 
 # response latency control condition
 #   is simply R = C + X1
-Rc = C + X1
+Rc = X1
 # and for the experimental condition
-Re = C + stochbb.minimum(X1, X2)
+Re = stochbb.minimum(X1, X2)
 
-Tmin, Tmax, N = 0, 1200, 1000;
+Tmin, Tmax, N = 0, 1200, 1200;
 t = linspace(Tmin, Tmax, N);
-Tc = empty(N,); Rc.density().eval(Tmin, Tmax, Tc)
-Te = empty(N,); Re.density().eval(Tmin, Tmax, Te)
-TCc = empty(N,); Rc.density().evalCDF(Tmin, Tmax, TCc)
-TCe = empty(N,); Re.density().evalCDF(Tmin, Tmax, TCe)
+Tc = empty((N,)); Rc.density().eval(Tmin, Tmax, Tc)
+Te = empty((N,)); Re.density().eval(Tmin, Tmax, Te)
+TCc = empty((N,)); Rc.density().evalCDF(Tmin, Tmax, TCc)
+TCe = empty((N,)); Re.density().evalCDF(Tmin, Tmax, TCe)
 
-
+print(Te[295:305])
 pylab.subplot(211)
 pc, = pylab.plot(t, Tc, "b", lw=3)
 pe, = pylab.plot(t, Te, "g", lw=3)
