@@ -131,6 +131,13 @@ namespace std {
   %template(varvector) vector<stochbb::Var>;
 };
 
+// Define vector-of-densities type:
+//  This allows to pass list of densities to C++ functions taking
+//  std::vector<Density> arguments.
+namespace std {
+  %template(densityvector) vector<stochbb::Density>;
+};
+
 namespace stochbb {
 
 class DerivedVar: public Var
@@ -329,6 +336,10 @@ Var mixture(const std::vector<double> weights, const std::vector<Var> &variables
 Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw( Error );
 %feature("autodoc", "1");
 Var condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw( Error );
+
+Density directConvolve(const std::vector<Density> &densities);
+Density directConvolve(const Density &a, const Density &b);
+Density directConvolve(const Density &a, const Density &b, const Density &c);
 
 %feature("autodoc", "1");
 double dnorm(double x);

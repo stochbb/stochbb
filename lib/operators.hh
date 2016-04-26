@@ -235,6 +235,10 @@ Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
  * \f]
  * @ingroup api */
 Var condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
+
+Density directConvolve(const std::vector<Density> &densities);
+Density directConvolve(const Density &a, const Density &b);
+Density directConvolve(const Density &a, const Density &b, const Density &c);
 }
 
 /** Overloads the +-operator to construct a @c Chain.

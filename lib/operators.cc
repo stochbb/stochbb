@@ -500,3 +500,22 @@ Var
 stochbb::condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) {
   return new CondChainObj(X1, X2, Y1, Y2);
 }
+
+
+/* ********************************************************************************************* *
+ * Implementation of directConvolve
+ * ********************************************************************************************* */
+Density
+stochbb::directConvolve(const std::vector<Density> &densities) {
+  return new ConvolutionDensityObj(densities);
+}
+
+Density
+stochbb::directConvolve(const Density &a, const Density &b) {
+  return directConvolve(std::vector<Density> {a,b});
+}
+
+Density
+stochbb::directConvolve(const Density &a, const Density &b, const Density &c) {
+  return directConvolve(std::vector<Density> {a,b,c});
+}

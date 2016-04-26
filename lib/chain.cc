@@ -199,7 +199,7 @@ ConvolutionDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
     tmp1.head(out.size()) = out*dt;
     // ... tmp2 = FFT(tmp1)
     fft.fwd(tmp2, tmp1);
-    // Skip first PDF, this avoid the back-shift of the product
+    // Skip first PDF, this avoids the back-shift of the product
     if (i>0) {
       // apply time shift
       for (int j=1; j<out.size();j++) {
@@ -313,7 +313,7 @@ ChainObj::ChainObj(const std::vector<Var> &variables, const std::string &name)
 
   // Assemble convolution density
   _density = *convolve(dens);
-  _density->unref();
+  //_density->unref();
 }
 
 ChainObj::~ChainObj() {
