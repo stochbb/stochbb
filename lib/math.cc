@@ -269,13 +269,20 @@ stochbb::qnorm(double p) {
 
 double
 stochbb::dgamma(double x, double k, double theta) {
-  if (x<0) { return 0; }
+  if (x<=0) {
+    return 0;
+  }
+  if ((x==0) && (k==1)) {
+    return std::exp(-std::lgamma(k) -k*std::log(theta));
+  } else if ((x==0) && (k>1)) {
+    return 0;
+  }
   return std::exp((k-1)*std::log(x) - x/theta -std::lgamma(k) -k*std::log(theta));
 }
 
 double
 stochbb::pgamma(double x, double k, double theta) {
-  if (x<0) { return 0; }
+  if (x<=0) { return 0; }
   return stochbb::gamma_li(k, x/theta);
 }
 

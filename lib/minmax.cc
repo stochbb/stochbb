@@ -177,15 +177,14 @@ MinimumDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> ou
   Tmin = (Tmin-_shift)/_scale;
   Tmax = (Tmax-_shift)/_scale;
 
-  double dx = (Tmax-Tmin)/out.size();
-  Eigen::VectorXd tmp(out.size());
   Eigen::MatrixXd pdfs(out.size(), _densities.size());
   Eigen::MatrixXd cdfs(out.size(), _densities.size());
   for (size_t i=0; i<_densities.size(); i++) {
-    _densities[i]->eval(Tmin, Tmax, tmp);    pdfs.col(i) = tmp*dx;
-    _densities[i]->evalCDF(Tmin, Tmax, tmp); cdfs.col(i) = tmp;
+    _densities[i]->eval(Tmin, Tmax, pdfs.col(i));
+    _densities[i]->evalCDF(Tmin, Tmax, cdfs.col(i));
   }
 
+  Eigen::VectorXd tmp(out.size());
   out.setZero();
   for (size_t i=0; i<_densities.size(); i++) {
     tmp.setOnes();
@@ -198,7 +197,7 @@ MinimumDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> ou
     }
     out += tmp;
   }
-  out = -out/(dx*_scale);
+  out = -out/_scale;
 }
 
 void

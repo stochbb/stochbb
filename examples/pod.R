@@ -23,7 +23,7 @@ Rc <- C %+% X1
 # of R under control condition (Rc) on the interval (0, d] and diverges for T>d.
 Re <- C %+% minimum(X1, X2)
 
-Tmin <- 0; Tmax <- 1200; N <- 2000;
+Tmin <- 0; Tmax <- 1200; N <- 1200;
 t   <- seq(Tmin, Tmax, length.out=N);
 Tc  <- array(0, c(N)); Rc$density$eval(Tmin, Tmax, Tc)
 Te  <- array(0, c(N)); Re$density$eval(Tmin, Tmax, Te)
