@@ -76,11 +76,11 @@ minimum <- function(a, b, ...) {
 }
 
 '%+%' <- function (a, b) {
-  if (is.numeric(a) && (class(b)==Var)) {
+  if (is.numeric(a) && is.Var(b)) {
     affine(b, 1, a)
-  } else if (is.numeric(b) && (class(a)==Var)) {
+  } else if (is.numeric(b) && is.Var(a)) {
     affine(a, 1, b)
-  } else if ((class(b)==Var) && (class(b)==Var)) {
+  } else if (is.Var(b) && is.Var(b)) {
     chain(a,b)
   } else {
     a+b;

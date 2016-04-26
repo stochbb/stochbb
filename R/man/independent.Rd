@@ -19,7 +19,7 @@ note that all \link{atomic} random variables are always independent from each ot
 # Z = X1 + X2
 X <- normal(0,1)
 Y <- normal(0,1)
-Z <- X %+% Y
+Z <- X \%+\% Y
 
 # TRUE
 independent(X,Y)

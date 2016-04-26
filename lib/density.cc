@@ -234,7 +234,7 @@ void
 NormalDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   double t = Tmin, dt = (Tmax-Tmin)/out.size();
   for (int i=0; i<out.size(); i++, t+=dt) {
-    out[i] = stochbb::dnorm((t-_mu)/_sigma);
+    out[i] = stochbb::dnorm((t-_mu)/_sigma)/_sigma;
   }
 }
 

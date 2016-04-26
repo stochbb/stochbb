@@ -254,7 +254,7 @@ stochbb::erfinv(double x) {
 
 double
 stochbb::dnorm(double x) {
-  return std::exp(-x*x/std::sqrt(2))/std::sqrt(2*M_PI);
+  return std::exp(-x*x/2)/std::sqrt(2*M_PI);
 }
 
 double

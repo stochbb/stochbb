@@ -21,7 +21,7 @@ Class \code{\linkS4class{Container}}, directly.
 \examples{
 \dontrun{
  X <- normal(0,1)
- Y <- X %+% normal(0,1)
+ Y <- X \%+\% normal(0,1)
  sam <- new(ExactSampler, c(X,Y))
  res <- array(0, c(1000, 2))
  sam$sample(res)

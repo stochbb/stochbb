@@ -159,7 +159,7 @@ resolving simple-structured dependencies between random variables.
 \subsection{Mixture of random variables}
 A mixture is the weighted sum of random variables
 \begin{equation}
- Y = \frac{w_1X_1+\cdots+x_NX_N}{w_1+\cdots+w_N}\,, \nonumber
+ Y = \frac{w_1X_1+\cdots+w_NX_N}{w_1+\cdots+w_N}\,, \nonumber
 \end{equation}
 where $w_i$ are positive weights. The result $Y$ is also a random variable with the PDF
 \begin{equation}
@@ -206,22 +206,22 @@ Therefore, the simple conditional random variable cannot be used here.
 The conditional chained random variable can be used to describe two independent parallel processing
 stages where the fastest stage will trigger another stage. For example, if $X_1$ wins, it triggers $Y_1$
 and if $X_2$ wins it triggers $Y_2$. In contrast to the conditional chained random variable, the 
-conditional random variable above does not trigger a next stage but \emph{selects} a third. 
-Therefore, the actual result of the \emph{winning} stage does not have an influence on the 
-selected one. 
+conditional random variable above does not trigger a third stage but \emph{selects} the value of a third stage. 
+Therefore, the actual waiting time of the \emph{winning} stage does not have an influence on the 
+selected one. 	
 
-The conditional chained random variable is certainly not common and to my knowledge not
+The conditional	 chained random variable is certainly not common and to my knowledge not
 covered in text books. Hence the density for it must be obtained first.
 Given that the cases ($X_1<X_2$ and $X_2<X_1$) are mutually exclusive, the density of $Z$, 
 $f_Z(z)$ can be expressed as a simple sum. Precisely
 \begin{multline}
- f_Z(Z) = \iiint_{-\infty}^\infty f(z,x_1,x_2,y_1|z=x_1+y_1,x_1<x_2)\,dx_1\,dx_2\,dy_1 \\
-  + \iiint_{-\infty}^\infty f(z,x_1,x_2,y_2|z=x_2+y_2,x_2<x_1)\,dx_1\,dx_2\,dy_2\,. \nonumber
+ f_Z(z) = \iiint_{-\infty}^\infty f(x_1,x_2,y_1|z=x_1+y_1,x_1<x_2)\,dx_1\,dx_2\,dy_1 \\
+  + \iiint_{-\infty}^\infty f(x_1,x_2,y_2|z=x_2+y_2,x_2<x_1)\,dx_1\,dx_2\,dy_2\,. \nonumber
 \end{multline}
 
 Given that $X_1, X_2$ and $Y_1$ are mutually independent, the first integral can be reduced to
 \begin{multline}
-\iiint_{-\infty}^\infty f(z,x_1,x_2,y_1|z=x_1+y_1,x_1<x_2)\,dx_1\,dx_2\,dy_1 \\
+\iiint_{-\infty}^\infty f(x_1,x_2,y_1|z=x_1+y_1,x_1<x_2)\,dx_1\,dx_2\,dy_1 \\
   = \iiint_{-\infty}^\infty f_{X_1}(x_1)\,f_{X_2}(x_2)\,f_{Y_1}(y_1)\,\delta(z-x_1-y_1)\,H(x_2-x_1)\,dx_1\,dx_2\,dy_1\\
   = \iint_{-\infty}^\infty f_{X_1}(x_1)\,f_{X_2}(x_2)\,f_{Y_1}(z-x_1)\,H(x_2-x_1)\,dx_1\,dx_2\\
   = \int_{-\infty}^\infty f_{X_1}(x_1)\,f_{Y_1}(z-x_1)\int_{-\infty}^\infty \,f_{X_2}(x_2)\,H(x_2-x_1)\,dx_2\,dx_1\\
@@ -236,11 +236,13 @@ Analogously, the second integral can be reduced to
 \end{multline}
 
 The final density of $Z$ is then given by
-\begin{equation}
- f_Z(Z) = \int_{-\infty}^\infty f_{X_1}(x_1)\,\left(1-F_{X_2}(x_1)\right)\,f_{Y_1}(z-x_1)\,dx_1
-  + \int_{-\infty}^\infty \,f_{X_2}(x_2)\left(1-F_{X_1}(x_2)\right)\,f_{Y_2}(z-x_2)\,dx_2\,, \nonumber
-\end{equation}
-and it can be evaluated using the same \emph{trick} for chains of random variables.
+\begin{align}
+ f_Z(z) &= \int_{-\infty}^\infty f_{X_1}(x_1)\,\left(1-F_{X_2}(x_1)\right)\,f_{Y_1}(z-x_1)\,dx_1
+  + \int_{-\infty}^\infty \,f_{X_2}(x_2)\left(1-F_{X_1}(x_2)\right)\,f_{Y_2}(z-x_2)\,dx_2\,, \nonumber \\
+  &= \left[f_{X_1}\,\left(1-F_{X_2}\right)\right]\ast f_{Y_1} 
+       + \left[f_{X_2}\left(1-F_{X_1}\right)\right]\ast f_{Y_2}\,,\nonumber
+\end{align}
+and it can be evaluated using the same \emph{trick} used for chains of random variables.
 
 \subsection{Compound random variables}
 The most complex derived random-variable type is the compound random variable. That is a random variable
