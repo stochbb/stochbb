@@ -1,6 +1,6 @@
 Package: stochbb
 Type: Package
-Title: Analyzing stochastic processes.
+Title: Analyzing Stochastic Processes
 Version: 1.0
 Date: 2016-04-24
 Author: Hannes Matuschek
@@ -8,4 +8,4 @@ Maintainer: Hannes Matuschek <hannes.matuschek@uni-potsdam.de>
 Description: Analyzing stochastic processes using numerical approximations.
 License: GPL (>= 2)
 Imports: methods, Rcpp (>= 0.12.2)
-LinkingTo: methods, Rcpp, RcppEigen
+LinkingTo: Rcpp, RcppEigen

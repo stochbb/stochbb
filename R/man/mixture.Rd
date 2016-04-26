@@ -12,7 +12,7 @@ variables.
 }
 \arguments{
  \item{X1, X2}{the random variables to mix.}
- \item{w1, w2}{the relative weights of the random variables.}
+ \item{w1, w2}{the relative weights of the random variables. They do not need to sum up to one.}
 }
 \seealso{
  \code{\link{derived}}

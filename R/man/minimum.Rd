@@ -8,7 +8,7 @@ This function constructs a new random variable that is the minimum of the given 
 variables. That is \eqn{Z = \min(X_1,...,X_N)}{Z = min(X_1,...,X_N)}.
 }
 \usage{
- min(X1, X2, ...)
+ minimum(X1, X2, ...)
 }
 \arguments{
  \item{X1, X2, ...}{the random variables to get the minimum from.}

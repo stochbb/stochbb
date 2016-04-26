@@ -2,12 +2,14 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{Var-class}
-
+\alias{Var}
+\alias{Rcpp_Var}
+\alias{is.Var}
 \title{Class \code{Var} for all random variables}
 \description{
 Represents a random variable within a system of dependent random variables. Please note that there
 is no direct constructor for the \code{Var} class. Instances of this class are created by
-construcing an \link{atomic} or \link{derived} random variable using functions.
+construing an \link{atomic} or \link{derived} random variable using factory functions.
 }
 \section{Extends}{
 Class \code{\linkS4class{Container}}, directly.
@@ -23,7 +25,7 @@ Class \code{\linkS4class{Container}}, directly.
 \section{Fields}{
   \describe{
     \item{\code{density}:}{Holds the density of the random variable.}
-    \item{\code{isNull}:}{If true, the container is empty.}
+    \item{\code{isNull}:}{If \code{TRUE}, the container is empty.}
     \item{\code{name}:}{Holds the name of the random variable.}
   }
 }

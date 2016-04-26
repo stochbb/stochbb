@@ -1,6 +1,5 @@
 \name{affine}
 \alias{affine}
-\alias{\%+\%}
 \title{
 Affine transformation of a random variable.
 }
@@ -17,13 +16,14 @@ Please note that the \code{\%+\%} operator can also be used to shift a random va
 \arguments{
  \item{X}{the random variable.}
  \item{a}{the scaleing.}
- \item{a}{the shift.}
+ \item{b}{the shift.}
 }
 \seealso{
  \code{\link{derived}}
 }
 \examples{
 \dontrun{
+
 # Z = 3*X + 100
 Z <- affine(X, 3, 100)
 
@@ -31,6 +31,5 @@ Z <- affine(X, 3, 100)
 Z <- affine(X, 1, 100)
 # or equivalently
 Z <- X \%+\% 100
-
 }
 }

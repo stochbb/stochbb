@@ -55,35 +55,35 @@ weibull <- function(k, lambda, name="") {
   }
 }
 
-chain <- function(a, b, ...) {
-  args <- c(a, b, ...)
+chain <- function(X1, X2, ...) {
+  args <- c(X1, X2, ...)
   stochbb::"_chain"(args);
 }
 
-independent <- function(a, b, ...) {
-  args <- c(a, b, ...)
+independent <- function(X1, X2, ...) {
+  args <- c(X1, X2, ...)
   stochbb::"_independent"(args);
 }
 
-maximum <- function(a, b, ...) {
-  args <- c(a, b, ...)
+maximum <- function(X1, X2, ...) {
+  args <- c(X1, X2, ...)
   stochbb::"_maximum"(args);
 }
 
-minimum <- function(a, b, ...) {
-  args <- c(a, b, ...)
+minimum <- function(X1, X2, ...) {
+  args <- c(X1, X2, ...)
   stochbb::"_minimum"(args);
 }
 
-'%+%' <- function (a, b) {
-  if (is.numeric(a) && is.Var(b)) {
-    affine(b, 1, a)
-  } else if (is.numeric(b) && is.Var(a)) {
-    affine(a, 1, b)
-  } else if (is.Var(b) && is.Var(b)) {
-    chain(a,b)
+'%+%' <- function (X1, X2) {
+  if (is.numeric(X1) && is.Var(X2)) {
+    affine(X2, 1, X1)
+  } else if (is.numeric(X2) && is.Var(X1)) {
+    affine(X1, 1, X2)
+  } else if (is.Var(X1) && is.Var(X2)) {
+    chain(X1,X2)
   } else {
-    a+b;
+    X1+X2;
   }
 }
 

@@ -2,7 +2,8 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{ExactSampler-class}
-
+\alias{ExactSampler}
+\alias{Rcpp_ExactSampler}
 \title{Implements an exact sampler.}
 \description{
 This class implements a reasonable fast exact sampler for one or more possibly dependent random
@@ -20,19 +21,19 @@ Class \code{\linkS4class{Container}}, directly.
 }
 \examples{
 \dontrun{
+
  X <- normal(0,1)
  Y <- X \%+\% normal(0,1)
  sam <- new(ExactSampler, c(X,Y))
  res <- array(0, c(1000, 2))
  sam$sample(res)
-
 }
 }
 
 \keyword{classes}
 \section{Fields}{
   \describe{
-    \item{\code{isNull}:}{Is TRUE if the container is invalid.}
+    \item{\code{isNull}:}{Is \code{TRUE} if the container is invalid.}
   }
 }
 \section{Methods}{

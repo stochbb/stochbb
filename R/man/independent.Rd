@@ -16,13 +16,14 @@ note that all \link{atomic} random variables are always independent from each ot
 }
 \examples{
 \dontrun{
+
 # Z = X1 + X2
 X <- normal(0,1)
 Y <- normal(0,1)
 Z <- X \%+\% Y
-
 # TRUE
 independent(X,Y)
+
 # FALSE
 independent(X,Z)
 }

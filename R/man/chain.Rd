@@ -2,7 +2,7 @@
 \alias{chain}
 \alias{\%+\%}
 \title{
-Represents a sum of random variables.
+Represents a sum of independent random variables.
 }
 \description{
 This function constructs a new random variable that is the sum of the given independent random
@@ -18,17 +18,17 @@ Please note that the \code{\%+\%} operator can also be used to shift a random va
  \item{X1, X2, ...}{the random variables to sum.}
 }
 \seealso{
- \code{\link{affine}}
- \code{\link{independent}}
- \code{\link{derived}}
+ \code{\link{affine}},
+ \code{\link{independent}},
+ \code{\link{derived}}.
 }
 \examples{
 \dontrun{
+
 # Z = X1 + X2
 Z <- chain(X1, X2)
 
 # or equivalently
 Z <- X1 \%+\% X2
-
 }
 }

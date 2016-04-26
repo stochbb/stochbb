@@ -9,18 +9,23 @@ parameters k & lambda, or as a compound random variable if both or one of the pa
 variable too.
 }
 \usage{
- weibull(k, lambda)
+ weibull(k, lambda, name="")
+}
+\arguments{
+ \item{k}{the shape parameter.}
+ \item{lambda}{the scale parameter.}
+ \item{name}{optional name of the random variable.}
 }
 \seealso{
  \code{\link{atomic}}
 }
 \examples{
 \dontrun{
+
 # Random variable X ~ Weibull(1,1)
 X <- weibull(1,1)
 
 # Compound random variable Y ~ Webull(X,1)
 Y <- weibull(1,X)
-
 }
 }

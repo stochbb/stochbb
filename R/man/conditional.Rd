@@ -18,7 +18,7 @@ probability of \eqn{X_1 < X_2}{X1 < X2}. That is
  \item{Y1, Y2}{the random variables to select from.}
 }
 \seealso{
- \code{\link{condchain}}
- \code{\link{independent}}
- \code{\link{derived}}
+ \code{\link{condchain}},
+ \code{\link{independent}},
+ \code{\link{derived}}.
 }
