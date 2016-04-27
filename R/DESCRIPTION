@@ -9,3 +9,5 @@ Description: Analyzing stochastic processes using numerical approximations.
 License: GPL (>= 2)
 Imports: methods, Rcpp (>= 0.10.0)
 LinkingTo: Rcpp, RcppEigen
+Suggests: R.rsp
+VignetteBuilder: R.rsp
