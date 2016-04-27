@@ -21,68 +21,68 @@ Var delta(double value);
 
 /** Constructs a uniformly-distributed random variable on the interval [a,b].
  * @ingroup api */
-Var uniform(double a, double b, const std::string &name="");
+Var uniform(double a, double b, const std::string &name="") throw (Error);
 
 /** Constructs a normal-distributed random variable for the given mean and standard deviation.
  * @ingroup api */
-Var normal(double mu, double sigma, const std::string &name="");
+Var normal(double mu, double sigma, const std::string &name="") throw (Error);
 /** Constructs a compound-normal distributed random variable for the given mean and
  * standard deviation. Where the mean is a random variable too.
  * @ingroup api */
-Var normal(const Var &mu, double sigma, const std::string &name="");
+Var normal(const Var &mu, double sigma, const std::string &name="") throw (Error);
 /** Constructs a compound-normal distributed random variable for the given mean and
  * standard deviation. Where the standard deviation is a random variable too.
  * @ingroup api */
-Var normal(double mu, const Var &sigma, const std::string &name="");
+Var normal(double mu, const Var &sigma, const std::string &name="") throw (Error);
 /** Constructs a compound-normal distributed random variable for the given mean and
  * standard deviation. Where both, the mean and standard deviation are a random variables.
  * @ingroup api */
-Var normal(const Var& mu, const Var &sigma, const std::string &name="");
+Var normal(const Var& mu, const Var &sigma, const std::string &name="") throw (Error);
 
 /** Constructs a gamma-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
-Var gamma(double k, double theta, const std::string &name="");
+Var gamma(double k, double theta, const std::string &name="") throw (Error);
 /** Constructs a compound-gamma distributed random variable for the given shape and scale parameters.
  * Where the shape parameter is a random variable too.
  * @ingroup api */
-Var gamma(const Var &k, double theta, const std::string &name="");
+Var gamma(const Var &k, double theta, const std::string &name="") throw (Error);
 /** Constructs a compound-gamma distributed random variable for the given shape and scale parameters.
  * Where the scale parameter is a random variable too.
  * @ingroup api */
-Var gamma(double k, const Var &theta, const std::string &name="");
+Var gamma(double k, const Var &theta, const std::string &name="") throw (Error);
 /** Constructs a compound-gamma distributed random variable for the given shape and scale parameters.
  * Where both, the shape and scale parameter are random variables.
  * @ingroup api */
-Var gamma(const Var& k, const Var &theta, const std::string &name="");
+Var gamma(const Var& k, const Var &theta, const std::string &name="") throw (Error);
 
 /** Constructs an inverse gamma-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
-Var invgamma(double alpha, double beta, const std::string &name="");
+Var invgamma(double alpha, double beta, const std::string &name="") throw (Error);
 /** Constructs a compound inverse gamma distributed random variable for the given shape and scale
  * parameters. Where the shape parameter is a random variable too.
  * @ingroup api */
-Var invgamma(const Var &alpha, double beta, const std::string &name="");
+Var invgamma(const Var &alpha, double beta, const std::string &name="") throw (Error);
 /** Constructs a compound inverse gamma distributed random variable for the given shape and scale
  * parameters. Where the scale parameter is a random variable too.
  * @ingroup api */
-Var invgamma(double alpha, const Var &beta, const std::string &name="");
+Var invgamma(double alpha, const Var &beta, const std::string &name="") throw (Error);
 /** Constructs a compound inverse gamma distributed random variable for the given shape and scale
  * parameters. Where both, the shape and scale parameter are random variables.
  * @ingroup api */
-Var invgamma(const Var& alpha, const Var &beta, const std::string &name="");
+Var invgamma(const Var& alpha, const Var &beta, const std::string &name="") throw (Error);
 
 /** Constructs a Weibull-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
-Var weibull(double k, double lambda, const std::string &name="");
+Var weibull(double k, double lambda, const std::string &name="") throw (Error);
 /** Constructs a compound Weibull-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
-Var weibull(const Var& k, double lambda, const std::string &name="");
+Var weibull(const Var& k, double lambda, const std::string &name="") throw (Error);
 /** Constructs a compound Weibull-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
-Var weibull(double k, const Var& lambda, const std::string &name="");
+Var weibull(double k, const Var& lambda, const std::string &name="") throw (Error);
 /** Constructs a compound Weibull-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
-Var weibull(const Var& k, const Var& lambda, const std::string &name="");
+Var weibull(const Var& k, const Var& lambda, const std::string &name="") throw (Error);
 
 /** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
  * That is
@@ -92,7 +92,7 @@ Var weibull(const Var& k, const Var& lambda, const std::string &name="");
  *
  * @param vars Specifies the RVs to sum.
  * @ingroup api */
-Var chain(const std::vector<Var> &vars);
+Var chain(const std::vector<Var> &vars) throw (Error);
 
 /** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
  * That is
@@ -100,7 +100,7 @@ Var chain(const std::vector<Var> &vars);
  *  Y = X_1+X_2\,.
  * \f]
  * @ingroup api */
-Var chain(const Var &X1, const Var &X2);
+Var chain(const Var &X1, const Var &X2) throw (Error);
 
 /** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
  * That is
@@ -108,7 +108,7 @@ Var chain(const Var &X1, const Var &X2);
  *  Y = X_1+X_2+X_3\,.
  * \f]
  * @ingroup api */
-Var chain(const Var &X1, const Var &X2, const Var &X3);
+Var chain(const Var &X1, const Var &X2, const Var &X3) throw (Error);
 
 /** Constructs a random variable \f$Y\f$ as the minimum of the given random variables.
  * That is
@@ -124,7 +124,7 @@ Var chain(const Var &X1, const Var &X2, const Var &X3);
  * \f]
  * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
  * @ingroup api */
-Var minimum(const std::vector<Var> &variables);
+Var minimum(const std::vector<Var> &variables) throw (Error);
 
 /** Constructs a random variable \f$Y\f$ as the minimum of the given random variables.
  * That is
@@ -140,7 +140,7 @@ Var minimum(const std::vector<Var> &variables);
  * \f]
  * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
  * @ingroup api */
-Var minimum(const Var &X1, const Var &X2);
+Var minimum(const Var &X1, const Var &X2) throw (Error);
 
 /** Constructs a random variable \f$Y\f$ as the minimum of the given random variables.
  * That is
@@ -156,7 +156,7 @@ Var minimum(const Var &X1, const Var &X2);
  * \f]
  * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
  * @ingroup api */
-Var minimum(const Var &X1, const Var &X2, const Var &X3);
+Var minimum(const Var &X1, const Var &X2, const Var &X3) throw (Error);
 
 /** Constructs a random variable \f$Y\f$, as the maximum of the given random variables.
  * That is
@@ -172,7 +172,7 @@ Var minimum(const Var &X1, const Var &X2, const Var &X3);
  * \f]
  * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
  * @ingroup api */
-Var maximum(const std::vector<Var> &variables);
+Var maximum(const std::vector<Var> &variables) throw (Error);
 
 /** Constructs a random variable \f$Y\f$, as the maximum of the given random variables.
  * That is
@@ -188,7 +188,7 @@ Var maximum(const std::vector<Var> &variables);
  * \f]
  * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
  * @ingroup api */
-Var maximum(const Var &X1, const Var &X2);
+Var maximum(const Var &X1, const Var &X2) throw (Error);
 
 /** Constructs a random variable \f$Y\f$, as the maximum of the given random variables.
  * That is
@@ -204,7 +204,7 @@ Var maximum(const Var &X1, const Var &X2);
  * \f]
  * where \f$X_1, X_2\f$ and \f$X_3\f$ are mutually independent random variables.
  * @ingroup api */
-Var maximum(const Var &X1, const Var &X2, const Var &X3);
+Var maximum(const Var &X1, const Var &X2, const Var &X3) throw (Error);
 
 /** Constructs an affine transformed of the given variable.
  * @ingroup api */
@@ -212,29 +212,29 @@ Var affine(const Var &var, double scale, double shift);
 
 /** Constructs a mixture of the given variables with assiciated weights.
  * @ingroup api */
-Var mixture(double wX1, const Var &X1, double wX2, const Var &X2);
+Var mixture(double wX1, const Var &X1, double wX2, const Var &X2) throw (Error);
 
 /** Constructs a mixture of the given variables with assiciated weights.
  * @ingroup api */
-Var mixture(double wX1, const Var &X1, double wX2, const Var &X2, double wX3, const Var &X3);
+Var mixture(double wX1, const Var &X1, double wX2, const Var &X2, double wX3, const Var &X3) throw (Error);
 
 /** Constructs a mixture of the given variables with assiciated weights.
  * @ingroup api */
-Var mixture(const std::vector<double> &weights, const std::vector<Var> &variables);
+Var mixture(const std::vector<double> &weights, const std::vector<Var> &variables) throw (Error);
 
 /** Constructs a conditional random variable. That is
  * \f[
  *  Z = \begin{cases}Y_1 & if\, X_1<X_2 \\ Y_2 & else.\end{cases}
  * \f]
  * @ingroup api */
-Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
+Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw (Error);
 
 /** Constructs a conditional chained random variable. That is
  * \f[
  *  Z = \begin{cases}X_1+Y_1 & if\, X_1<X_2 \\ X_2+Y_2 & else.\end{cases}
  * \f]
  * @ingroup api */
-Var condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
+Var condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw (Error);
 
 Density directConvolve(const std::vector<Density> &densities);
 Density directConvolve(const Density &a, const Density &b);

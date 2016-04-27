@@ -79,7 +79,7 @@ ConditionalDensityObj::rangeEst(double alpha, double &a, double &b) const {
  * Implementation of ConditionalObj
  * ********************************************************************************************* */
 ConditionalObj::ConditionalObj(const Var& X1, const Var &X2, const Var &Y1, const Var &Y2,
-                               const std::string &name)
+                               const std::string &name) throw (Error)
   : DerivedVarObj(std::vector<Var> {X1, X2, Y1, Y2}, name), _density(0)
 {
   // Check for independence (Y1 and Y2 are allowed to be dependent RVs).
@@ -118,13 +118,15 @@ ConditionalObj::density() {
 /* ********************************************************************************************* *
  * Implementation of CondChainDensityObj
  * ********************************************************************************************* */
-CondChainDensityObj::CondChainDensityObj(DensityObj *X1, DensityObj *X2, DensityObj *Y1, DensityObj *Y2)
+CondChainDensityObj::CondChainDensityObj(
+    DensityObj *X1, DensityObj *X2, DensityObj *Y1, DensityObj *Y2) throw (Error)
   : DensityObj(), _X1(X1), _X2(X2), _Y1(Y1), _Y2(Y2)
 {
   // pass...
 }
 
-CondChainDensityObj::CondChainDensityObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2)
+CondChainDensityObj::CondChainDensityObj(
+    const Var &X1, const Var &X2, const Var &Y1, const Var &Y2)  throw (Error)
   : DensityObj(), _X1(0), _X2(0), _Y1(0), _Y2(0)
 {
   _X1 = *X1.density(); _X2 = *X2.density();

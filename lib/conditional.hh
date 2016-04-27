@@ -61,7 +61,8 @@ class ConditionalObj: public DerivedVarObj
 {
 public:
   /** Constructs the conditional random variable object from the given random variables. */
-  ConditionalObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2, const std::string &name="");
+  ConditionalObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2,
+                 const std::string &name="") throw (Error);
 
   virtual void mark();
 
@@ -91,11 +92,11 @@ class CondChainDensityObj: public DensityObj
 {
 protected:
   /** Constructs a @c CondChainDensityObj from the given densities. */
-  CondChainDensityObj(DensityObj *X1, DensityObj *X2, DensityObj *Y1, DensityObj *Y2);
+  CondChainDensityObj(DensityObj *X1, DensityObj *X2, DensityObj *Y1, DensityObj *Y2) throw (Error);
 
 public:
   /** Constructs a @c CondChainDensityObj from the given variables. */
-  CondChainDensityObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2);
+  CondChainDensityObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw (Error);
   virtual void mark();
 
   void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;

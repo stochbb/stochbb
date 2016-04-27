@@ -88,7 +88,7 @@ MixtureDensityObj::rangeEst(double alpha, double &a, double &b) const {
  * Implementation of MixtrueObj
  * ********************************************************************************************* */
 MixtureObj::MixtureObj(const std::vector<double> &weights, const std::vector<Var> &variables,
-                       const std::string &name)
+                       const std::string &name) throw (Error)
   : DerivedVarObj(variables, name), _weights(weights), _density(0)
 {
   if (_weights.size() != variables.size()) {

@@ -4,10 +4,13 @@ import stochbb
 
 X1 = stochbb.normal(100,10)
 X2 = stochbb.normal(100,10)
+
 # Determine res numerically
 d  = stochbb.directConvolve(X1.density(), X2.density())
+
 # Will determine density analytically
 Y = X1+X2
+
 # What should be the solution
 Z = stochbb.normal(200, sqrt(200))
 

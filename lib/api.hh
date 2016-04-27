@@ -9,9 +9,9 @@
 #ifndef __SBB_API_HH__
 #define __SBB_API_HH__
 
+#include "exception.hh"
 #include <vector>
 #include <Eigen/Eigen>
-#include "exception.hh"
 #include "object.hh"
 
 

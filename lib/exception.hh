@@ -64,6 +64,13 @@ public:
   virtual ~TypeError() throw ();
 };
 
-}
+} // namespace stochbb
+
+#define assume(test) \
+  if (! (test)) { \
+    stochbb::AssumptionError err; \
+    err << "Assumption " << #test << " failed."; \
+    throw err; \
+  }
 
 #endif

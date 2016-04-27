@@ -267,52 +267,52 @@ public:
 Var delta(double value);
 
 %feature("autodoc", "1");
-Var uniform(double a, double b);
+Var uniform(double a, double b) throw (Error);
 
 %feature("autodoc", "1");
-Var normal(double mu, double sigma);
+Var normal(double mu, double sigma) throw (Error);
 %feature("autodoc", "1");
-Var normal(double mu, const Var &sigma);
+Var normal(double mu, const Var &sigma) throw (Error);
 %feature("autodoc", "1");
-Var normal(const Var &mu, double sigma);
+Var normal(const Var &mu, double sigma) throw (Error);
 %feature("autodoc", "1");
-Var normal(const Var &mu, const Var &sigma);
+Var normal(const Var &mu, const Var &sigma) throw (Error);
 
 %feature("autodoc", "1");
-Var gamma(double k, double theta);
+Var gamma(double k, double theta) throw (Error);
 %feature("autodoc", "1");
-Var gamma(double k, const Var &theta);
+Var gamma(double k, const Var &theta) throw (Error);
 %feature("autodoc", "1");
-Var gamma(const Var &k, double theta);
+Var gamma(const Var &k, double theta) throw (Error);
 %feature("autodoc", "1");
-Var gamma(const Var &k, const Var &theta);
+Var gamma(const Var &k, const Var &theta) throw (Error);
 
 %feature("autodoc", "1");
-Var invgamma(double alpha, double beta);
+Var invgamma(double alpha, double beta) throw (Error);
 %feature("autodoc", "1");
-Var invgamma(double alpha, const Var &beta);
+Var invgamma(double alpha, const Var &beta) throw (Error);
 %feature("autodoc", "1");
-Var invgamma(const Var &alpha, double beta);
+Var invgamma(const Var &alpha, double beta) throw (Error);
 %feature("autodoc", "1");
-Var invgamma(const Var &alpha, const Var &beta);
+Var invgamma(const Var &alpha, const Var &beta) throw (Error);
 
 %feature("autodoc", "1");
-Var weibull(double k, double lam);
+Var weibull(double k, double lam) throw (Error);
 %feature("autodoc", "1");
-Var weibull(const Var& k, double lam);
+Var weibull(const Var& k, double lam) throw (Error);
 %feature("autodoc", "1");
-Var weibull(double k, const Var& lam);
+Var weibull(double k, const Var& lam) throw (Error);
 %feature("autodoc", "1");
-Var weibull(const Var& k, const Var& lam);
+Var weibull(const Var& k, const Var& lam) throw (Error);
 
 %feature("autodoc", "1");
 Var affine(const Var &var, double scale, double shift);
 
 %feature("autodoc", "1");
-Var chain(const std::vector<Var> &vars) throw( Error );
+Var chain(const std::vector<Var> &vars) throw (Error);
 
 %feature("autodoc", "1");
-Var minimum(const Var &X1, const Var &X2) throw( Error );
+Var minimum(const Var &X1, const Var &X2) throw (Error);
 %feature("autodoc", "1");
 Var minimum(const Var &X1, const Var &X2, const Var &X3) throw( Error );
 %feature("autodoc", "1");

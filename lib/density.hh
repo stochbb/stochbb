@@ -3,6 +3,7 @@
 
 #include "object.hh"
 #include "api.hh"
+#include "exception.hh"
 #include <Eigen/Eigen>
 
 namespace stochbb {
@@ -120,7 +121,7 @@ public:
   /** Constructs a uniform distribution on the interval \f$[a,b]\f$.
    * @param a Specifies the lower bound of the interval.
    * @param b Specifies the upper bound of the interval. */
-  UniformDensityObj(double a, double b);
+  UniformDensityObj(double a, double b) throw (Error);
   /** Destructor. */
   virtual ~UniformDensityObj();
   void mark();
@@ -157,7 +158,7 @@ class NormalDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor with mean and standard deviation. */
-  NormalDensityObj(double mean, double stddev);
+  NormalDensityObj(double mean, double stddev) throw (Error);
   /** Destructor. */
   virtual ~NormalDensityObj();
   void mark();
@@ -192,7 +193,7 @@ class GammaDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
-  GammaDensityObj(double k, double theta, double shift=0);
+  GammaDensityObj(double k, double theta, double shift=0) throw (Error);
   /** Destructor. */
   virtual ~GammaDensityObj();
   void mark();
@@ -231,7 +232,7 @@ class InvGammaDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor. */
-  InvGammaDensityObj(double alpha, double beta, double shift=0);
+  InvGammaDensityObj(double alpha, double beta, double shift=0) throw (Error);
   /** Destructor. */
   virtual ~InvGammaDensityObj();
   void mark();
@@ -274,7 +275,7 @@ class WeibullDensityObj: public AtomicDensityObj
 {
 public:
   /** Constructor with shape @c k, scale @c lambda and @c shift. */
-  WeibullDensityObj(double k, double lambda, double shift=0);
+  WeibullDensityObj(double k, double lambda, double shift=0) throw (Error);
   /** Destructor. */
   virtual ~WeibullDensityObj();
   void mark();

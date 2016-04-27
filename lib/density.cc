@@ -139,10 +139,11 @@ DeltaDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of UniformDensityObj
  * ********************************************************************************************* */
-UniformDensityObj::UniformDensityObj(double a, double b)
+UniformDensityObj::UniformDensityObj(double a, double b) throw (Error)
   : AtomicDensityObj(), _a(a), _b(b)
 {
   logDebug() << "Create UniformDensity with a=" << _a << ", b=" << _b << " #" << this << ".";
+  assume(_a<_b);
 }
 
 UniformDensityObj::~UniformDensityObj() {
@@ -213,11 +214,12 @@ UniformDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of NormalDensityObj
  * ********************************************************************************************* */
-NormalDensityObj::NormalDensityObj(double mean, double stddev)
+NormalDensityObj::NormalDensityObj(double mean, double stddev) throw (Error)
   : AtomicDensityObj(), _mu(mean), _sigma(stddev)
 {
   logDebug() << "Create NormalDensity with mu=" << _mu << ", sigma=" << _sigma
              << " #" << this << ".";
+  assume(_sigma > 0);
 }
 
 NormalDensityObj::~NormalDensityObj() {
@@ -293,11 +295,13 @@ NormalDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of GammaDensityObj
  * ********************************************************************************************* */
-GammaDensityObj::GammaDensityObj(double k, double theta, double shift)
+GammaDensityObj::GammaDensityObj(double k, double theta, double shift) throw (Error)
   : AtomicDensityObj(), _k(k), _theta(theta), _shift(shift)
 {
   logDebug() << "Create GammaDensity with k=" << _k << ", theta=" << _theta
              << ", shift=" << _shift << " #" << this << "." ;
+  assume(_k > 0);
+  assume(_theta > 0);
 }
 
 GammaDensityObj::~GammaDensityObj() {
@@ -374,10 +378,13 @@ GammaDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of InvGammaDensityObj
  * ********************************************************************************************* */
-InvGammaDensityObj::InvGammaDensityObj(double alpha, double beta, double shift)
+InvGammaDensityObj::InvGammaDensityObj(double alpha, double beta, double shift) throw (Error)
   : AtomicDensityObj(), _alpha(alpha), _beta(beta), _shift(shift)
 {
-  // pass...
+  logDebug() << "Create InvGammaDensity with alpha=" << _alpha << ", beta=" << _beta
+             << ", shift=" << _shift << " #" << this << "." ;
+  assume(_alpha > 0);
+  assume(_beta  > 0);
 }
 
 InvGammaDensityObj::~InvGammaDensityObj() {
@@ -454,11 +461,13 @@ InvGammaDensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of WeibullDensityObj
  * ********************************************************************************************* */
-WeibullDensityObj::WeibullDensityObj(double k, double lambda, double shift)
+WeibullDensityObj::WeibullDensityObj(double k, double lambda, double shift) throw (Error)
   : AtomicDensityObj(), _k(k), _lambda(lambda), _shift(shift)
 {
   logDebug() << "Create WeibullDensity with k=" << _k << ", lambda=" << _lambda
              << ", shift=" << _shift << " #" << this << "." ;
+  assume(_k > 0);
+  assume(_lambda > 0);
 }
 
 WeibullDensityObj::~WeibullDensityObj() {

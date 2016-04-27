@@ -45,7 +45,7 @@ class MixtureObj : public DerivedVarObj
 public:
   /** Constructs a mixture of the given @c variables and @c weights. */
   MixtureObj(const std::vector<double> &weights, const std::vector<Var> &variables,
-             const std::string &name="");
+             const std::string &name="") throw (Error);
 
   virtual void mark();
   virtual Density density();

@@ -5,8 +5,22 @@ import stochbb;
 from matplotlib import pylab
 import cProfile
 
-# Install Logger
-stochbb.Logger.addHandler(stochbb.IOLogHandler())
+#
+# This example demonstrates how a divergence point can arise in a very simple stochastic
+# model of some cognitive process. The divergence point is the earliest time-point at which the
+# distributions of some response latency differ between two experimental conditions. Obviously,
+# there is no divergence point if the two response latency distributions are analytic. For two
+# non-analytic response latencies, a divergence point may exist.
+#
+# This example uses 3 Gamma distributions (of wich one is a shifted Gamma distribution) and the
+# minimum(,) operator. For both conditions (control, experimental) there is a common stage C
+# following some Gamma distribution. Under control condition, the common stage is followed by a
+# second Gamma distributed stage X1 (C -> X1). Under the experimental condition, the common stage
+# also triggers a second stage X2 with a shifted Gamma distribution parallel with the stage X1
+# present under the control conditon. This stage is delayed by 300ms relative to the parallel stage
+# X1, but completes much faster than X1 once it started. The response latency under the exp.
+# condition is then the chain C -> max(X1, X2).
+#
 
 #
 # Processing model
