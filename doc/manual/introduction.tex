@@ -80,7 +80,7 @@ PDFs of the summed variables. That is
 
 The direct numerical convolution of the underlying distributions can be computationally expensive if the
 number of PDFs is large. Assuming that all distributions are well supported on a common interval, however, 
-allows for a fast numerical convolution by means of the FFT convolution. For the FFT convolution, all 
+allows for a fast numerical convolution by means of FFT convolution \cite{Press2007}. For the FFT convolution, all 
 densities $f_i(x)$ are evaluated on a common regular gird and the evaluation of the convolution on that gird
 can then be computed easily. This, however, requires that the grid is chosen such that all densities being
 convoluted as well as the result are well supported on the chosen interval. Moreover, the grid must be fine 
@@ -200,15 +200,17 @@ It can be defined as
 where $X_1, X_2, Y_1$ and $X_1, X_2, Y_2$ are mutually independent. $Y_1$ and $Y_2$ may be 
 dependent random variables. Although being similar to the conditional random variable, there is an 
 important difference: Both possible outcomes ($X_1+Y_1$ and $X_2+Y_2$) 
-are not independent from the condition (i.e. $X_1+Y_1$ is trivially dependent on $X_1$).
+are not independent from the condition (i.e. $X_1+Y_1$ depends trivially on $X_1$).
 Therefore, the simple conditional random variable cannot be used here. 
 
 The conditional chained random variable can be used to describe two independent parallel processing
 stages where the fastest stage will trigger another stage. For example, if $X_1$ wins, it triggers $Y_1$
 and if $X_2$ wins it triggers $Y_2$. In contrast to the conditional chained random variable, the 
-conditional random variable above does not trigger a third stage but \emph{selects} the value of a third stage. 
+conditional random variable does not trigger a third stage but \emph{selects} the value of a third stage. 
 Therefore, the actual waiting time of the \emph{winning} stage does not have an influence on the 
-selected one. 	
+selected one and may lead to non-causal waiting times if $X_1$ and $X_2$ are larger than $Y_1$ and
+$Y_2$ (i.e., the response is faster than the processes selecting the response). The conditional chained 
+random variable always maintains causality.  	
 
 The conditional	 chained random variable is certainly not common and to my knowledge not
 covered in text books. Hence the density for it must be obtained first.
@@ -247,7 +249,7 @@ and it can be evaluated using the same \emph{trick} used for chains of random va
 \subsection{Compound random variables}
 The most complex derived random-variable type is the compound random variable. That is a random variable
 $X$ distributed according to a parametric distribution $X\sim f_{X|A}(x;A)$ with parameter $A$. $A$, however, 
-is a random variable by itself with its own distribution $A\sim g(a)$. The distribution of the compound 
+is itself a random variable with its own distribution $A\sim g(a)$. The distribution of the compound 
 random variable $X$ is then obtained by marginalizing the parameter of the PDF $f_{X|A}(\cdot;a)$ as 
 \begin{equation}
  f_X(x) = \int f_{X|A}(x;a)\,g(a)\,da\,,\nonumber
@@ -257,9 +259,5 @@ and the CDF is obtained analogously as
  F_X(x) = \int F_{X|A}(x;a)\,g(a)\,da\,.\nonumber
 \end{equation}
 
-StochBB determines the PDF and CDF of $X$ by performing the integral numerically using a similar \emph{trick}
-as for the convolution of PDFs. Here the parameter distribution is evaluated on the same grid as the distribution
-of the random variable $X$ itself, allowing to determine the approximate PDF of the compound. This, however, requires 
-that both distributions, the distribution of the parameter and the distribution of the variable itself have similar 
-scales. This assumption is not always met. If violated, the resulting approximation might be bad.
+StochBB determines the PDF and CDF of $X$ by performing the integral numerically.
 

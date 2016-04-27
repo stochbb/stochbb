@@ -1,14 +1,15 @@
-\section{Divergence Point Example}
-This example shows a simple \emph{toy model} of some cognitive process that is able to produce a
-so called \emph{divergence point} \cite{Reingold2012}. A divergence point of two response latency
-distributions is the earliest time point at which the two response latencies differ. Obviously, 
-there can't be any divergence point if the two response latency distributions are analytic 
-(e.g., the convolution (chain) of Gamma distributions, \cite{Gelooven1999}). This example, however,
+\section{Divergence point example}
+This example shows a simple \emph{toy model} for some cognitive process that is able to produce a
+so called \emph{divergence point} \cite{Reingold2012}. A divergence point of two response-latency
+distributions is the earliest time point at which the two response-latency distributions differ. Obviously, 
+there exists no divergence point, if the two response latency distributions are analytic 
+(e.g., the convolution of Gamma distributions, \cite{Gelooven1999}). This example, however,
 not only shows how a non-analytic response-latency distribution may arise that allows for a 
-divergence point, but has an actual divergence point%
-\footnote{One distribution being non-analytic is a necessary but not a sufficient condition.}. 
+divergence point, but actually has a divergence point%
+\footnote{At least one distribution being non-analytic is a necessary but not a sufficient
+condition for the existence of a divergence point.}. 
 
-This very simple model consists of 3 $\Gamma$-distributed random variables $C, X_1$ and $X_2$,
+This very simple model consists of 3 Gamma-distributed random variables $C, X_1$ and $X_2$,
 where the latter is a shifted Gamma distribution (here shifted by $300$ ms, i.e. 
 $X_3 \sim \Gamma(T-300; k, \theta)$).  The model is
 \begin{align}
@@ -61,8 +62,8 @@ TCe = empty((N,)); Re.density().evalCDF(Tmin, Tmax, TCe)
 Figure \ref{fig:pod} shows the plots generated from the code above. The blue lines show the PDF
 (upper panel) and survival function (1-CDF, lower panel) of the response latency under control
 condition. Being a convolution of two Gamma distributions, it is an analytic function on the
-interval $(0,\infty)$. The green lines show the PDF and survival function of the response latency
-under control condition. As the distribution of $X_2$ is not analytic on the complete interval
+interval $(0,\infty)$ \citep{Gelooven1999}. The green lines show the PDF and survival function
+of the response latency under control condition. As the distribution of $X_2$ is not analytic on the complete interval
 $(0,\infty)$ (discontinuity at $T=300$ ms), a divergence point may exist at $T=300$ (red vertical
 lines).  In fact, that point is visible in both the PDF and the survival function. Hence, this simple
 model is able to produce a divergence point as both response-latency distributions are identical

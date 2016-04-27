@@ -1,21 +1,28 @@
 \section{Artificial example} \label{sec:example}
-Within this section, we show how a rather trivial stochastic model of a reading experiment can be implemented using StochBB's Python interface.
+Within this section, we show how a rather trivial stochastic model of a reading experiment can be
+implemented using StochBB's Python interface.
 
-The model describes the fixation duration $R$ as a simple chain of a lexical $L$, semantic $S$ and occulomotor $M$ stage. Each stage is represented by a Gamma distributed random variable, that is
+The model describes the fixation duration $R$ as a simple chain of a lexical $L$, semantic $S$ and
+occulomotor $M$ stage. Each stage is represented by a Gamma distributed random variable, that is
 \begin{align*}
  L &\sim \Gamma(5\,f+5, 10)\\
  S &\sim \Gamma(10\,p+5, 20)\\
  M &\sim \Gamma(10, 30)\\
  \Rightarrow R &= L+S+M\,,
 \end{align*} 
-where $f$ is the words log-frequency and $p$ its predictability. In a reading experiment, participants usually do not read a single word with a fixed frequency and predictability but rather read several words with different frequencies and predictabilities. Hence it is necessary to model the predictabilities and frequencies as random variables too, for example
+where $f$ is the words log-frequency and $p$ its predictability. In a reading experiment, 
+participants usually do not read a single word with a fixed frequency and predictability but
+rather read several words with different frequencies and predictabilities. Hence it is necessary
+to model the predictabilities and frequencies as random variables too, for example
 \begin{align*}
  f &\sim U[0,4]\\
  p &\sim U[0,1]\,.
 \end{align*}
-With this, the lexical ($L$) and semantic ($S$) stages are not Gamma distributed anymore but compound-Gamma distributed. 
+With this, the lexical ($L$) and semantic ($S$) stages are not Gamma distributed anymore but
+compound distributed random variables. 
 
-The following code shows how this simple model of a reading experiment is implemented using the Python API of StochBB.
+The following code shows how this simple model of a reading experiment is implemented using the
+Python API of StochBB.
 
 \begin{lstlisting}[language=Python]
 from numpy import *
@@ -43,7 +50,7 @@ t = linspace(Tmin, Tmax, N); dt = float(Tmax-Tmin)/N
 pL = empty(N,); L.density().eval(Tmin, Tmax, pL)
 pS = empty(N,); S.density().eval(Tmin, Tmax, pS)
 pM = empty(N,); M.density().eval(Tmin, Tmax, pM)
-pR = empty(N,); cProfile.run("R.density().eval(Tmin, Tmax, pR)")
+pR = empty(N,); R.density().eval(Tmin, Tmax, pR)
 
 # Sample 10k samples from system
 sam = stochbb.ExactSampler([L,S,M,R])
