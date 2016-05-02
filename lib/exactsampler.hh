@@ -58,7 +58,7 @@ protected:
   /** Samples from a conditional chain random variable. */
   static void _sample_condchain(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
   /** Samples from a compound random variable. */
-  static void _sample_comp(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
+  static void _sample_compound(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
 
 protected:
   /** The variables selected for output. */

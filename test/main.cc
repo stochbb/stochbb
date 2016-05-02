@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "convolutiontest.hh"
+#include "compoundtest.hh"
 
 using namespace stochbb;
 using namespace stochbb::UnitTest;
@@ -14,6 +15,7 @@ int main(int argc, char *argv[]) {
 
   // Add suites
   runner.addSuite(ConvolutionTest::suite());
+  runner.addSuite(CompoundTest::suite());
 
   // Exec tests:
   runner();

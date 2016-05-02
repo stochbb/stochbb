@@ -30,28 +30,19 @@ bool convolution_can_combine(const Density &a, const Density &b) {
   if (dynamic_cast<DeltaDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a delta distribution -> yes
     return true;
-  } else if (dynamic_cast<UniformDistributionObj *>(*a_atom->distribution())) {
-    // If LHS is a uniform density ...
-    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
-      // ... and RHS is a delta density -> yes
-      return true;
-    }
+  } else if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
+    // If RHS is a delta distribution -> yes
+    return true;
   } else if (dynamic_cast<NormalDistributionObj *>(*a_atom->distribution())) {
-    // If RHS is a normal distribution ...
-    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
-      // ... and RHS is a delta density -> yes
-      return true;
-    } else if (b_atom && dynamic_cast<NormalDistributionObj *>(*b_atom->distribution())) {
+    // If LHS is a normal distribution ...
+    if (b_atom && dynamic_cast<NormalDistributionObj *>(*b_atom->distribution())) {
       // ... and RHS is a normal density -> yes
       return true;
     }
   } else if (dynamic_cast<GammaDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a gamma density ...
-    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
-      // If RHS is a delta density ...
-      return true;
-    } else if (b_atom && dynamic_cast<GammaDistributionObj *>(*b_atom->distribution())) {
-      // If LHS is a gamma too and has the same scale
+    if (b_atom && dynamic_cast<GammaDistributionObj *>(*b_atom->distribution())) {
+      // ... and RHS is a gamma too and has the same scale
       return a_atom->parameter(1) == b_atom->parameter(1);
     }
   }
@@ -67,20 +58,15 @@ convolution_combine(const Density &a, const Density &b) {
   AtomicDensityObj *b_atom = dynamic_cast<AtomicDensityObj *>(*b);
 
   logDebug() << "Convolve densities...";
-  if (dynamic_cast<DeltaDistributionObj *>(*a_atom->distribution())) {
+  if (a_atom && dynamic_cast<DeltaDistributionObj *>(*a_atom->distribution())) {
     // If LHS is delta -> turn into affine trafo
     return b.affine(1, a_atom->parameter(0));
-  } else if (dynamic_cast<UniformDistributionObj *>(*a_atom->distribution())) {
-    // If LHS is a uniform density ...
-    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
-      return a.affine(1, b_atom->parameter(0));
-    }
+  } else if (dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
+    // If RHS is a delta -> turn into affine trafo
+    return a.affine(1, b_atom->parameter(0));
   } else if (dynamic_cast<NormalDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a normal distribution ...
-    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b)) {
-      // ... and RHS is a delta density
-      a.affine(1, b_atom->parameter(0));
-    } else if (b_atom && dynamic_cast<NormalDistributionObj *>(*b_atom->distribution())) {
+    if (b_atom && dynamic_cast<NormalDistributionObj *>(*b_atom->distribution())) {
       // ... and RHS is a normal density too
       double mu_a = a_atom->parameter(0), mu_b = b_atom->parameter(0);
       double sig_a = a_atom->parameter(1), sig_b = b_atom->parameter(1);
@@ -89,12 +75,9 @@ convolution_combine(const Density &a, const Density &b) {
     }
   } else if (dynamic_cast<GammaDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a gamma density ...
-    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
-      // ... and RHS is a delta density
-      return a.affine(1, b_atom->parameter(0));
-    } else if (b_atom && dynamic_cast<GammaDistributionObj *>(*b_atom->distribution())) {
+    if (b_atom && dynamic_cast<GammaDistributionObj *>(*b_atom->distribution())) {
       double theta_a = a_atom->parameter(1), theta_b = b_atom->parameter(1);
-      // If LHS is a gamma too and has the same scale
+      // ... and LHS is a gamma too and has the same scale
       if (theta_a == theta_b) {
         double k_a = a_atom->parameter(0), k_b = b_atom->parameter(0);
         double shift_a = a_atom->parameter(2), shift_b = b_atom->parameter(2);

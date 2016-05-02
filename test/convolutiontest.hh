@@ -2,6 +2,7 @@
 #define CONVOLUTIONTEST_HH
 
 #include "lib/unittest.hh"
+
 namespace stochbb {
 
 class ConvolutionTest : public UnitTest::TestCase

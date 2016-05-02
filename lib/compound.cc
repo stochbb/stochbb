@@ -85,45 +85,41 @@ CompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> o
   size_t Nstep = 100;
   double df = 1;
 
-  // Get parameter values and PDFs
+  // Get parameter values and PDFs of parameters
   Eigen::MatrixXd PDFs(Nstep, _parameters.size());
   Eigen::MatrixXd params(Nstep, _parameters.size());
   for (size_t i=0; i<_parameters.size(); i++) {
     double a, b;
-    _parameters[i]->rangeEst(0.01, a, b);
+    _parameters[i]->rangeEst(0.00001, a, b);
 
     double x = a, dx = (b-a)/Nstep;
-    df *= (b-a)/Nstep;
+    df *= dx;
 
     for (size_t j=0; j<Nstep; j++, x+=dx)
       params(j,i) = x;
 
-    _parameters[i]->eval(a,b, PDFs.col(i));
+    _parameters[i]->eval(a, b, PDFs.col(i));
   }
 
   out.setZero();
   size_t N = std::pow(Nstep, _parameters.size());
   Eigen::VectorXd param(_parameters.size());
-  std::vector<size_t> idxs(0, _parameters.size());
-  double dx=(Tmax-Tmin)/out.size();
+  std::vector<size_t> idxs(_parameters.size());
 
   // For each value in [Tmin, Tmax):
-#pragma omp for
-  for (int i=0; i<out.size(); i++) {
-    double x = Tmin + i*dx;
-    // "Integrate" over parameter space
-    for (size_t j=0; j<N; j++) {
-      // Get parameter indices
-      _to_param_indices(j, Nstep, idxs);
-      // Get parameter vector and prod of parameter PDFs
-      double dp = 1;
-      for (size_t k=0; k<_parameters.size(); k++) {
-        param[k] = params(idxs[k], k);
-        dp *= PDFs(idxs[k], k);
-      }
-      _distribution->pdf(x, x+dx, out.segment<1>(i), param);
-      out(i) *= dp*df;
+  Eigen::VectorXd tmp(out.size()); out.setZero();
+  // "Integrate" over parameter space
+  for (size_t j=0; j<N; j++) {
+    // Get parameter indices
+    _to_param_indices(j, Nstep, idxs);
+    // Get parameter vector and prod of parameter PDFs
+    double dp = 1;
+    for (size_t k=0; k<_parameters.size(); k++) {
+      param[k] = params(idxs[k], k);
+      dp *= PDFs(idxs[k], k);
     }
+    _distribution->pdf(Tmin, Tmax, tmp, param);
+    out += tmp*dp*df;
   }
 }
 
@@ -137,10 +133,10 @@ CompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
   Eigen::MatrixXd params(Nstep, _parameters.size());
   for (size_t i=0; i<_parameters.size(); i++) {
     double a, b;
-    _parameters[i]->rangeEst(0.01, a, b);
+    _parameters[i]->rangeEst(0.00001, a, b);
 
     double x = a, dx = (b-a)/Nstep;
-    df *= (b-a)/Nstep;
+    df *= dx;
 
     for (size_t j=0; j<Nstep; j++, x+=dx)
       params(j,i) = x;
@@ -151,26 +147,21 @@ CompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
   out.setZero();
   size_t N = std::pow(Nstep, _parameters.size());
   Eigen::VectorXd param(_parameters.size());
-  std::vector<size_t> idxs(0, _parameters.size());
-  double dx=(Tmax-Tmin)/out.size();
+  std::vector<size_t> idxs(_parameters.size());
+  Eigen::VectorXd tmp(out.size());
 
-  // For each value in [Tmin, Tmax):
-#pragma omp for
-  for (int i=0; i<out.size(); i++) {
-    double x = Tmin + i*dx;
-    // "Integrate" over parameter space
-    for (size_t j=0; j<N; j++) {
-      // Get parameter indices
-      _to_param_indices(j, Nstep, idxs);
-      // Get parameter vector and prod of parameter PDFs
-      double dp = 1;
-      for (size_t k=0; k<_parameters.size(); k++) {
-        param[k] = params(idxs[k], k);
-        dp *= PDFs(idxs[k], k);
-      }
-      _distribution->cdf(x, x+dx, out.segment<1>(i), param);
-      out(i) *= dp*df;
+  // For each value in [Tmin, Tmax), "Integrate" over parameter space
+  for (size_t j=0; j<N; j++) {
+    // Get parameter indices
+    _to_param_indices(j, Nstep, idxs);
+    // Get parameter vector and prod of parameter PDFs
+    double dp = 1;
+    for (size_t k=0; k<_parameters.size(); k++) {
+      param[k] = params(idxs[k], k);
+      dp *= PDFs(idxs[k], k);
     }
+    _distribution->cdf(Tmin, Tmax, tmp, param);
+    out += tmp*dp*df;
   }
 }
 

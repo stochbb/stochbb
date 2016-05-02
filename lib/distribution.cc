@@ -1,6 +1,7 @@
 #include "distribution.hh"
 #include "math.hh"
 #include "rng.hh"
+#include <iostream>
 
 using namespace stochbb;
 
@@ -83,7 +84,7 @@ DeltaDistributionObj::cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> 
 
 void
 DeltaDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
-  lower = upper = params[0];
+  lower = params[0]*(1.-1e-6); upper = params[0]*(1.+1e-6);
 }
 
 void
@@ -240,7 +241,7 @@ NormalDistributionObj::affine(double scale, double shift, std::vector<DensityObj
 
 void NormalDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double mu=params[0], sigma=params[1];
-  lower=mu-stochbb::qnorm(p)*sigma; upper=mu+stochbb::qnorm(p)*sigma;
+  lower=mu+stochbb::qnorm(p)*sigma; upper=mu+stochbb::qnorm(1-p)*sigma;
 }
 
 void NormalDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
