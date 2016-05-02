@@ -132,7 +132,7 @@ ExactSamplerObj::_choose_sampler(VarObj *var) throw (TypeError) {
     return ExactSamplerObj::_sample_conditional;
   } else if (dynamic_cast<CondChainObj *>(var)) {
     return ExactSamplerObj::_sample_condchain;
-  } else if (dynamic_cast<GenericCompoundObj *>(var)) {
+  } else if (dynamic_cast<CompoundObj *>(var)) {
     return ExactSamplerObj::_sample_comp;
   }
 
@@ -248,7 +248,7 @@ ExactSamplerObj::_sample_condchain(ExactSamplerObj *self, VarObj *var, Eigen::Ma
 
 void
 ExactSamplerObj::_sample_comp(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
-  GenericCompoundObj *comp = static_cast<GenericCompoundObj *>(var);
+  CompoundObj *comp = static_cast<CompoundObj *>(var);
 
   std::vector<size_t> p_idxs; p_idxs.reserve(comp->distribution().nParams());
 

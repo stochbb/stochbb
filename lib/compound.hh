@@ -9,28 +9,17 @@
 
 namespace stochbb {
 
-/** Base class of all compound random variables. */
-class CompoundObj : public DerivedVarObj
-{
-protected:
-  /** Hidden constructor.
-   * @param vars Specifies the variables, the compound depends on.
-   * @param name Specifies the optional name for the random variable. */
-  CompoundObj(const std::vector<Var> &vars, const std::string &name);
-
-public:
-  virtual void mark();
-};
-
 /** Implements the generic density of compound random variables. That is a random variable
  * that is distributed with an atomic density where the parameters are random variables too. */
-class GenericCompoundDensityObj: public DensityObj
+class CompoundDensityObj: public DensityObj
 {
 public:
-  /** Constructs a compound density with the given distribution family and parameter distributions. */
-  GenericCompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params);
+  /** Constructs a compound density with the given distribution family and parameter distributions.
+   * @param dist Specifies the distribution.
+   * @param params Specifies the parameter distributions. */
+  CompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params);
   /** Destructor. */
-  virtual ~GenericCompoundDensityObj();
+  virtual ~CompoundDensityObj();
   void mark();
 
   /** Returns a reference to the distribution object. */
@@ -66,22 +55,25 @@ protected:
 
 
 /** Base class of all compound random variables. */
-class GenericCompoundObj : public CompoundObj
+class CompoundObj : public DerivedVarObj
 {
 public:
   /** Constructs a new compound random variable object.
    * @param vars Specifies the variables, the compound depends on.
+   * @param distribution Specifies the distribution.
    * @param name Specifies the optional name for the random variable. */
-  GenericCompoundObj(const std::vector<Var> &vars, const Distribution &distribution, const std::string &name);
+  CompoundObj(const std::vector<Var> &vars, const Distribution &distribution, const std::string &name);
 
   virtual void mark();
 
   virtual Density density();
+
+  /** Retruns the distribution of the compound variable. */
   Distribution distribution();
 
 protected:
   /** A reference to the density. */
-  GenericCompoundDensityObj *_density;
+  CompoundDensityObj *_density;
 };
 
 }

@@ -69,7 +69,7 @@ AtomicDensityObj::~AtomicDensityObj() {
 void
 AtomicDensityObj::mark() {
   if (isMarked()) { return; }
-  AtomicDensityObj::mark();
+  DensityObj::mark();
   if (_distribution) { _distribution->mark(); }
 }
 
@@ -109,7 +109,7 @@ AtomicDensityObj::affine(double scale, double shift) const {
 
 void
 AtomicDensityObj::rangeEst(double alpha, double &a, double &b) const {
-  /// @bug Implement!
+  _distribution->quantile(a, b, alpha, _params);
 }
 
 void

@@ -12,8 +12,8 @@ namespace stochbb {
  * random variable can then be considered as an instance of that family with a specific set of
  * parameters (@c GenericAtomicDensityObj).
  *
- * All densities have at least 2 parameters which are \f$[scale, shift, ...]\f$ such that a specific
- * density can be expressed as \f$f\left(\frac{x-shift}{scale}, ...\right)\f$. */
+ * Almost all densities (not delta) have at least 2 parameters which are \f$[scale, shift, ...]\f$
+ * such that a specific density can be expressed as \f$f\left(\frac{x-shift}{scale}, ...\right)\f$. */
 class DistributionObj: public Object
 {
 protected:

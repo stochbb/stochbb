@@ -93,6 +93,7 @@ public:
 
   void rangeEst(double alpha, double &a, double &b) const;
 
+  /** Samples from the atomic distribution. */
   void sample(Eigen::Ref<Eigen::VectorXd> out) const;
 
   int compare(const DensityObj &other) const;

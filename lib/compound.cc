@@ -8,50 +8,34 @@ using namespace stochbb;
 
 
 /* ********************************************************************************************* *
- * Implementation of CompoundObj
- * ********************************************************************************************* */
-CompoundObj::CompoundObj(const std::vector<Var> &vars, const std::string &name)
-  : DerivedVarObj(vars, name)
-{
-  // pass...
-}
-
-void
-CompoundObj::mark() {
-  if (isMarked()) { return; }
-  DerivedVarObj::mark();
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of GenericCompoundObj
  * ********************************************************************************************* */
-GenericCompoundObj::GenericCompoundObj(const std::vector<Var> &vars, const Distribution &distribution, const std::string &name)
-  : CompoundObj(vars, name), _density(0)
+CompoundObj::CompoundObj(const std::vector<Var> &vars, const Distribution &distribution, const std::string &name)
+  : DerivedVarObj(vars, name), _density(0)
 {
   std::vector<DensityObj *> densities; densities.reserve(vars.size());
   for (size_t i=0; i<vars.size(); i++) {
     densities.push_back(*vars[i].density());
   }
-  _density = new GenericCompoundDensityObj(*distribution, densities);
+  _density = new CompoundDensityObj(*distribution, densities);
 }
 
 void
-GenericCompoundObj::mark() {
+CompoundObj::mark() {
   if (isMarked())
     return;
-  CompoundObj::mark();
+  DerivedVarObj::mark();
   if (_density)
     _density->mark();
 }
 
 Density
-GenericCompoundObj::density() {
+CompoundObj::density() {
   return _density;
 }
 
 Distribution
-GenericCompoundObj::distribution() {
+CompoundObj::distribution() {
   return _density->distribution();
 }
 
@@ -59,18 +43,18 @@ GenericCompoundObj::distribution() {
 /* ********************************************************************************************* *
  * Implementation of GenericCompoundDensityObj
  * ********************************************************************************************* */
-GenericCompoundDensityObj::GenericCompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params)
+CompoundDensityObj::CompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params)
   : DensityObj(), _distribution(dist), _parameters(params)
 {
   // pass...
 }
 
-GenericCompoundDensityObj::~GenericCompoundDensityObj() {
+CompoundDensityObj::~CompoundDensityObj() {
   // pass...
 }
 
 void
-GenericCompoundDensityObj::mark() {
+CompoundDensityObj::mark() {
   if (isMarked()) { return; }
   DensityObj::mark();
   _distribution->mark();
@@ -80,24 +64,24 @@ GenericCompoundDensityObj::mark() {
 }
 
 Distribution
-GenericCompoundDensityObj::distribution() const {
+CompoundDensityObj::distribution() const {
   _distribution->ref();
   return _distribution;
 }
 
 size_t
-GenericCompoundDensityObj::nParams() const {
+CompoundDensityObj::nParams() const {
   return _distribution->nParams();
 }
 
 Density
-GenericCompoundDensityObj::parameter(size_t i) const {
+CompoundDensityObj::parameter(size_t i) const {
   _parameters[i]->ref();
   return _parameters[i];
 }
 
 void
-GenericCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+CompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   size_t Nstep = 100;
   double df = 1;
 
@@ -144,7 +128,7 @@ GenericCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::Vect
 }
 
 void
-GenericCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
+CompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
   size_t Nstep = 100;
   double df = 1;
 
@@ -191,21 +175,21 @@ GenericCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::V
 }
 
 void
-GenericCompoundDensityObj::_to_param_indices(size_t i, size_t N, std::vector<size_t> &idxs) const {
+CompoundDensityObj::_to_param_indices(size_t i, size_t N, std::vector<size_t> &idxs) const {
   for (size_t j=0; j<idxs.size(); j++) {
     idxs[j] = i%N; i /= N;
   }
 }
 
 Density
-GenericCompoundDensityObj::affine(double scale, double shift) const {
-  GenericCompoundDensityObj *res = new GenericCompoundDensityObj(_distribution, _parameters);
+CompoundDensityObj::affine(double scale, double shift) const {
+  CompoundDensityObj *res = new CompoundDensityObj(_distribution, _parameters);
   _distribution->affine(scale, shift, res->_parameters);
   return res;
 }
 
 void
-GenericCompoundDensityObj::rangeEst(double alpha, double &a, double &b) const {
+CompoundDensityObj::rangeEst(double alpha, double &a, double &b) const {
   Eigen::VectorXd A(_parameters.size()), B(_parameters.size());
   for (size_t i=0; i<_parameters.size(); i++) {
     _parameters[i]->rangeEst(alpha, A[i], B[i]);
@@ -216,12 +200,12 @@ GenericCompoundDensityObj::rangeEst(double alpha, double &a, double &b) const {
 }
 
 int
-GenericCompoundDensityObj::compare(const DensityObj &other) const {
+CompoundDensityObj::compare(const DensityObj &other) const {
   // Compare by density type
   if (int res = DensityObj::compare(other))
     return res;
   // same density class -> cast
-  const GenericCompoundDensityObj &cother = static_cast<const GenericCompoundDensityObj &>(other);
+  const CompoundDensityObj &cother = static_cast<const CompoundDensityObj &>(other);
   // Compare by distribution
   if (int res = _distribution->compare(*cother._distribution))
     return res;
@@ -234,7 +218,7 @@ GenericCompoundDensityObj::compare(const DensityObj &other) const {
 }
 
 void
-GenericCompoundDensityObj::print(std::ostream &stream) const {
+CompoundDensityObj::print(std::ostream &stream) const {
   stream << "<CompoundDensity of "; _distribution->print(stream);
   stream << " with [";
   _parameters[0]->print(stream);

@@ -54,7 +54,7 @@ stochbb::normal(const Var &mu, double sigma, const std::string &name) throw (Err
   }
   // Otherwise assemble CompoundVar
   std::vector<Var> vars = {mu, delta(sigma)};
-  return new GenericCompoundObj(vars, new NormalDistributionObj(), name);
+  return new CompoundObj(vars, new NormalDistributionObj(), name);
 }
 
 Var
@@ -66,7 +66,7 @@ stochbb::normal(double mu, const Var &sigma, const std::string &name) throw (Err
   }
   // Otherwise assemble CompoundVar
   std::vector<Var> vars = {delta(mu), sigma};
-  return new GenericCompoundObj(vars, new NormalDistributionObj(), name);
+  return new CompoundObj(vars, new NormalDistributionObj(), name);
 }
 
 Var
@@ -83,7 +83,7 @@ stochbb::normal(const Var &mu, const Var &sigma, const std::string &name) throw 
   }
   // Otherwise assemble CompoundVar
   std::vector<Var> vars = {mu, sigma};
-  return new GenericCompoundObj(vars, new NormalDistributionObj(), name);
+  return new CompoundObj(vars, new NormalDistributionObj(), name);
 }
 
 
@@ -107,7 +107,7 @@ stochbb::gamma(const Var &k, double theta, const std::string &name) throw (Error
   }
   // Otherwise assemble CompoundVar
   std::vector<Var> vars = {k, delta(theta)};
-  return new GenericCompoundObj(vars, new GammaDistributionObj(), name);
+  return new CompoundObj(vars, new GammaDistributionObj(), name);
 }
 
 Var
@@ -119,7 +119,7 @@ stochbb::gamma(double k, const Var &theta, const std::string &name) throw (Error
   }
   // Otherwise assemble CompoundVar
   std::vector<Var> vars = {delta(k), theta};
-  return new GenericCompoundObj(vars, new GammaDistributionObj(), name);
+  return new CompoundObj(vars, new GammaDistributionObj(), name);
 }
 
 Var
@@ -136,7 +136,7 @@ stochbb::gamma(const Var &k, const Var &theta, const std::string &name) throw (E
   }
   // Otherwise assemble CompoundVar
   std::vector<Var> vars = {k, theta};
-  return new GenericCompoundObj(vars, new GammaDistributionObj(), name);
+  return new CompoundObj(vars, new GammaDistributionObj(), name);
 }
 
 
@@ -159,8 +159,7 @@ stochbb::invgamma(const Var &alpha, double beta, const std::string &name) throw 
     return stochbb::invgamma(alpha_atomic->parameter(0), beta, name);
   }
   // Otherwise assemble CompoundVar
-  return new GenericCompoundObj(std::vector<Var> {alpha, delta(beta)},
-                                new InvGammaDistributionObj(), name);
+  return new CompoundObj(std::vector<Var> {alpha, delta(beta)}, new InvGammaDistributionObj(), name);
 }
 
 Var
@@ -171,8 +170,7 @@ stochbb::invgamma(double alpha, const Var &beta, const std::string &name) throw 
     return stochbb::invgamma(alpha, beta_atomic->parameter(0), name);
   }
   // Otherwise assemble CompoundVar
-  return new GenericCompoundObj(std::vector<Var> {delta(alpha), beta},
-                                new InvGammaDistributionObj(), name);
+  return new CompoundObj(std::vector<Var> {delta(alpha), beta}, new InvGammaDistributionObj(), name);
 }
 
 Var
@@ -188,8 +186,7 @@ stochbb::invgamma(const Var &alpha, const Var &beta, const std::string &name) th
     return stochbb::invgamma(alpha, beta_atomic->parameter(0), name);
   }
   // Otherwise assemble CompoundVar
-  return new GenericCompoundObj(std::vector<Var> {alpha, beta},
-                                new InvGammaDistributionObj(), name);
+  return new CompoundObj(std::vector<Var> {alpha, beta}, new InvGammaDistributionObj(), name);
 }
 
 
@@ -210,8 +207,7 @@ stochbb::weibull(const Var &k, double lambda, const std::string &name) throw (Er
   if (k_atomic && dynamic_cast<DeltaDistributionObj *>(*k_atomic->distribution())) {
     return stochbb::weibull(k_atomic->parameter(0), lambda);
   }
-  return new GenericCompoundObj(std::vector<Var> {k, delta(lambda)},
-                                new WeibullDistributionObj(), name);
+  return new CompoundObj(std::vector<Var> {k, delta(lambda)}, new WeibullDistributionObj(), name);
 }
 
 Var
@@ -220,8 +216,7 @@ stochbb::weibull(double k, const Var &lambda, const std::string &name) throw (Er
   if (lambda_atomic && dynamic_cast<DeltaDistributionObj *>(*lambda_atomic->distribution())) {
     return stochbb::weibull(k, lambda_atomic->parameter(0));
   }
-  return new GenericCompoundObj(std::vector<Var> {delta(k), lambda},
-                                new WeibullDistributionObj(), name);
+  return new CompoundObj(std::vector<Var> {delta(k), lambda}, new WeibullDistributionObj(), name);
 }
 
 Var
@@ -234,8 +229,7 @@ stochbb::weibull(const Var &k, const Var& lambda, const std::string &name) throw
   if (lambda_atomic && dynamic_cast<DeltaDistributionObj *>(*lambda_atomic->distribution())) {
     return stochbb::weibull(k, lambda_atomic->parameter(0));
   }
-  return new GenericCompoundObj(std::vector<Var> {k, lambda},
-                                new WeibullDistributionObj(), name);
+  return new CompoundObj(std::vector<Var> {k, lambda}, new WeibullDistributionObj(), name);
 }
 
 
