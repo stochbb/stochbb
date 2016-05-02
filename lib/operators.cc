@@ -19,7 +19,7 @@ Var
 stochbb::delta(double value) {
   Eigen::VectorXd param(1); param << value;
   return new AtomicVarObj(
-        new GenericAtomicDensityObj(
+        new AtomicDensityObj(
           Distribution(new DeltaDistributionObj()), param));
 }
 
@@ -28,7 +28,10 @@ stochbb::delta(double value) {
  * ********************************************************************************************* */
 Var
 stochbb::uniform(double a, double b, const std::string &name) throw (Error) {
-  return new AtomicVarObj(new UniformDensityObj(a,b), name);
+  Eigen::VectorXd param(2); param << a, b;
+  return new AtomicVarObj(
+        new AtomicDensityObj(
+          Distribution(new UniformDistributionObj()), param));
 }
 
 /* ********************************************************************************************* *
@@ -36,41 +39,51 @@ stochbb::uniform(double a, double b, const std::string &name) throw (Error) {
  * ********************************************************************************************* */
 Var
 stochbb::normal(double mu, double sigma, const std::string &name) throw (Error) {
-  return new AtomicVarObj(new NormalDensityObj(mu,sigma), name);
+  Eigen::VectorXd param(2); param << mu, sigma;
+  return new AtomicVarObj(
+        new AtomicDensityObj(
+          Distribution(new NormalDistributionObj()), param));
 }
 
 Var
 stochbb::normal(const Var &mu, double sigma, const std::string &name) throw (Error) {
   // If mu is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*mu.density())) {
-    return stochbb::normal(delta->delay(), sigma, name);
+  AtomicDensityObj *mu_atomic = dynamic_cast<AtomicDensityObj *>(* mu.density());
+  if (mu_atomic && dynamic_cast<DeltaDistributionObj *>(*mu_atomic->distribution())) {
+    return stochbb::normal(mu_atomic->parameter(0), sigma, name);
   }
   // Otherwise assemble CompoundVar
-  return new NormalCompoundObj(mu, delta(sigma), name);
+  std::vector<Var> vars = {mu, delta(sigma)};
+  return new GenericCompoundObj(vars, new NormalDistributionObj(), name);
 }
 
 Var
 stochbb::normal(double mu, const Var &sigma, const std::string &name) throw (Error) {
   // If sigma is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*sigma.density())) {
-    return stochbb::normal(mu, delta->delay(), name);
+  AtomicDensityObj *sigma_atomic = dynamic_cast<AtomicDensityObj *>(* sigma.density());
+  if (sigma_atomic && dynamic_cast<DeltaDistributionObj *>(*sigma_atomic->distribution())) {
+    return stochbb::normal(mu, sigma_atomic->parameter(0), name);
   }
   // Otherwise assemble CompoundVar
-  return new NormalCompoundObj(delta(mu), sigma, name);
+  std::vector<Var> vars = {delta(mu), sigma};
+  return new GenericCompoundObj(vars, new NormalDistributionObj(), name);
 }
 
 Var
 stochbb::normal(const Var &mu, const Var &sigma, const std::string &name) throw (Error) {
+  AtomicDensityObj *mu_atomic = dynamic_cast<AtomicDensityObj *>(* mu.density());
+  AtomicDensityObj *sigma_atomic = dynamic_cast<AtomicDensityObj *>(* sigma.density());
   // If mu is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*mu.density())) {
-    return stochbb::normal(delta->delay(), sigma, name);
+  if (mu_atomic && dynamic_cast<DeltaDistributionObj *>(*mu_atomic->distribution())) {
+    return stochbb::normal(mu_atomic->parameter(0), sigma, name);
   }
   // else if sigma is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*sigma.density())) {
-    return stochbb::normal(mu, delta->delay(), name);
+  if (sigma_atomic && dynamic_cast<DeltaDistributionObj *>(*sigma_atomic->distribution())) {
+    return stochbb::normal(mu, sigma_atomic->parameter(0), name);
   }
   // Otherwise assemble CompoundVar
-  return new NormalCompoundObj(mu, sigma, name);
+  std::vector<Var> vars = {mu, sigma};
+  return new GenericCompoundObj(vars, new NormalDistributionObj(), name);
 }
 
 
@@ -79,41 +92,51 @@ stochbb::normal(const Var &mu, const Var &sigma, const std::string &name) throw 
  * ********************************************************************************************* */
 Var
 stochbb::gamma(double k, double theta, const std::string &name) throw (Error) {
-  return new AtomicVarObj(new GammaDensityObj(k, theta), name);
+  Eigen::VectorXd param(2); param << k, theta;
+  return new AtomicVarObj(
+        new AtomicDensityObj(
+          Distribution(new GammaDistributionObj()), param));
 }
 
 Var
 stochbb::gamma(const Var &k, double theta, const std::string &name) throw (Error) {
   // If mu is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*k.density())) {
-    return stochbb::gamma(delta->delay(), theta, name);
+  AtomicDensityObj *k_atomic = dynamic_cast<AtomicDensityObj *>(*k.density());
+  if (k_atomic && dynamic_cast<DeltaDistributionObj *>(*k_atomic->distribution())) {
+    return stochbb::gamma(k_atomic->parameter(0), theta, name);
   }
   // Otherwise assemble CompoundVar
-  return new GammaCompoundObj(k, delta(theta), name);
+  std::vector<Var> vars = {k, delta(theta)};
+  return new GenericCompoundObj(vars, new GammaDistributionObj(), name);
 }
 
 Var
 stochbb::gamma(double k, const Var &theta, const std::string &name) throw (Error) {
   // If sigma is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*theta.density())) {
-    return stochbb::gamma(k, delta->delay(), name);
+  AtomicDensityObj *theta_atomic = dynamic_cast<AtomicDensityObj *>(*theta.density());
+  if (theta_atomic && dynamic_cast<DeltaDistributionObj *>(*theta_atomic->distribution())) {
+    return stochbb::gamma(k, theta_atomic->parameter(0), name);
   }
   // Otherwise assemble CompoundVar
-  return new GammaCompoundObj(delta(k), theta, name);
+  std::vector<Var> vars = {delta(k), theta};
+  return new GenericCompoundObj(vars, new GammaDistributionObj(), name);
 }
 
 Var
 stochbb::gamma(const Var &k, const Var &theta, const std::string &name) throw (Error) {
-  // If mu is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*k.density())) {
-    return stochbb::gamma(delta->delay(), theta, name);
+  AtomicDensityObj *k_atomic = dynamic_cast<AtomicDensityObj *>(*k.density());
+  AtomicDensityObj *theta_atomic = dynamic_cast<AtomicDensityObj *>(*theta.density());
+  // If k is delta distributed -> simplify to atomic random variable
+  if (k_atomic && dynamic_cast<DeltaDistributionObj *>(*k_atomic->distribution())) {
+    return stochbb::gamma(k_atomic->parameter(0), theta, name);
   }
-  // else if sigma is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*theta.density())) {
-    return stochbb::gamma(k, delta->delay(), name);
+  // else if theta is delta distributed -> simplify to atomic random variable
+  if (theta_atomic && dynamic_cast<DeltaDistributionObj *>(*theta_atomic->distribution())) {
+    return stochbb::gamma(k, theta_atomic->parameter(0), name);
   }
   // Otherwise assemble CompoundVar
-  return new GammaCompoundObj(k, theta, name);
+  std::vector<Var> vars = {k, theta};
+  return new GenericCompoundObj(vars, new GammaDistributionObj(), name);
 }
 
 
@@ -122,41 +145,51 @@ stochbb::gamma(const Var &k, const Var &theta, const std::string &name) throw (E
  * ********************************************************************************************* */
 Var
 stochbb::invgamma(double alpha, double beta, const std::string &name) throw (Error) {
-  return new AtomicVarObj(new InvGammaDensityObj(alpha, beta), name);
+  Eigen::VectorXd param(2); param << alpha, beta;
+  return new AtomicVarObj(
+        new AtomicDensityObj(
+          Distribution(new InvGammaDistributionObj()), param));
 }
 
 Var
 stochbb::invgamma(const Var &alpha, double beta, const std::string &name) throw (Error) {
-  // If mu is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*alpha.density())) {
-    return stochbb::invgamma(delta->delay(), beta, name);
+  // If alpha is delta distributed -> simplify to atomic random variable
+  AtomicDensityObj *alpha_atomic = dynamic_cast<AtomicDensityObj *>(*alpha.density());
+  if (alpha_atomic && dynamic_cast<DeltaDistributionObj *>(*alpha_atomic->distribution())) {
+    return stochbb::invgamma(alpha_atomic->parameter(0), beta, name);
   }
   // Otherwise assemble CompoundVar
-  return new InvGammaCompoundObj(alpha, delta(beta), name);
+  return new GenericCompoundObj(std::vector<Var> {alpha, delta(beta)},
+                                new InvGammaDistributionObj(), name);
 }
 
 Var
 stochbb::invgamma(double alpha, const Var &beta, const std::string &name) throw (Error) {
-  // If sigma is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*beta.density())) {
-    return stochbb::invgamma(alpha, delta->delay(), name);
+  // If beta is delta distributed -> simplify to atomic random variable
+  AtomicDensityObj *beta_atomic = dynamic_cast<AtomicDensityObj *>(*beta.density());
+  if (beta_atomic && dynamic_cast<DeltaDistributionObj *>(*beta_atomic->distribution())) {
+    return stochbb::invgamma(alpha, beta_atomic->parameter(0), name);
   }
   // Otherwise assemble CompoundVar
-  return new InvGammaCompoundObj(delta(alpha), beta, name);
+  return new GenericCompoundObj(std::vector<Var> {delta(alpha), beta},
+                                new InvGammaDistributionObj(), name);
 }
 
 Var
 stochbb::invgamma(const Var &alpha, const Var &beta, const std::string &name) throw (Error) {
-  // If mu is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*alpha.density())) {
-    return stochbb::invgamma(delta->delay(), beta, name);
+  AtomicDensityObj *alpha_atomic = dynamic_cast<AtomicDensityObj *>(*alpha.density());
+  AtomicDensityObj *beta_atomic = dynamic_cast<AtomicDensityObj *>(*beta.density());
+  // If alpha is delta distributed -> simplify to atomic random variable
+  if (alpha_atomic && dynamic_cast<DeltaDistributionObj *>(*alpha_atomic->distribution())) {
+    return stochbb::invgamma(alpha_atomic->parameter(0), beta, name);
   }
-  // else if sigma is delta distributed -> simplify to atomic random variable
-  if (DeltaDensityObj *delta = dynamic_cast<DeltaDensityObj *>(*beta.density())) {
-    return stochbb::invgamma(alpha, delta->delay(), name);
+  // else if beta is delta distributed -> simplify to atomic random variable
+  if (beta_atomic && dynamic_cast<DeltaDistributionObj *>(*beta_atomic->distribution())) {
+    return stochbb::invgamma(alpha, beta_atomic->parameter(0), name);
   }
   // Otherwise assemble CompoundVar
-  return new InvGammaCompoundObj(alpha, beta, name);
+  return new GenericCompoundObj(std::vector<Var> {alpha, beta},
+                                new InvGammaDistributionObj(), name);
 }
 
 
@@ -165,34 +198,44 @@ stochbb::invgamma(const Var &alpha, const Var &beta, const std::string &name) th
  * ********************************************************************************************* */
 Var
 stochbb::weibull(double k, double lambda, const std::string &name) throw (Error) {
-  return new AtomicVarObj(new WeibullDensityObj(k, lambda), name);
+  Eigen::VectorXd param(2); param << k, lambda;
+  return new AtomicVarObj(
+        new AtomicDensityObj(
+          Distribution(new WeibullDistributionObj()), param));
 }
 
 Var
 stochbb::weibull(const Var &k, double lambda, const std::string &name) throw (Error) {
-  if (DeltaDensityObj *delta_k = dynamic_cast<DeltaDensityObj *>(*k.density())) {
-    return stochbb::weibull(delta_k->delay(), lambda);
+  AtomicDensityObj *k_atomic = dynamic_cast<AtomicDensityObj *>(* k.density());
+  if (k_atomic && dynamic_cast<DeltaDistributionObj *>(*k_atomic->distribution())) {
+    return stochbb::weibull(k_atomic->parameter(0), lambda);
   }
-  return new WeibullCompoundObj(k, delta(lambda), name);
+  return new GenericCompoundObj(std::vector<Var> {k, delta(lambda)},
+                                new WeibullDistributionObj(), name);
 }
 
 Var
 stochbb::weibull(double k, const Var &lambda, const std::string &name) throw (Error) {
-  if (DeltaDensityObj *delta_lambda = dynamic_cast<DeltaDensityObj *>(*lambda.density())) {
-    return stochbb::weibull(k, delta_lambda->delay());
+  AtomicDensityObj *lambda_atomic = dynamic_cast<AtomicDensityObj *>(* lambda.density());
+  if (lambda_atomic && dynamic_cast<DeltaDistributionObj *>(*lambda_atomic->distribution())) {
+    return stochbb::weibull(k, lambda_atomic->parameter(0));
   }
-  return new WeibullCompoundObj(delta(k), lambda, name);
+  return new GenericCompoundObj(std::vector<Var> {delta(k), lambda},
+                                new WeibullDistributionObj(), name);
 }
 
 Var
 stochbb::weibull(const Var &k, const Var& lambda, const std::string &name) throw (Error) {
-  if (DeltaDensityObj *delta_k = dynamic_cast<DeltaDensityObj *>(*k.density())) {
-    return stochbb::weibull(delta_k->delay(), lambda);
+  AtomicDensityObj *k_atomic = dynamic_cast<AtomicDensityObj *>(* k.density());
+  AtomicDensityObj *lambda_atomic = dynamic_cast<AtomicDensityObj *>(* lambda.density());
+  if (k_atomic && dynamic_cast<DeltaDistributionObj *>(*k_atomic->distribution())) {
+    return stochbb::weibull(k_atomic->parameter(0), lambda);
   }
-  if (DeltaDensityObj *delta_lambda = dynamic_cast<DeltaDensityObj *>(*lambda.density())) {
-    return stochbb::weibull(k, delta_lambda->delay());
+  if (lambda_atomic && dynamic_cast<DeltaDistributionObj *>(*lambda_atomic->distribution())) {
+    return stochbb::weibull(k, lambda_atomic->parameter(0));
   }
-  return new WeibullCompoundObj(k, lambda, name);
+  return new GenericCompoundObj(std::vector<Var> {k, lambda},
+                                new WeibullDistributionObj(), name);
 }
 
 

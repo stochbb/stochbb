@@ -1,11 +1,14 @@
 #include "chain.hh"
 #include "exception.hh"
+#include "operators.hh"
+#include "logger.hh"
+#include "distribution.hh"
+
 #include <unsupported/Eigen/FFT>
 #include <list>
 #include <algorithm>
 #include <complex>
-#include "operators.hh"
-#include "logger.hh"
+
 
 using namespace stochbb;
 
@@ -19,33 +22,37 @@ inline int density_compare(const Density &a, const Density &b) {
  * ********************************************************************************************* */
 // Checks if two densities can be combined
 bool convolution_can_combine(const Density &a, const Density &b) {
+  AtomicDensityObj *a_atom = dynamic_cast<AtomicDensityObj *>(*a);
+  AtomicDensityObj *b_atom = dynamic_cast<AtomicDensityObj *>(*b);
+  if (0 == a_atom) { return false; }
+
   // Check by type
-  if (dynamic_cast<DeltaDensityObj *>(*a)) {
+  if (dynamic_cast<DeltaDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a delta distribution -> yes
     return true;
-  } else if (dynamic_cast<UniformDensityObj *>(*a)) {
+  } else if (dynamic_cast<UniformDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a uniform density ...
-    if (dynamic_cast<DeltaDensityObj *>(*b)) {
+    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
       // ... and RHS is a delta density -> yes
       return true;
     }
-  } else if (dynamic_cast<NormalDensityObj *>(*a)) {
+  } else if (dynamic_cast<NormalDistributionObj *>(*a_atom->distribution())) {
     // If RHS is a normal distribution ...
-    if (dynamic_cast<DeltaDensityObj *>(*b)) {
+    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
       // ... and RHS is a delta density -> yes
       return true;
-    } else if (dynamic_cast<NormalDensityObj *>(*b)) {
+    } else if (b_atom && dynamic_cast<NormalDistributionObj *>(*b_atom->distribution())) {
       // ... and RHS is a normal density -> yes
       return true;
     }
-  } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(*a)) {
+  } else if (dynamic_cast<GammaDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a gamma density ...
-    if (dynamic_cast<DeltaDensityObj *>(*b)) {
+    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
       // If RHS is a delta density ...
       return true;
-    } else if (GammaDensityObj *gamma_b = dynamic_cast<GammaDensityObj *>(*b)) {
+    } else if (b_atom && dynamic_cast<GammaDistributionObj *>(*b_atom->distribution())) {
       // If LHS is a gamma too and has the same scale
-      return gamma_a->theta() == gamma_b->theta();
+      return a_atom->parameter(1) == b_atom->parameter(1);
     }
   }
   // Otherwise -> no
@@ -56,38 +63,43 @@ bool convolution_can_combine(const Density &a, const Density &b) {
 // convolution_can_combine). Returns a new reference to a convolution object
 Density
 convolution_combine(const Density &a, const Density &b) {
+  AtomicDensityObj *a_atom = dynamic_cast<AtomicDensityObj *>(*a);
+  AtomicDensityObj *b_atom = dynamic_cast<AtomicDensityObj *>(*b);
+
   logDebug() << "Convolve densities...";
-  if (DeltaDensityObj *delta_a = dynamic_cast<DeltaDensityObj *>(*a)) {
+  if (dynamic_cast<DeltaDistributionObj *>(*a_atom->distribution())) {
     // If LHS is delta -> turn into affine trafo
-    return b.affine(1, delta_a->delay());
-  } else if (UniformDensityObj *unif_a = dynamic_cast<UniformDensityObj *>(*a)) {
+    return b.affine(1, a_atom->parameter(0));
+  } else if (dynamic_cast<UniformDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a uniform density ...
-    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(*b)) {
-      // ... and RHS is a delta density -> yes
-      return new UniformDensityObj(unif_a->a()+delta_b->delay(),
-                                   unif_a->b()+delta_b->delay());
+    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
+      return a.affine(1, b_atom->parameter(0));
     }
-  } else if (NormalDensityObj *norm_a = dynamic_cast<NormalDensityObj *>(*a)) {
+  } else if (dynamic_cast<NormalDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a normal distribution ...
-    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(*b)) {
+    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b)) {
       // ... and RHS is a delta density
-      return new NormalDensityObj(norm_a->mu()+delta_b->delay(), norm_a->sigma());
-    } else if (NormalDensityObj *norm_b = dynamic_cast<NormalDensityObj *>(*b)) {
+      a.affine(1, b_atom->parameter(0));
+    } else if (b_atom && dynamic_cast<NormalDistributionObj *>(*b_atom->distribution())) {
       // ... and RHS is a normal density too
-      return new NormalDensityObj(norm_a->mu()+norm_b->mu(),
-                                  std::sqrt(norm_a->sigma()*norm_a->sigma()
-                                            + norm_b->sigma()*norm_b->sigma()));
+      double mu_a = a_atom->parameter(0), mu_b = b_atom->parameter(0);
+      double sig_a = a_atom->parameter(1), sig_b = b_atom->parameter(1);
+      Eigen::VectorXd param(2); param << mu_a+mu_b, std::sqrt(sig_a*sig_a + sig_b+sig_b);
+      return new AtomicDensityObj(Distribution(new NormalDistributionObj()), param);
     }
-  } else if (GammaDensityObj *gamma_a = dynamic_cast<GammaDensityObj *>(*a)) {
+  } else if (dynamic_cast<GammaDistributionObj *>(*a_atom->distribution())) {
     // If LHS is a gamma density ...
-    if (DeltaDensityObj *delta_b = dynamic_cast<DeltaDensityObj *>(*b)) {
+    if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
       // ... and RHS is a delta density
-      return new GammaDensityObj(gamma_a->k(), gamma_a->theta(), gamma_a->shift()+delta_b->delay());
-    } else if (GammaDensityObj *gamma_b = dynamic_cast<GammaDensityObj *>(*b)) {
+      return a.affine(1, b_atom->parameter(0));
+    } else if (b_atom && dynamic_cast<GammaDistributionObj *>(*b_atom->distribution())) {
+      double theta_a = a_atom->parameter(1), theta_b = b_atom->parameter(1);
       // If LHS is a gamma too and has the same scale
-      if (gamma_a->theta() == gamma_b->theta()) {
-        return new GammaDensityObj(gamma_a->k()+gamma_b->k(), gamma_a->theta(),
-                                   gamma_a->shift()+gamma_b->shift());
+      if (theta_a == theta_b) {
+        double k_a = a_atom->parameter(0), k_b = b_atom->parameter(0);
+        double shift_a = a_atom->parameter(2), shift_b = b_atom->parameter(2);
+        Eigen::VectorXd param(3); param << k_a+k_b, theta_a, shift_a+shift_b;
+        return new AtomicDensityObj(Distribution(new GammaDistributionObj()), param);
       }
     }
   }

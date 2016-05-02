@@ -221,6 +221,43 @@ Distribution::operator=(const Distribution &other) {
   return *this;
 }
 
+size_t
+Distribution::nParams() const {
+  return _distribution->nParams();
+}
+
+void
+Distribution::pdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
+  return _distribution->pdf(Tmin, Tmax, out, params);
+}
+
+void
+Distribution::cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
+  return _distribution->cdf(Tmin, Tmax, out, params);
+}
+
+void
+Distribution::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const{
+  _distribution->quantile(lower, upper, p, params);
+}
+
+void
+Distribution::affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const {
+  return _distribution->affine(scale, shift, params);
+}
+
+void
+Distribution::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
+  _distribution->sample(out, params);
+}
+
+double
+Distribution::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
+  Eigen::VectorXd out(1);
+  _distribution->sample(out, params);
+  return out(0);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AtomicDensity container

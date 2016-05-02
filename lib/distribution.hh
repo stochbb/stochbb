@@ -111,6 +111,8 @@ public:
   void cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
            const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
 };
 
@@ -131,6 +133,8 @@ public:
   void cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
            const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
 };
 
@@ -151,6 +155,8 @@ public:
   void cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
            const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
 };
 
@@ -171,94 +177,11 @@ public:
   void cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
            const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
 };
 
-
-/** Represents a specific "instantiation" of a distribution as a @c DensityObj of atomic random
- * variables. */
-class GenericAtomicDensityObj: public AtomicDensityObj
-{
-protected:
-  /** Hidden constructor. Constructs a generic atomic density with the given distribution and
-   * parameters. */
-  GenericAtomicDensityObj(DistributionObj *dist, Eigen::Ref<Eigen::VectorXd> params);
-
-public:
-  /** Constructs a generic atomic density with the given distribution and parameters. */
-  GenericAtomicDensityObj(const Distribution &dist, Eigen::Ref<Eigen::VectorXd> params);
-  /** Destructor. */
-  virtual ~GenericAtomicDensityObj();
-  void mark();
-
-  /** Returns a reference to the distribution object. */
-  Distribution distribution() const;
-  /** Returns the number of parameters of the density. */
-  size_t nParams() const;
-  /** Returns a specific parameter. */
-  double parameter(size_t i) const;
-
-  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-
-  Density affine(double scale, double shift) const;
-
-  void rangeEst(double alpha, double &a, double &b) const;
-
-  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-
-  int compare(const DensityObj &other) const;
-  void print(std::ostream &stream) const;
-
-protected:
-  /** Holds a reference to the distribution instance. */
-  DistributionObj *_distribution;
-  /** Holds the parameter vector. */
-  Eigen::VectorXd _params;
-};
-
-
-/** Implements the generic density of compound random variables. That is a random variable
- * that is distributed with an atomic density where the parameters are random variables too. */
-class GenericCompoundDensityObj: public DensityObj
-{
-public:
-  /** Constructs a compound density with the given distribution family and parameter distributions. */
-  GenericCompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params);
-  /** Destructor. */
-  virtual ~GenericCompoundDensityObj();
-  void mark();
-
-  /** Returns a reference to the distribution object. */
-  Distribution distribution() const;
-  /** Returns the number of parameters of the density. */
-  size_t nParams() const;
-  /** Returns a specific parameter density. */
-  Density parameter(size_t i) const;
-
-  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-
-  Density affine(double scale, double shift) const;
-
-  void rangeEst(double alpha, double &a, double &b) const;
-
-  int compare(const DensityObj &other) const;
-  void print(std::ostream &stream) const;
-
-protected:
-  /** Helper function to iterate over several indices.
-   * @param i Specifies the running index.
-   * @param N Specifies the number of dimensions per index.
-   * @param idxs On exit, contains the vector of indices. */
-  void _to_param_indices(size_t i, size_t N, std::vector<size_t> &idxs) const;
-
-protected:
-  /** Holds a reference to the distribution instance. */
-  DistributionObj *_distribution;
-  /** Holds references to the parameter densities. */
-  std::vector<DensityObj *> _parameters;
-};
 
 }
 

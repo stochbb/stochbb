@@ -163,10 +163,31 @@ public:
   /** Retruns a new reference to the @c DensityObj. */
   inline DistributionObj *ref() const { _object->ref(); return _distribution; }
 
+  /** Returns the number of parameters. */
+  size_t nParams() const;
+  /** Evaluates the probability density function with the specified parameters on a regular grid
+   * in \f$[T_{min}, T_{max})\f$ and stores the result into @c out. */
+  void pdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
+           const Eigen::Ref<const Eigen::VectorXd> params) const;
+  /** Evaluates the probability function with the specified parameters on a regular grid
+   * in \f$[T_{min}, T_{max})\f$ and stores the result into @c out. */
+  void cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
+           const Eigen::Ref<const Eigen::VectorXd> params) const;
+  /** Returns the quantiles (@c lower, @c upper) for the given probability @c p with the specified
+   * parameters. */
+  void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  /** Changes the given set of parameters such that the distribution is an affine transformed. */
+  void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
+  /** Draws some samples from the distribution with the specified parameters. */
+  void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  /** Draws some samples from the distribution with the specified parameters. */
+  double sample(const Eigen::Ref<const Eigen::VectorXd> params) const;
+
 protected:
   /** The reference to the @c DistributionObj instance. */
   DistributionObj *_distribution;
 };
+
 
 /** The densities of @c AtomicVar.
  * This is the base class of all densities of atomic random variables, that is a random variable

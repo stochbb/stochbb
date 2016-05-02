@@ -57,12 +57,8 @@ protected:
   static void _sample_conditional(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
   /** Samples from a conditional chain random variable. */
   static void _sample_condchain(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a compound-normal random variable. */
-  static void _sample_comp_normal(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a compound-gamma random variable. */
-  static void _sample_comp_gamma(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a compound-Weibull random variable. */
-  static void _sample_comp_weibull(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
+  /** Samples from a compound random variable. */
+  static void _sample_comp(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
 
 protected:
   /** The variables selected for output. */

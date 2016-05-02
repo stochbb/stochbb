@@ -8,7 +8,6 @@
 
 namespace stochbb {
 
-
 /** Base class of all densities. */
 class DensityObj: public Object
 {
@@ -64,246 +63,48 @@ public:
 };
 
 
-/** Implements the base class of all densities of atomic random variables.
- * As atomic variables do not depend on other random variables, it is possible to sample them
- * directly. Hence their densities implement a @c sample method. */
+/** Represents a specific "instantiation" of a distribution as a @c DensityObj of atomic random
+ * variables. */
 class AtomicDensityObj: public DensityObj
 {
 protected:
-  /** Hidden constructor. */
-  AtomicDensityObj();
+  /** Hidden constructor. Constructs a generic atomic density with the given distribution and
+   * parameters. */
+  AtomicDensityObj(DistributionObj *dist, Eigen::Ref<Eigen::VectorXd> params);
 
 public:
+  /** Constructs a generic atomic density with the given distribution and parameters. */
+  AtomicDensityObj(const Distribution &dist, Eigen::Ref<Eigen::VectorXd> params);
   /** Destructor. */
   virtual ~AtomicDensityObj();
-
   void mark();
 
-  /** Samples from the atomic density. Only atomic densities, that is densities which do not depend
-   * on other densities, can be sampled directly. For all other densities consider the
-   * @c ExactSampler or @c MarginalSampler classes. */
-  virtual void sample(Eigen::Ref<Eigen::VectorXd> out) const = 0;
-};
-
-
-/** Implements the delta distribution. */
-class DeltaDensityObj: public AtomicDensityObj
-{
-public:
-  /** Constructor. */
-  DeltaDensityObj(double delay);
-  /** Destructor. */
-  virtual ~DeltaDensityObj();
-  void mark();
+  /** Returns a reference to the distribution object. */
+  Distribution distribution() const;
+  /** Returns the number of parameters of the density. */
+  size_t nParams() const;
+  /** Returns a specific parameter. */
+  double parameter(size_t i) const;
 
   void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
+
   Density affine(double scale, double shift) const;
+
   void rangeEst(double alpha, double &a, double &b) const;
+
+  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
 
   int compare(const DensityObj &other) const;
   void print(std::ostream &stream) const;
 
-  /** Retruns the delay of the delta distribution. */
-  inline double delay() const { return _delay; }
-
 protected:
-  /** Holds the center of the distribution. */
-  double _delay;
+  /** Holds a reference to the distribution instance. */
+  DistributionObj *_distribution;
+  /** Holds the parameter vector. */
+  Eigen::VectorXd _params;
 };
 
-
-/** Implements the uniform distribution on the interval \f$[a,b]\f$. */
-class UniformDensityObj: public AtomicDensityObj
-{
-public:
-  /** Constructs a uniform distribution on the interval \f$[a,b]\f$.
-   * @param a Specifies the lower bound of the interval.
-   * @param b Specifies the upper bound of the interval. */
-  UniformDensityObj(double a, double b) throw (Error);
-  /** Destructor. */
-  virtual ~UniformDensityObj();
-  void mark();
-
-  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  Density affine(double scale, double shift) const;
-  void rangeEst(double alpha, double &a, double &b) const;
-
-  int compare(const DensityObj &other) const;
-  void print(std::ostream &stream) const;
-
-  /** Returns the lower-bound of the uniform distribution. */
-  inline double a() const { return _a; }
-  /** Returns the upper-bound of the uniform distribution. */
-  inline double b() const { return _b; }
-
-protected:
-  /** The lower end of the interval. */
-  double _a;
-  /** The upper end of the interval. */
-  double _b;
-};
-
-
-/** Implements the normal distribution.
- * That is
- * \f[
- *  \phi(x, \mu, \sigma) = \frac{\exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)}{\sqrt{2\pi}\sigma}\,.
- * \f]
- */
-class NormalDensityObj: public AtomicDensityObj
-{
-public:
-  /** Constructor with mean and standard deviation. */
-  NormalDensityObj(double mean, double stddev) throw (Error);
-  /** Destructor. */
-  virtual ~NormalDensityObj();
-  void mark();
-
-  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  Density affine(double scale, double shift) const;
-  void rangeEst(double alpha, double &a, double &b) const;
-
-  int compare(const DensityObj &other) const;
-  void print(std::ostream &stream) const;
-
-  /** Returns the mean of the normal distribution. */
-  inline double mu() const { return _mu; }
-  /** Returns the standard deviation of the normal distribution. */
-  inline double sigma() const { return _sigma; }
-
-protected:
-  /** The mean. */
-  double _mu;
-  /** The standard deviation. */
-  double _sigma;
-};
-
-
-/** Implements the (shifted) Gamma distribution. That is
- * \f[
- *  \Gamma(x; k, \theta) = \frac{x^{k-1}e^{-\frac{x}{\theta}}}{\Gamma(k)\,\theta^k}
- * \f] */
-class GammaDensityObj: public AtomicDensityObj
-{
-public:
-  /** Constructor. */
-  GammaDensityObj(double k, double theta, double shift=0) throw (Error);
-  /** Destructor. */
-  virtual ~GammaDensityObj();
-  void mark();
-
-  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  Density affine(double scale, double shift) const;
-  void rangeEst(double alpha, double &a, double &b) const;
-
-  int compare(const DensityObj &other) const;
-  void print(std::ostream &stream) const;
-
-  /** Returns the shape parameter of the gamma distribution. */
-  inline double k() const { return _k; }
-  /** Returns the scale parameter of the gamma distribution. */
-  inline double theta() const { return _theta; }
-  /** Returns the shift of the distribution. */
-  inline double shift() const { return _shift; }
-
-protected:
-  /** The shape paramter. */
-  double _k;
-  /** The scale parameter. */
-  double _theta;
-  /** Shift of the affine transform. */
-  double _shift;
-};
-
-
-/** Implements the (shifted) inverse Gamma distribution. That is
- * \f[
- *  \Gamma(x; \alpha, \beta) = \frac{\beta^\alpha x^{-\alpha-1}e^{-\frac{\beta}{a}}}{\Gamma(\alpha)}
- * \f] */
-class InvGammaDensityObj: public AtomicDensityObj
-{
-public:
-  /** Constructor. */
-  InvGammaDensityObj(double alpha, double beta, double shift=0) throw (Error);
-  /** Destructor. */
-  virtual ~InvGammaDensityObj();
-  void mark();
-
-  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  Density affine(double scale, double shift) const;
-  void rangeEst(double alpha, double &a, double &b) const;
-
-  int compare(const DensityObj &other) const;
-  void print(std::ostream &stream) const;
-
-  /** Returns the shape parameter of the inverse gamma distribution. */
-  inline double alpha() const { return _alpha; }
-  /** Returns the scale parameter of the inverse gamma distribution. */
-  inline double beta() const { return _beta; }
-  /** Returns the shift of the distribution. */
-  inline double shift() const { return _shift; }
-
-protected:
-  /** The shape paramter. */
-  double _alpha;
-  /** The scale parameter. */
-  double _beta;
-  /** Shift of the affine transform. */
-  double _shift;
-};
-
-
-/** Implements the Weibull distribution.
- * The (shifted) Weilbull distribution is defined as
- * \f[
- *  f(x\ge 0;k,\lambda,\theta) = \frac{k}{\lambda}\left(\frac{x-\theta}{\lambda}\right)^{k-1}
- *    \exp\left[-\left(\frac{x-\theta}{\lambda}\right)^k\right]\,,
- * \f]
- * where \f$k\f$ is the shape parameter, \f$\lambda\f$ the scale parameter and \f$\theta\f$
- * the shift*/
-class WeibullDensityObj: public AtomicDensityObj
-{
-public:
-  /** Constructor with shape @c k, scale @c lambda and @c shift. */
-  WeibullDensityObj(double k, double lambda, double shift=0) throw (Error);
-  /** Destructor. */
-  virtual ~WeibullDensityObj();
-  void mark();
-
-  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void sample(Eigen::Ref<Eigen::VectorXd> out) const;
-  Density affine(double scale, double shift) const;
-  void rangeEst(double alpha, double &a, double &b) const;
-
-  int compare(const DensityObj &other) const;
-  void print(std::ostream &stream) const;
-
-  /** Returns the shape parameter of the Weilbull distribution. */
-  inline double k() const { return _k; }
-  /** Returns the scale parameter of the Weibull distribution. */
-  inline double lambda() const { return _lambda; }
-  /** Returns the shift of the distribution. */
-  inline double shift() const { return _shift; }
-
-protected:
-  /** The shape paramter. */
-  double _k;
-  /** The scale parameter. */
-  double _lambda;
-  /** Shift of the affine transform. */
-  double _shift;
-};
 
 }
 

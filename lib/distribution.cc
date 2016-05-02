@@ -34,102 +34,6 @@ DistributionObj::compare(const DistributionObj &other) const {
   return 0;
 }
 
-/* ********************************************************************************************* *
- * Implementation of GenericAtomicDensityObj
- * ********************************************************************************************* */
-GenericAtomicDensityObj::GenericAtomicDensityObj(DistributionObj *dist, Eigen::Ref<Eigen::VectorXd> params)
-  : AtomicDensityObj(), _distribution(dist), _params(params)
-{
-  // pass...
-}
-
-GenericAtomicDensityObj::GenericAtomicDensityObj(const Distribution &dist, Eigen::Ref<Eigen::VectorXd> params)
-  : AtomicDensityObj(), _distribution(*dist), _params(params)
-{
-  // pass...
-}
-
-GenericAtomicDensityObj::~GenericAtomicDensityObj() {
-  // pass...
-}
-
-void
-GenericAtomicDensityObj::mark() {
-  if (isMarked()) { return; }
-  AtomicDensityObj::mark();
-  if (_distribution) { _distribution->mark(); }
-}
-
-Distribution
-GenericAtomicDensityObj::distribution() const {
-  _distribution->ref();
-  return _distribution;
-}
-
-size_t
-GenericAtomicDensityObj::nParams() const {
-  return _distribution->nParams();
-}
-
-double
-GenericAtomicDensityObj::parameter(size_t i) const {
-  return _params[i];
-}
-
-void
-GenericAtomicDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
-  _distribution->pdf(Tmin, Tmax, out, _params);
-}
-
-void
-GenericAtomicDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
-  _distribution->cdf(Tmin, Tmax, out, _params);
-}
-
-Density
-GenericAtomicDensityObj::affine(double scale, double shift) const {
-  // copy parameters
-  Eigen::VectorXd params = _params;
-  _distribution->affine(scale, shift, params);
-  return new GenericAtomicDensityObj(_distribution, params);
-}
-
-void
-GenericAtomicDensityObj::rangeEst(double alpha, double &a, double &b) const {
-  /// @bug Implement!
-}
-
-void
-GenericAtomicDensityObj::sample(Eigen::Ref<Eigen::VectorXd> out) const {
-  _distribution->sample(out, _params);
-}
-
-int
-GenericAtomicDensityObj::compare(const DensityObj &other) const {
-  // Compare types
-  if (int res = DensityObj::compare(other)) { return res; }
-  // Compare atomic densities
-  const GenericAtomicDensityObj *ogen = dynamic_cast<const GenericAtomicDensityObj *>(&other);
-  // Compare by distribution type
-  if (int res = _distribution->compare(*ogen->_distribution))
-    return res;
-  // compare by parameters
-  for (int i=0; i<_params.size(); i++) {
-    if (_params[i] < ogen->_params[i])
-      return -1;
-    else if (_params[i] > ogen->_params[i])
-      return 1;
-  }
-  return 0;
-}
-
-void
-GenericAtomicDensityObj::print(std::ostream &stream) const {
-  stream << "<AtomicDensity ";
-  _distribution->print(stream);
-  stream << " @" << _params.transpose() << " #" << this << ">";
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of DeltaDistObj
@@ -319,6 +223,21 @@ void NormalDistributionObj::cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::Vect
   }
 }
 
+void
+NormalDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const {
+  double mu = params[0], sigma = params[1];
+  params[0] = scale*mu + shift;
+  params[1] = scale*sigma;
+}
+
+void
+NormalDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
+  DensityObj *mu = params[0], *sigma = params[1];
+  /// @bug Returns a unreferenced pointer as affine() returns a managed reference
+  params[0] = *mu->affine(scale, shift);
+  params[1] = *sigma->affine(scale,0);
+}
+
 void NormalDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double mu=params[0], sigma=params[1];
   lower=mu-stochbb::qnorm(p)*sigma; upper=mu+stochbb::qnorm(p)*sigma;
@@ -372,6 +291,21 @@ void GammaDistributionObj::cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::Vecto
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = stochbb::pgamma(t, k, theta);
   }
+}
+
+void
+GammaDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const {
+  double theta = params[1], s = params[2];
+  params[1] = scale*theta;
+  params[2] = scale*s+shift;
+}
+
+void
+GammaDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
+  DensityObj *theta = params[1], *s = params[2];
+  /// @bug Returns a unreferenced pointer as affine() returns a managed reference
+  params[0] = *theta->affine(scale, 0);
+  params[1] = *s->affine(scale,shift);
 }
 
 void GammaDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
@@ -428,6 +362,21 @@ void InvGammaDistributionObj::cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::Ve
   for (int i=0; i<out.size(); i++, t+=dt) {
     out[i] = stochbb::pinvgamma(t, alpha, beta);
   }
+}
+
+void
+InvGammaDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const {
+  double beta = params[1], s = params[2];
+  params[1] = scale*beta;
+  params[2] = scale*s+shift;
+}
+
+void
+InvGammaDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
+  DensityObj *beta = params[1], *s = params[2];
+  /// @bug Returns a unreferenced pointer as affine() returns a managed reference
+  params[0] = *beta->affine(scale, 0);
+  params[1] = *s->affine(scale,shift);
 }
 
 void InvGammaDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
@@ -493,6 +442,21 @@ WeibullDistributionObj::cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
 }
 
 void
+WeibullDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const {
+  double lambda = params[1], s = params[2];
+  params[1] = scale*lambda;
+  params[2] = scale*s+shift;
+}
+
+void
+WeibullDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
+  DensityObj *lambda = params[1], *s = params[2];
+  /// @bug Returns a unreferenced pointer as affine() returns a managed reference
+  params[0] = *lambda->affine(scale, 0);
+  params[1] = *s->affine(scale,shift);
+}
+
+void
 WeibullDistributionObj::quantile(double &lower, double &upper, double p,
                                  const Eigen::Ref<const Eigen::VectorXd> params) const
 {
@@ -509,191 +473,3 @@ WeibullDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref
 }
 
 
-/* ********************************************************************************************* *
- * Implementation of GenericCompoundDensityObj
- * ********************************************************************************************* */
-GenericCompoundDensityObj::GenericCompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params)
-  : DensityObj(), _distribution(dist), _parameters(params)
-{
-  // pass...
-}
-
-GenericCompoundDensityObj::~GenericCompoundDensityObj() {
-  // pass...
-}
-
-void
-GenericCompoundDensityObj::mark() {
-  if (isMarked()) { return; }
-  DensityObj::mark();
-  _distribution->mark();
-  for (size_t i=0; i<_parameters.size(); i++) {
-    _parameters[i]->mark();
-  }
-}
-
-Distribution
-GenericCompoundDensityObj::distribution() const {
-  _distribution->ref();
-  return _distribution;
-}
-
-size_t
-GenericCompoundDensityObj::nParams() const {
-  return _distribution->nParams();
-}
-
-Density
-GenericCompoundDensityObj::parameter(size_t i) const {
-  _parameters[i]->ref();
-  return _parameters[i];
-}
-
-void
-GenericCompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
-  size_t Nstep = 100;
-  double df = 1;
-
-  // Get parameter values and PDFs
-  Eigen::MatrixXd PDFs(Nstep, _parameters.size());
-  Eigen::MatrixXd params(Nstep, _parameters.size());
-  for (size_t i=0; i<_parameters.size(); i++) {
-    double a, b;
-    _parameters[i]->rangeEst(0.01, a, b);
-
-    double x = a, dx = (b-a)/Nstep;
-    df *= (b-a)/Nstep;
-
-    for (size_t j=0; j<Nstep; j++, x+=dx)
-      params(j,i) = x;
-
-    _parameters[i]->eval(a,b, PDFs.col(i));
-  }
-
-  out.setZero();
-  size_t N = std::pow(Nstep, _parameters.size());
-  Eigen::VectorXd param(_parameters.size());
-  std::vector<size_t> idxs(0, _parameters.size());
-  double dx=(Tmax-Tmin)/out.size();
-
-  // For each value in [Tmin, Tmax):
-#pragma omp for
-  for (int i=0; i<out.size(); i++) {
-    double x = Tmin + i*dx;
-    // "Integrate" over parameter space
-    for (size_t j=0; j<N; j++) {
-      // Get parameter indices
-      _to_param_indices(j, Nstep, idxs);
-      // Get parameter vector and prod of parameter PDFs
-      double dp = 1;
-      for (size_t k=0; k<_parameters.size(); k++) {
-        param[k] = params(idxs[k], k);
-        dp *= PDFs(idxs[k], k);
-      }
-      _distribution->pdf(x, x+dx, out.segment<1>(i), param);
-      out(i) *= dp*df;
-    }
-  }
-}
-
-void
-GenericCompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const {
-  size_t Nstep = 100;
-  double df = 1;
-
-  // Get parameter values and PDFs
-  Eigen::MatrixXd PDFs(Nstep, _parameters.size());
-  Eigen::MatrixXd params(Nstep, _parameters.size());
-  for (size_t i=0; i<_parameters.size(); i++) {
-    double a, b;
-    _parameters[i]->rangeEst(0.01, a, b);
-
-    double x = a, dx = (b-a)/Nstep;
-    df *= (b-a)/Nstep;
-
-    for (size_t j=0; j<Nstep; j++, x+=dx)
-      params(j,i) = x;
-
-    _parameters[i]->eval(a,b, PDFs.col(i));
-  }
-
-  out.setZero();
-  size_t N = std::pow(Nstep, _parameters.size());
-  Eigen::VectorXd param(_parameters.size());
-  std::vector<size_t> idxs(0, _parameters.size());
-  double dx=(Tmax-Tmin)/out.size();
-
-  // For each value in [Tmin, Tmax):
-#pragma omp for
-  for (int i=0; i<out.size(); i++) {
-    double x = Tmin + i*dx;
-    // "Integrate" over parameter space
-    for (size_t j=0; j<N; j++) {
-      // Get parameter indices
-      _to_param_indices(j, Nstep, idxs);
-      // Get parameter vector and prod of parameter PDFs
-      double dp = 1;
-      for (size_t k=0; k<_parameters.size(); k++) {
-        param[k] = params(idxs[k], k);
-        dp *= PDFs(idxs[k], k);
-      }
-      _distribution->cdf(x, x+dx, out.segment<1>(i), param);
-      out(i) *= dp*df;
-    }
-  }
-}
-
-void
-GenericCompoundDensityObj::_to_param_indices(size_t i, size_t N, std::vector<size_t> &idxs) const {
-  for (size_t j=0; j<idxs.size(); j++) {
-    idxs[j] = i%N; i /= N;
-  }
-}
-
-Density
-GenericCompoundDensityObj::affine(double scale, double shift) const {
-  GenericCompoundDensityObj *res = new GenericCompoundDensityObj(_distribution, _parameters);
-  _distribution->affine(scale, shift, res->_parameters);
-  return res;
-}
-
-void
-GenericCompoundDensityObj::rangeEst(double alpha, double &a, double &b) const {
-  Eigen::VectorXd A(_parameters.size()), B(_parameters.size());
-  for (size_t i=0; i<_parameters.size(); i++) {
-    _parameters[i]->rangeEst(alpha, A[i], B[i]);
-  }
-  double tmp;
-  _distribution->quantile(a, tmp, alpha, A);
-  _distribution->quantile(tmp, b, alpha, B);
-}
-
-int
-GenericCompoundDensityObj::compare(const DensityObj &other) const {
-  // Compare by density type
-  if (int res = DensityObj::compare(other))
-    return res;
-  // same density class -> cast
-  const GenericCompoundDensityObj &cother = static_cast<const GenericCompoundDensityObj &>(other);
-  // Compare by distribution
-  if (int res = _distribution->compare(*cother._distribution))
-    return res;
-  // Compare by parameter densities
-  for (size_t i=0; i<_parameters.size(); i++) {
-    if (int res = _parameters[i]->compare(*cother._parameters[i]))
-      return res;
-  }
-  return 0;
-}
-
-void
-GenericCompoundDensityObj::print(std::ostream &stream) const {
-  stream << "<CompoundDensity of "; _distribution->print(stream);
-  stream << " with [";
-  _parameters[0]->print(stream);
-  for (size_t i=1; i<_parameters.size(); i++) {
-    stream << ", ";
-    _parameters[i]->print(stream);
-  }
-  stream << "] #" << this << ">";
-}

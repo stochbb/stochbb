@@ -132,12 +132,8 @@ ExactSamplerObj::_choose_sampler(VarObj *var) throw (TypeError) {
     return ExactSamplerObj::_sample_conditional;
   } else if (dynamic_cast<CondChainObj *>(var)) {
     return ExactSamplerObj::_sample_condchain;
-  } else if (dynamic_cast<NormalCompoundObj *>(var)) {
-    return ExactSamplerObj::_sample_comp_normal;
-  } else if (dynamic_cast<GammaCompoundObj *>(var)) {
-    return ExactSamplerObj::_sample_comp_gamma;
-  } else if (dynamic_cast<WeibullCompoundObj *>(var)) {
-    return ExactSamplerObj::_sample_comp_weibull;
+  } else if (dynamic_cast<GenericCompoundObj *>(var)) {
+    return ExactSamplerObj::_sample_comp;
   }
 
   TypeError err;
@@ -251,34 +247,20 @@ ExactSamplerObj::_sample_condchain(ExactSamplerObj *self, VarObj *var, Eigen::Ma
 }
 
 void
-ExactSamplerObj::_sample_comp_normal(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
-  NormalCompoundObj *cnorm = static_cast<NormalCompoundObj *>(var);
-  size_t out_idx = self->_varmap[var];
-  for (int i=0; i<out.rows(); i++) {
-    double mu = out(i, self->_varmap[*cnorm->variable(0)]);
-    double sigma = out(i, self->_varmap[*cnorm->variable(1)]);
-    out(i, out_idx) = RNG::norm(mu, sigma);
-  }
-}
+ExactSamplerObj::_sample_comp(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
+  GenericCompoundObj *comp = static_cast<GenericCompoundObj *>(var);
 
-void
-ExactSamplerObj::_sample_comp_gamma(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
-  GammaCompoundObj *cgamma = static_cast<GammaCompoundObj *>(var);
-  size_t out_idx = self->_varmap[var];
-  for (int i=0; i<out.rows(); i++) {
-    double k = out(i, self->_varmap[*cgamma->variable(0)]);
-    double theta = out(i, self->_varmap[*cgamma->variable(1)]);
-    out(i, out_idx) = RNG::gamma(k, theta);
-  }
-}
+  std::vector<size_t> p_idxs; p_idxs.reserve(comp->distribution().nParams());
 
-void
-ExactSamplerObj::_sample_comp_weibull(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
-  WeibullCompoundObj *cweibull = static_cast<WeibullCompoundObj *>(var);
-  size_t out_idx = self->_varmap[var];
-  for (int i=0; i<out.rows(); i++) {
-    double k = out(i, self->_varmap[*cweibull->variable(0)]);
-    double lambda = out(i, self->_varmap[*cweibull->variable(1)]);
-    out(i, out_idx) = RNG::gamma(k, lambda);
+  size_t Z  = self->_varmap[comp];
+
+  Eigen::VectorXd params(p_idxs.size());
+  for (int i=0; i<out.size(); i++) {
+    // Assemble sample of parameters
+    for (size_t j=0; j<p_idxs.size(); j++) {
+      params(j) = out(i, p_idxs[j]);
+    }
+    // get a single sample with sampled parameters:
+    out(i, Z) = comp->distribution().sample(params);
   }
 }
