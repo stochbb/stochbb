@@ -11,7 +11,7 @@ condition for the existence of a divergence point.}.
 
 This very simple model consists of 3 Gamma-distributed random variables $C, X_1$ and $X_2$,
 where the latter is a shifted Gamma distribution (here shifted by $300$ ms, i.e. 
-$X_3 \sim \Gamma(T-300; k, \theta)$).  The model is
+$X_2 \sim \Gamma(x_2-300; k, \theta)$).  The model is
 \begin{align}
  \text{control: } & R_c = C + X_1 & \text{ where } C \sim \Gamma(c; 3, 20),\,X_1\sim\Gamma(x_1; 10,30)\\
  \text{experimental: } & R_e = C + \min(X_1, X_2) & \text{ where } X_2 \sim\Gamma(x_2-300; 1, 70)\,.
@@ -22,7 +22,13 @@ triggers a second stage $X_2$ that itself immediately triggers the response. Und
 again the stimulus triggers the common stage $C$ which then triggers $X_1$. Additionally, the common
 stage $C$ also triggers the delayed stage $X_2$ in parallel to $X_1$. The response is then triggered by 
 either $X_1$ or $X_2$, depending on which stage completes first. Consequently, the response latency
-under control condition is $R_e = C + \min(X_1,X_2)$.
+under experimental condition is $R_e = C + \min(X_1,X_2)$.
+
+\begin{figure} [!ht]
+ \centering
+ \includegraphics[width=0.7\textwidth]{pod_graph.pdf}
+ \caption{Visualization of the two processes.} \label{fig:podgraph}
+\end{figure}
 
 The following code shows how this simple model is implemented using the Python API of StochBB.
 

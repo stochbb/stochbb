@@ -6,6 +6,7 @@
 #include "mixture.hh"
 #include "conditional.hh"
 #include "compound.hh"
+#include "distribution.hh"
 #include "logger.hh"
 
 using namespace stochbb;
@@ -16,7 +17,10 @@ using namespace stochbb;
  * ********************************************************************************************* */
 Var
 stochbb::delta(double value) {
-  return new AtomicVarObj(new DeltaDensityObj(value));
+  Eigen::VectorXd param(1); param << value;
+  return new AtomicVarObj(
+        new GenericAtomicDensityObj(
+          Distribution(new DeltaDistributionObj()), param));
 }
 
 /* ********************************************************************************************* *
