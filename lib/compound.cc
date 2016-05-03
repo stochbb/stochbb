@@ -60,7 +60,7 @@ CompoundObj::parameter(size_t i) const {
 CompoundDensityObj::CompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params)
   : DensityObj(), _distribution(dist), _parameters(params)
 {
-  // pass...
+  assume(_distribution->nParams() == _parameters.size());
 }
 
 CompoundDensityObj::~CompoundDensityObj() {

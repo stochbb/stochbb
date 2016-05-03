@@ -9,17 +9,26 @@
 
 namespace stochbb {
 
-/** Implements the generic density of compound random variables. That is a random variable
- * that is distributed with an atomic density where the parameters are random variables too. */
+/** Implements the generic density of all compound random variables. That is, a random variable
+ * that is distributed according to some parametric density where the parameters are random
+ * variables too.
+ *
+ * The compound distribution is obtained by numerical integration over the complete parameter
+ * space. The bounds for this integration are obtained for each parameter using the
+ * @c stochbb::Density::rangeEst method for each parameter density. For the sake of efficientcy,
+ * delta-distributed parameters are handled separately, reducing the dimension of the parameter
+ * space to intergrate over. */
 class CompoundDensityObj: public DensityObj
 {
 public:
   /** Constructs a compound density with the given distribution family and parameter distributions.
-   * @param dist Specifies the distribution.
-   * @param params Specifies the parameter distributions. */
+   * @param dist Specifies the distribution (weak reference).
+   * @param params Specifies the parameter distributions (weak references). */
   CompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params);
+
   /** Destructor. */
   virtual ~CompoundDensityObj();
+
   void mark();
 
   /** Returns a reference to the distribution object. */
