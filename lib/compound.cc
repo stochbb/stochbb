@@ -11,13 +11,17 @@ using namespace stochbb;
  * Implementation of GenericCompoundObj
  * ********************************************************************************************* */
 CompoundObj::CompoundObj(const std::vector<Var> &vars, const Distribution &distribution, const std::string &name)
-  : DerivedVarObj(vars, name), _density(0), _parameters(vars)
+  : DerivedVarObj(vars, name), _density(0), _parameters()
 {
-  std::vector<DensityObj *> densities; densities.reserve(vars.size());
+  std::vector<DensityObj *> densities;
+  densities.reserve(vars.size()); _parameters.reserve(vars.size());
   for (size_t i=0; i<vars.size(); i++) {
+    _parameters.push_back(*vars[i]);
     densities.push_back(*vars[i].density());
   }
   _density = new CompoundDensityObj(*distribution, densities);
+  // new CompoundDensityObj() returns a new reference -> unref.
+  _density->unref();
 }
 
 void
@@ -27,10 +31,14 @@ CompoundObj::mark() {
   DerivedVarObj::mark();
   if (_density)
     _density->mark();
+  for (size_t i=0; i<_parameters.size(); i++) {
+    _parameters[i]->mark();
+  }
 }
 
 Density
 CompoundObj::density() {
+  _density->ref();
   return _density;
 }
 
@@ -41,6 +49,7 @@ CompoundObj::distribution() {
 
 Var
 CompoundObj::parameter(size_t i) const {
+  _parameters[i]->ref();
   return _parameters[i];
 }
 

@@ -38,7 +38,7 @@ Container::Container(const Container &other)
 
 Container::~Container() {
   // Decrement reference count
-  if (0 != _object) { _object->unref(); }
+  if (_object) { _object->unref(); }
   _object = 0;
 }
 
@@ -48,9 +48,9 @@ Container::operator =(const Container &other)
   Object *old_obj = _object;
   _object = other._object;
   // reference new object
-  if (0 != _object) { _object->ref(); }
+  if (_object) { _object->ref(); }
   // unreference old object:
-  if (0 != old_obj) { old_obj->unref(); }
+  if (old_obj) { old_obj->unref(); }
   // done.
   return *this;
 }

@@ -50,16 +50,10 @@ DensityObj::print(std::ostream &stream) const {
 /* ********************************************************************************************* *
  * Implementation of GenericAtomicDensityObj
  * ********************************************************************************************* */
-AtomicDensityObj::AtomicDensityObj(DistributionObj *dist, Eigen::Ref<Eigen::VectorXd> params)
-  : DensityObj(), _distribution(dist), _params(params)
-{
-  assume(_params.size() == _distribution->nParams());
-}
-
 AtomicDensityObj::AtomicDensityObj(const Distribution &dist, Eigen::Ref<Eigen::VectorXd> params)
   : DensityObj(), _distribution(*dist), _params(params)
 {
-  assume(_params.size() == _distribution->nParams());
+  assume(size_t(_params.size()) == _distribution->nParams());
 }
 
 AtomicDensityObj::~AtomicDensityObj() {

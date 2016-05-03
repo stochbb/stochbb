@@ -67,13 +67,6 @@ public:
  * variable. */
 class AtomicDensityObj: public DensityObj
 {
-protected:
-  /** Hidden constructor. Constructs a generic atomic density with the given distribution and
-   * parameters.
-   * @param dist Specifies the distribution of the random variable.
-   * @param params Specifies the parameters for the random variable. */
-  AtomicDensityObj(DistributionObj *dist, Eigen::Ref<Eigen::VectorXd> params);
-
 public:
   /** Constructs a generic atomic density with the given distribution and parameters.
    * @param dist Specifies the distribution of the random variable.

@@ -41,8 +41,7 @@ Var
 stochbb::normal(double mu, double sigma, const std::string &name) throw (Error) {
   Eigen::VectorXd param(2); param << mu, sigma;
   return new AtomicVarObj(
-        new AtomicDensityObj(
-          Distribution(new NormalDistributionObj()), param));
+        new AtomicDensityObj(new NormalDistributionObj(), param));
 }
 
 Var
@@ -94,8 +93,7 @@ Var
 stochbb::gamma(double k, double theta, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << k, theta, 0;
   return new AtomicVarObj(
-        new AtomicDensityObj(
-          Distribution(new GammaDistributionObj()), param));
+        new AtomicDensityObj(new GammaDistributionObj(), param));
 }
 
 Var
@@ -147,8 +145,7 @@ Var
 stochbb::invgamma(double alpha, double beta, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << alpha, beta, 0;
   return new AtomicVarObj(
-        new AtomicDensityObj(
-          Distribution(new InvGammaDistributionObj()), param));
+        new AtomicDensityObj(new InvGammaDistributionObj(), param));
 }
 
 Var
@@ -200,8 +197,7 @@ Var
 stochbb::weibull(double k, double lambda, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << k, lambda, 0;
   return new AtomicVarObj(
-        new AtomicDensityObj(
-          Distribution(new WeibullDistributionObj()), param));
+        new AtomicDensityObj(new WeibullDistributionObj(), param));
 }
 
 Var

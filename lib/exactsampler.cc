@@ -78,6 +78,9 @@ ExactSamplerObj::mark() {
   for (size_t i=0; i<_queue.size(); i++) {
     _queue[i]->mark();
   }
+  for (size_t i=0; i<_outvars.size(); i++) {
+    _outvars[i]->mark();
+  }
 }
 
 void
@@ -250,15 +253,17 @@ void
 ExactSamplerObj::_sample_compound(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out) {
   CompoundObj *comp = static_cast<CompoundObj *>(var);
 
-  std::vector<size_t> p_idxs; p_idxs.reserve(comp->distribution().nParams());
+  std::vector<size_t> p_idxs; p_idxs.resize(comp->distribution().nParams());
   // Get indices of parameters
   for (size_t i=0; i<p_idxs.size(); i++) {
     p_idxs[i] = self->_varmap[*comp->parameter(i)];
   }
+  // get index of compound variable
   size_t Z  = self->_varmap[comp];
 
+  // Sample...
   Eigen::VectorXd params(p_idxs.size());
-  for (int i=0; i<out.size(); i++) {
+  for (int i=0; i<out.rows(); i++) {
     // Assemble sample of parameters
     for (size_t j=0; j<p_idxs.size(); j++) {
       params(j) = out(i, p_idxs[j]);

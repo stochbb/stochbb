@@ -229,6 +229,7 @@ class Var: public Container
 public:
   /** The object type of the container. */
   typedef VarObj ObjectType;
+
 public:
   /** Empty constructor. */
   Var();

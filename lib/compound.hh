@@ -78,7 +78,7 @@ protected:
   /** A reference to the density. */
   CompoundDensityObj *_density;
   /** The vector of parameter variables. */
-  std::vector<Var> _parameters;
+  std::vector<VarObj *> _parameters;
 };
 
 }
