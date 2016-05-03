@@ -93,22 +93,28 @@ CompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> o
     _parameters[i]->rangeEst(0.00001, a, b);
 
     double x = a, dx = (b-a)/Nstep;
+    // update df for integral over all params
     df *= dx;
 
+    // store param values
     for (size_t j=0; j<Nstep; j++, x+=dx)
       params(j,i) = x;
-
+    // get parameter PDF
     _parameters[i]->eval(a, b, PDFs.col(i));
   }
 
   out.setZero();
+  // sum over Nstep^M values (M number of parameters)
   size_t N = std::pow(Nstep, _parameters.size());
+  // the current parameter vector
   Eigen::VectorXd param(_parameters.size());
+  // value indices for the i-th summand
   std::vector<size_t> idxs(_parameters.size());
+  // temp vector holding the PDF for a specific param. vector
+  Eigen::VectorXd tmp(out.size()); out.setZero();
 
   // For each value in [Tmin, Tmax):
-  Eigen::VectorXd tmp(out.size()); out.setZero();
-  // "Integrate" over parameter space
+  //   "Integrate" over parameter space
   for (size_t j=0; j<N; j++) {
     // Get parameter indices
     _to_param_indices(j, Nstep, idxs);
@@ -118,7 +124,9 @@ CompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> o
       param[k] = params(idxs[k], k);
       dp *= PDFs(idxs[k], k);
     }
+    // eval distribution PDF for given parameter vector
     _distribution->pdf(Tmin, Tmax, tmp, param);
+    // update result
     out += tmp*dp*df;
   }
 }

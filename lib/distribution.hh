@@ -7,12 +7,12 @@
 
 namespace stochbb {
 
-/** Base class of all distributions, being families of distribution functions that are
- * parametrized by a set of parameters. An probability (atomic) density that is assigned to a
+/** Base class of all distributions. Distributions are families of density functions that are
+ * parametrized by a set of parameters. A (atomic) probability density, that is assigned to a
  * random variable can then be considered as an instance of that family with a specific set of
  * parameters (@c GenericAtomicDensityObj).
  *
- * Almost all densities (not delta) have at least 2 parameters which are \f$[scale, shift, ...]\f$
+ * Almost all densities (except delta) have at least 2 parameters which are \f$[scale, shift, ...]\f$
  * such that a specific density can be expressed as \f$f\left(\frac{x-shift}{scale}, ...\right)\f$. */
 class DistributionObj: public Object
 {
@@ -70,6 +70,7 @@ public:
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
   void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void print(std::ostream &stream) const;
 };
 
 
@@ -92,6 +93,7 @@ public:
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
   void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void print(std::ostream &stream) const;
 };
 
 
@@ -114,6 +116,7 @@ public:
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
   void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void print(std::ostream &stream) const;
 };
 
 
@@ -136,6 +139,7 @@ public:
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
   void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void print(std::ostream &stream) const;
 };
 
 
@@ -158,6 +162,7 @@ public:
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
   void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void print(std::ostream &stream) const;
 };
 
 
@@ -180,6 +185,7 @@ public:
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
   void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void print(std::ostream &stream) const;
 };
 
 

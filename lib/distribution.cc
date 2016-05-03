@@ -83,8 +83,9 @@ DeltaDistributionObj::cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> 
 }
 
 void
-DeltaDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
-  lower = params[0]*(1.-1e-6); upper = params[0]*(1.+1e-6);
+DeltaDistributionObj::quantile(double &lower, double &upper, double p,
+                               const Eigen::Ref<const Eigen::VectorXd> params) const {
+  lower = params[0]-1e-6; upper = params[0]+1e-6;
 }
 
 void
@@ -98,8 +99,14 @@ DeltaDistributionObj::affine(double scale, double shift, std::vector<DensityObj 
 }
 
 void
-DeltaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
+DeltaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out,
+                             const Eigen::Ref<const Eigen::VectorXd> params) const {
   out.setConstant(params[0]);
+}
+
+void
+DeltaDistributionObj::print(std::ostream &stream) const {
+  stream << "<DeltaDistributionObj #" << this << ">";
 }
 
 
@@ -183,6 +190,11 @@ UniformDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref
   }
 }
 
+void
+UniformDistributionObj::print(std::ostream &stream) const {
+  stream << "<DeltaDistributionObj #" << this << ">";
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of NormalDistObj
@@ -249,6 +261,11 @@ void NormalDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen:
   for (int i=0; i<out.size(); i++) {
     out(i) = RNG::norm()*sigma + mu;
   }
+}
+
+void
+NormalDistributionObj::print(std::ostream &stream) const {
+  stream << "<DeltaDistributionObj #" << this << ">";
 }
 
 
@@ -322,6 +339,11 @@ GammaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<c
   }
 }
 
+void
+GammaDistributionObj::print(std::ostream &stream) const {
+  stream << "<DeltaDistributionObj #" << this << ">";
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of InvGammaDistObj
@@ -380,16 +402,27 @@ InvGammaDistributionObj::affine(double scale, double shift, std::vector<DensityO
   params[1] = *s->affine(scale,shift);
 }
 
-void InvGammaDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
+void
+InvGammaDistributionObj::quantile(double &lower, double &upper, double p,
+                                  const Eigen::Ref<const Eigen::VectorXd> params) const
+{
   double alpha=params[0], beta=params[1], shift=params[2];
   lower=shift; upper = stochbb::qinvgamma(p, alpha, beta) + shift;
 }
 
-void InvGammaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
+void
+InvGammaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out,
+                                const Eigen::Ref<const Eigen::VectorXd> params) const
+{
   double alpha=params[0], beta=params[1], shift=params[2];
   for (int i=0; i<out.size(); i++) {
     out(i) = RNG::invgamma(alpha, beta) + shift;
   }
+}
+
+void
+InvGammaDistributionObj::print(std::ostream &stream) const {
+  stream << "<DeltaDistributionObj #" << this << ">";
 }
 
 
@@ -473,4 +506,8 @@ WeibullDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref
   }
 }
 
+void
+WeibullDistributionObj::print(std::ostream &stream) const {
+  stream << "<DeltaDistributionObj #" << this << ">";
+}
 

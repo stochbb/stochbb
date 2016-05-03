@@ -53,13 +53,13 @@ DensityObj::print(std::ostream &stream) const {
 AtomicDensityObj::AtomicDensityObj(DistributionObj *dist, Eigen::Ref<Eigen::VectorXd> params)
   : DensityObj(), _distribution(dist), _params(params)
 {
-  // pass...
+  assume(_params.size() == _distribution->nParams());
 }
 
 AtomicDensityObj::AtomicDensityObj(const Distribution &dist, Eigen::Ref<Eigen::VectorXd> params)
   : DensityObj(), _distribution(*dist), _params(params)
 {
-  // pass...
+  assume(_params.size() == _distribution->nParams());
 }
 
 AtomicDensityObj::~AtomicDensityObj() {

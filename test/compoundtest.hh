@@ -11,6 +11,7 @@ public:
   CompoundTest();
 
   void testNormalCompound();
+  void testGammaCompound();
 
 public:
   static UnitTest::TestSuite *suite();

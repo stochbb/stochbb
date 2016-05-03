@@ -34,10 +34,21 @@ CompoundTest::testNormalCompound() {
   }
 }
 
+void
+CompoundTest::testGammaCompound() {
+  Var k = uniform(0,4);
+  Var X = gamma(5*k+5, 10);
+
+  size_t N = 100;
+  Eigen::VectorXd dX(N);
+  X.density().eval(0, 1200, dX);
+}
+
 TestSuite *
 CompoundTest::suite() {
   TestSuite *suite = new TestSuite("Compound");
   suite->addTest(new TestCaller<CompoundTest>("normalCompound", &CompoundTest::testNormalCompound));
+  suite->addTest(new TestCaller<CompoundTest>("gammaCompound", &CompoundTest::testGammaCompound));
   return suite;
 }
 

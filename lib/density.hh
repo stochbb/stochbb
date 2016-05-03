@@ -63,17 +63,21 @@ public:
 };
 
 
-/** Represents a specific "instantiation" of a distribution as a @c DensityObj of atomic random
- * variables. */
+/** Represents a specific "instantiation" of a distribution as a @c DensityObj for an atomic random
+ * variable. */
 class AtomicDensityObj: public DensityObj
 {
 protected:
   /** Hidden constructor. Constructs a generic atomic density with the given distribution and
-   * parameters. */
+   * parameters.
+   * @param dist Specifies the distribution of the random variable.
+   * @param params Specifies the parameters for the random variable. */
   AtomicDensityObj(DistributionObj *dist, Eigen::Ref<Eigen::VectorXd> params);
 
 public:
-  /** Constructs a generic atomic density with the given distribution and parameters. */
+  /** Constructs a generic atomic density with the given distribution and parameters.
+   * @param dist Specifies the distribution of the random variable.
+   * @param params Specifies the parameters for the random variable. */
   AtomicDensityObj(const Distribution &dist, Eigen::Ref<Eigen::VectorXd> params);
   /** Destructor. */
   virtual ~AtomicDensityObj();
