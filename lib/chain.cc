@@ -70,7 +70,7 @@ convolution_combine(const Density &a, const Density &b) {
       // ... and RHS is a normal density too
       double mu_a = a_atom->parameter(0), mu_b = b_atom->parameter(0);
       double sig_a = a_atom->parameter(1), sig_b = b_atom->parameter(1);
-      Eigen::VectorXd param(2); param << mu_a+mu_b, std::sqrt(sig_a*sig_a + sig_b+sig_b);
+      Eigen::VectorXd param(2); param << mu_a+mu_b, std::sqrt(sig_a*sig_a + sig_b*sig_b);
       return new AtomicDensityObj(Distribution(new NormalDistributionObj()), param);
     }
   } else if (dynamic_cast<GammaDistributionObj *>(*a_atom->distribution())) {
