@@ -22,9 +22,9 @@ class CompoundDensityObj: public DensityObj
 {
 public:
   /** Constructs a compound density with the given distribution family and parameter distributions.
-   * @param dist Specifies the distribution (weak reference).
+   * @param dist Specifies the distribution.
    * @param params Specifies the parameter distributions (weak references). */
-  CompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params);
+  CompoundDensityObj(const Distribution &dist, const std::vector<DensityObj *> &params);
 
   /** Destructor. */
   virtual ~CompoundDensityObj();
@@ -68,7 +68,7 @@ class CompoundObj : public DerivedVarObj
 {
 public:
   /** Constructs a new compound random variable object.
-   * @param vars Specifies the variables, the compound depends on.
+   * @param vars Specifies the variables, the compound depends on (the parameters).
    * @param distribution Specifies the distribution.
    * @param name Specifies the optional name for the random variable. */
   CompoundObj(const std::vector<Var> &vars, const Distribution &distribution, const std::string &name);
@@ -84,8 +84,9 @@ public:
   Var parameter(size_t i) const;
 
 protected:
+  DistributionObj *_distribution;
   /** A reference to the density. */
-  CompoundDensityObj *_density;
+  DensityObj *_density;
   /** The vector of parameter variables. */
   std::vector<VarObj *> _parameters;
 };

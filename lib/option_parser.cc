@@ -158,11 +158,6 @@ KeywordRule::dump() {
 }
 
 
-OneOfRule::OneOfRule(Parser *parser)
-  : RuleInterface(parser)
-{
-}
-
 OneOfRule::OneOfRule(Parser *parser, std::list<RuleInterface *> &opts)
   : RuleInterface(parser), options(opts)
 {

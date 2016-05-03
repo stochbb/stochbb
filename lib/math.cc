@@ -159,7 +159,7 @@ _betai_aux(double a, double b, double x) {
 
 double
 stochbb::betai(double a, double b, double x) {
-  return x < (a + 1.) / (a + b + 2.)? _betai_aux(a, b, x) : 1. - _betai_aux(b, a, 1. - x);
+  return x < (a + 1.) / (a + b + 2.) ? _betai_aux(a, b, x) : 1. - _betai_aux(b, a, 1. - x);
 }
 
 double

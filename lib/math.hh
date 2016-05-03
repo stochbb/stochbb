@@ -17,7 +17,7 @@ double erfc(double x);
 /** The inverse error function. */
 double erfinv(double p);
 
-/** The beta function. */
+/** Regularized incomplete beta function. */
 double betai(double a, double b, double x);
 
 /** PDF of the standard normal distribution. */

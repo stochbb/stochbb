@@ -3,6 +3,8 @@
 #include "math.hh"
 #include "logger.hh"
 #include "distribution.hh"
+#include "reduction.hh"
+
 
 using namespace stochbb;
 
@@ -11,7 +13,7 @@ using namespace stochbb;
  * Implementation of GenericCompoundObj
  * ********************************************************************************************* */
 CompoundObj::CompoundObj(const std::vector<Var> &vars, const Distribution &distribution, const std::string &name)
-  : DerivedVarObj(vars, name), _density(0), _parameters()
+  : DerivedVarObj(vars, name), _distribution(*distribution), _density(0), _parameters()
 {
   std::vector<DensityObj *> densities;
   densities.reserve(vars.size()); _parameters.reserve(vars.size());
@@ -19,9 +21,13 @@ CompoundObj::CompoundObj(const std::vector<Var> &vars, const Distribution &distr
     _parameters.push_back(*vars[i]);
     densities.push_back(*vars[i].density());
   }
-  _density = new CompoundDensityObj(*distribution, densities);
-  // new CompoundDensityObj() returns a new reference -> unref.
-  _density->unref();
+  Density density = new CompoundDensityObj(distribution, densities);
+  // try to simplify density
+  while (CompoundReductionRule *rule = CompoundReductions::get().find(density)) {
+    density = rule->apply(density);
+  }
+  // finally store density
+  _density = *density;
 }
 
 void
@@ -29,6 +35,8 @@ CompoundObj::mark() {
   if (isMarked())
     return;
   DerivedVarObj::mark();
+  if (_distribution)
+    _distribution->mark();
   if (_density)
     _density->mark();
   for (size_t i=0; i<_parameters.size(); i++) {
@@ -44,7 +52,8 @@ CompoundObj::density() {
 
 Distribution
 CompoundObj::distribution() {
-  return _density->distribution();
+  _distribution->ref();
+  return _distribution;
 }
 
 Var
@@ -57,8 +66,8 @@ CompoundObj::parameter(size_t i) const {
 /* ********************************************************************************************* *
  * Implementation of GenericCompoundDensityObj
  * ********************************************************************************************* */
-CompoundDensityObj::CompoundDensityObj(DistributionObj *dist, const std::vector<DensityObj *> &params)
-  : DensityObj(), _distribution(dist), _parameters(params)
+CompoundDensityObj::CompoundDensityObj(const Distribution &dist, const std::vector<DensityObj *> &params)
+  : DensityObj(), _distribution(*dist), _parameters(params)
 {
   assume(_distribution->nParams() == _parameters.size());
 }
@@ -71,7 +80,8 @@ void
 CompoundDensityObj::mark() {
   if (isMarked()) { return; }
   DensityObj::mark();
-  _distribution->mark();
+  if (_distribution)
+    _distribution->mark();
   for (size_t i=0; i<_parameters.size(); i++) {
     _parameters[i]->mark();
   }
@@ -79,7 +89,9 @@ CompoundDensityObj::mark() {
 
 Distribution
 CompoundDensityObj::distribution() const {
+  // increment reference counter
   _distribution->ref();
+  // transfer new reference to Distribution container
   return _distribution;
 }
 
@@ -90,7 +102,9 @@ CompoundDensityObj::nParams() const {
 
 Density
 CompoundDensityObj::parameter(size_t i) const {
+  // increment reference counter
   _parameters[i]->ref();
+  // transfer new reference to Density container
   return _parameters[i];
 }
 
@@ -217,8 +231,13 @@ CompoundDensityObj::_to_param_indices(size_t i, const std::vector<size_t> &Ns, s
 
 Density
 CompoundDensityObj::affine(double scale, double shift) const {
+  // increment reference counter
+  _distribution->ref();
+  // Copy, reference to _distribution is taken by the constructor
   CompoundDensityObj *res = new CompoundDensityObj(_distribution, _parameters);
+  // perform affine transform on parameter distributions
   _distribution->affine(scale, shift, res->_parameters);
+  // done, reference is transferred to Density container.
   return res;
 }
 

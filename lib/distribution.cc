@@ -246,7 +246,6 @@ NormalDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Vect
 void
 NormalDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
   DensityObj *mu = params[0], *sigma = params[1];
-  /// @bug Returns a unreferenced pointer as affine() returns a managed reference
   params[0] = *mu->affine(scale, shift);
   params[1] = *sigma->affine(scale,0);
 }
@@ -321,9 +320,8 @@ GammaDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Vecto
 void
 GammaDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
   DensityObj *theta = params[1], *s = params[2];
-  /// @bug Returns a unreferenced pointer as affine() returns a managed reference
-  params[0] = *theta->affine(scale, 0);
-  params[1] = *s->affine(scale,shift);
+  params[1] = *theta->affine(scale, 0);
+  params[2] = *s->affine(scale,shift);
 }
 
 void GammaDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
@@ -397,9 +395,8 @@ InvGammaDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Ve
 void
 InvGammaDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
   DensityObj *beta = params[1], *s = params[2];
-  /// @bug Returns a unreferenced pointer as affine() returns a managed reference
-  params[0] = *beta->affine(scale, 0);
-  params[1] = *s->affine(scale,shift);
+  params[1] = *beta->affine(scale, 0);
+  params[2] = *s->affine(scale,shift);
 }
 
 void
@@ -485,9 +482,8 @@ WeibullDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Vec
 void
 WeibullDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
   DensityObj *lambda = params[1], *s = params[2];
-  /// @bug Returns a unreferenced pointer as affine() returns a managed reference
-  params[0] = *lambda->affine(scale, 0);
-  params[1] = *s->affine(scale,shift);
+  params[1] = *lambda->affine(scale, 0);
+  params[2] = *s->affine(scale,shift);
 }
 
 void

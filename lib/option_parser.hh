@@ -116,9 +116,6 @@ protected:
 class OneOfRule: public RuleInterface
 {
 protected:
-  /** \todo Is this needed? */
-  OneOfRule(Parser *parser);
-
   /** The constructor takes a list of option rules. The ownership of these rules is
    * tranferred to this object and they are destroyed if this object is destroyed. */
   OneOfRule(Parser *parser, std::list<RuleInterface *> &options);

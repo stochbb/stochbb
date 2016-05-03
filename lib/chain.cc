@@ -3,6 +3,7 @@
 #include "operators.hh"
 #include "logger.hh"
 #include "distribution.hh"
+#include "reduction.hh"
 
 #include <unsupported/Eigen/FFT>
 #include <list>
@@ -20,78 +21,6 @@ inline int density_compare(const Density &a, const Density &b) {
 /* ********************************************************************************************* *
  * combine densities
  * ********************************************************************************************* */
-// Checks if two densities can be combined
-bool convolution_can_combine(const Density &a, const Density &b) {
-  AtomicDensityObj *a_atom = dynamic_cast<AtomicDensityObj *>(*a);
-  AtomicDensityObj *b_atom = dynamic_cast<AtomicDensityObj *>(*b);
-  if (0 == a_atom) { return false; }
-
-  // Check by type
-  if (dynamic_cast<DeltaDistributionObj *>(*a_atom->distribution())) {
-    // If LHS is a delta distribution -> yes
-    return true;
-  } else if (b_atom && dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
-    // If RHS is a delta distribution -> yes
-    return true;
-  } else if (dynamic_cast<NormalDistributionObj *>(*a_atom->distribution())) {
-    // If LHS is a normal distribution ...
-    if (b_atom && dynamic_cast<NormalDistributionObj *>(*b_atom->distribution())) {
-      // ... and RHS is a normal density -> yes
-      return true;
-    }
-  } else if (dynamic_cast<GammaDistributionObj *>(*a_atom->distribution())) {
-    // If LHS is a gamma density ...
-    if (b_atom && dynamic_cast<GammaDistributionObj *>(*b_atom->distribution())) {
-      // ... and RHS is a gamma too and has the same scale
-      return a_atom->parameter(1) == b_atom->parameter(1);
-    }
-  }
-  // Otherwise -> no
-  return false;
-}
-
-// Derives new the analytic convolution of densities (if possible, check with
-// convolution_can_combine). Returns a new reference to a convolution object
-Density
-convolution_combine(const Density &a, const Density &b) {
-  AtomicDensityObj *a_atom = dynamic_cast<AtomicDensityObj *>(*a);
-  AtomicDensityObj *b_atom = dynamic_cast<AtomicDensityObj *>(*b);
-
-  logDebug() << "Convolve densities...";
-  if (a_atom && dynamic_cast<DeltaDistributionObj *>(*a_atom->distribution())) {
-    // If LHS is delta -> turn into affine trafo
-    return b.affine(1, a_atom->parameter(0));
-  } else if (dynamic_cast<DeltaDistributionObj *>(*b_atom->distribution())) {
-    // If RHS is a delta -> turn into affine trafo
-    return a.affine(1, b_atom->parameter(0));
-  } else if (dynamic_cast<NormalDistributionObj *>(*a_atom->distribution())) {
-    // If LHS is a normal distribution ...
-    if (b_atom && dynamic_cast<NormalDistributionObj *>(*b_atom->distribution())) {
-      // ... and RHS is a normal density too
-      double mu_a = a_atom->parameter(0), mu_b = b_atom->parameter(0);
-      double sig_a = a_atom->parameter(1), sig_b = b_atom->parameter(1);
-      Eigen::VectorXd param(2); param << mu_a+mu_b, std::sqrt(sig_a*sig_a + sig_b*sig_b);
-      return new AtomicDensityObj(Distribution(new NormalDistributionObj()), param);
-    }
-  } else if (dynamic_cast<GammaDistributionObj *>(*a_atom->distribution())) {
-    // If LHS is a gamma density ...
-    if (b_atom && dynamic_cast<GammaDistributionObj *>(*b_atom->distribution())) {
-      double theta_a = a_atom->parameter(1), theta_b = b_atom->parameter(1);
-      // ... and LHS is a gamma too and has the same scale
-      if (theta_a == theta_b) {
-        double k_a = a_atom->parameter(0), k_b = b_atom->parameter(0);
-        double shift_a = a_atom->parameter(2), shift_b = b_atom->parameter(2);
-        Eigen::VectorXd param(3); param << k_a+k_b, theta_a, shift_a+shift_b;
-        return new AtomicDensityObj(Distribution(new GammaDistributionObj()), param);
-      }
-    }
-  }
-  // Otherwise --> oops
-  AssumptionError err;
-  err << "Cannot combine densities.";
-  throw err;
-}
-
 Density
 stochbb::convolve(const std::vector<Density> &densities, double scale, double shift) {
   // copy vector
@@ -99,14 +28,16 @@ stochbb::convolve(const std::vector<Density> &densities, double scale, double sh
   // Sort densities w.r.t type and parameters
   std::sort(dens.begin(), dens.end(), density_compare);
 
-  logDebug() << "Try to convolve " << dens.size() << " densities...";
+  // Get reduction rules
+  ConvolutionReductions &rules = ConvolutionReductions::get();
+
   // Try to combine some of the densities
   std::vector<Density>::iterator last = dens.begin();
   std::vector<Density>::iterator current = dens.begin(); current++;
   while (current != dens.end()) {
-    if (convolution_can_combine(*last, *current)) {
+    if (ConvolutionReductionRule *rule = rules.find(*last, *current)) {
       // If densities can be combined -> combine & replace last density
-      *last = convolution_combine(*last, *current);
+      *last = rule->apply(*last, *current);
       // erase combined density
       current = dens.erase(current);
     } else {
@@ -114,7 +45,6 @@ stochbb::convolve(const std::vector<Density> &densities, double scale, double sh
       last++; current++;
     }
   }
-  logDebug() << "... done.";
 
   if (1 == dens.size()) {
     // If only one density is left -> unpack
