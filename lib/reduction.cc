@@ -262,23 +262,35 @@ NormalCompoundRule::test(const Density &a) const {
   CompoundDensityObj *comp = dynamic_cast<CompoundDensityObj *>(*a);
   if (! (comp && dynamic_cast<NormalDistributionObj *>(*comp->distribution())))
     return false;
-  Density mu = comp->parameter(0), sigma = comp->parameter(1);
-  //AtomicDensityObj *mu_atomic = dynamic_cast<AtomicDensityObj *>(*mu);
+  Density sigma = comp->parameter(1);
   AtomicDensityObj *sigma_atomic = dynamic_cast<AtomicDensityObj *>(*sigma);
   // if sigma is fixed
-  return sigma_atomic && dynamic_cast<DeltaDistributionObj *>(*sigma_atomic->distribution());
+  return (sigma_atomic && dynamic_cast<DeltaDistributionObj *>(*sigma_atomic->distribution()));
 }
 
 Density
 NormalCompoundRule::apply(const Density &a) const {
   // given that a is a normal distr. with fixed sigma
   CompoundDensityObj *comp = dynamic_cast<CompoundDensityObj *>(*a);
+  // Get mu and sigma densities
   Density mu = comp->parameter(0), sigma = comp->parameter(1);
   AtomicDensityObj *sigma_atomic = dynamic_cast<AtomicDensityObj *>(*sigma);
-  std::vector<Density> densities; densities.reserve(2);
+
+  // Assemble atomic density N(0,sigma)
   Eigen::VectorXd params(2); params << 0, sigma_atomic->parameter(0);
-  densities.push_back(new AtomicDensityObj(new NormalDistributionObj(), params));
+  Density S(new AtomicDensityObj(new NormalDistributionObj(), params));
+
+  // check if conv. of S & mu can be reduced further
+  if (ConvolutionReductionRule *rule = ConvolutionReductions::get().find(S, mu)) {
+    return rule->apply(S, mu);
+  }
+
+  // If convolution cannot be reduced -> constrcut conv. density
+  std::vector<Density> densities; densities.reserve(2);
   densities.push_back(mu);
+  densities.push_back(S);
+
+  // done
   return new ConvolutionDensityObj(densities);
 }
 
