@@ -11,7 +11,7 @@ using namespace stochbb;
  * Implementation of GenericCompoundObj
  * ********************************************************************************************* */
 CompoundObj::CompoundObj(const std::vector<Var> &vars, const Distribution &distribution, const std::string &name)
-  : DerivedVarObj(vars, name), _density(0)
+  : DerivedVarObj(vars, name), _density(0), _parameters(vars)
 {
   std::vector<DensityObj *> densities; densities.reserve(vars.size());
   for (size_t i=0; i<vars.size(); i++) {
@@ -37,6 +37,11 @@ CompoundObj::density() {
 Distribution
 CompoundObj::distribution() {
   return _density->distribution();
+}
+
+Var
+CompoundObj::parameter(size_t i) const {
+  return _parameters[i];
 }
 
 
@@ -88,24 +93,30 @@ CompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> o
   // Get parameter values and PDFs of parameters
   Eigen::MatrixXd PDFs(Nstep, _parameters.size());
   Eigen::MatrixXd params(Nstep, _parameters.size());
+  std::vector<size_t> Ns; Ns.reserve(_parameters.size());
+  size_t N = 1;
   for (size_t i=0; i<_parameters.size(); i++) {
-    double a, b;
-    _parameters[i]->rangeEst(0.00001, a, b);
-
-    double x = a, dx = (b-a)/Nstep;
-    // update df for integral over all params
-    df *= dx;
-
-    // store param values
-    for (size_t j=0; j<Nstep; j++, x+=dx)
-      params(j,i) = x;
-    // get parameter PDF
-    _parameters[i]->eval(a, b, PDFs.col(i));
+    AtomicDensityObj *p_atom = dynamic_cast<AtomicDensityObj *>(_parameters[i]);
+    if (p_atom && dynamic_cast<DeltaDistributionObj *>(*p_atom->distribution())) {
+      // Handle delta distributions
+      Ns.push_back(1);
+      params.col(i).setConstant(p_atom->parameter(0));
+      PDFs.col(i).setConstant(1);
+      N *= 1;
+    } else {
+      Ns.push_back(Nstep);
+      N *= Nstep;
+      double a, b;
+      _parameters[i]->rangeEst(0.00001, a, b);
+      double x = a, dx = (b-a)/Nstep; df *= dx;
+      for (size_t j=0; j<Nstep; j++, x+=dx)
+        params(j,i) = x;
+      // get parameter PDF
+      _parameters[i]->eval(a, b, PDFs.col(i));
+    }
   }
 
   out.setZero();
-  // sum over Nstep^M values (M number of parameters)
-  size_t N = std::pow(Nstep, _parameters.size());
   // the current parameter vector
   Eigen::VectorXd param(_parameters.size());
   // value indices for the i-th summand
@@ -117,7 +128,7 @@ CompoundDensityObj::eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> o
   //   "Integrate" over parameter space
   for (size_t j=0; j<N; j++) {
     // Get parameter indices
-    _to_param_indices(j, Nstep, idxs);
+    _to_param_indices(j, Ns, idxs);
     // Get parameter vector and prod of parameter PDFs
     double dp = 1;
     for (size_t k=0; k<_parameters.size(); k++) {
@@ -136,47 +147,62 @@ CompoundDensityObj::evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd
   size_t Nstep = 100;
   double df = 1;
 
-  // Get parameter values and PDFs
+  // Get parameter values and PDFs of parameters
   Eigen::MatrixXd PDFs(Nstep, _parameters.size());
   Eigen::MatrixXd params(Nstep, _parameters.size());
+  std::vector<size_t> Ns; Ns.reserve(_parameters.size());
+  size_t N = 1;
   for (size_t i=0; i<_parameters.size(); i++) {
-    double a, b;
-    _parameters[i]->rangeEst(0.00001, a, b);
-
-    double x = a, dx = (b-a)/Nstep;
-    df *= dx;
-
-    for (size_t j=0; j<Nstep; j++, x+=dx)
-      params(j,i) = x;
-
-    _parameters[i]->eval(a,b, PDFs.col(i));
+    AtomicDensityObj *p_atom = dynamic_cast<AtomicDensityObj *>(_parameters[i]);
+    if (p_atom && dynamic_cast<DeltaDistributionObj *>(*p_atom->distribution())) {
+      // Handle delta distributions
+      Ns.push_back(1);
+      params.col(i).setConstant(p_atom->parameter(0));
+      PDFs.col(i).setConstant(1);
+      N *= 1;
+    } else {
+      Ns.push_back(Nstep);
+      N *= Nstep;
+      double a, b;
+      _parameters[i]->rangeEst(0.00001, a, b);
+      double x = a, dx = (b-a)/Nstep; df *= dx;
+      for (size_t j=0; j<Nstep; j++, x+=dx)
+        params(j,i) = x;
+      // get parameter PDF
+      _parameters[i]->eval(a, b, PDFs.col(i));
+    }
   }
 
   out.setZero();
-  size_t N = std::pow(Nstep, _parameters.size());
+  // the current parameter vector
   Eigen::VectorXd param(_parameters.size());
+  // value indices for the i-th summand
   std::vector<size_t> idxs(_parameters.size());
-  Eigen::VectorXd tmp(out.size());
+  // temp vector holding the PDF for a specific param. vector
+  Eigen::VectorXd tmp(out.size()); out.setZero();
 
-  // For each value in [Tmin, Tmax), "Integrate" over parameter space
+  // For each value in [Tmin, Tmax):
+  //   "Integrate" over parameter space
   for (size_t j=0; j<N; j++) {
     // Get parameter indices
-    _to_param_indices(j, Nstep, idxs);
+    _to_param_indices(j, Ns, idxs);
     // Get parameter vector and prod of parameter PDFs
     double dp = 1;
     for (size_t k=0; k<_parameters.size(); k++) {
       param[k] = params(idxs[k], k);
       dp *= PDFs(idxs[k], k);
     }
+    // eval distribution PDF for given parameter vector
     _distribution->cdf(Tmin, Tmax, tmp, param);
+    // update result
     out += tmp*dp*df;
   }
 }
 
 void
-CompoundDensityObj::_to_param_indices(size_t i, size_t N, std::vector<size_t> &idxs) const {
-  for (size_t j=0; j<idxs.size(); j++) {
-    idxs[j] = i%N; i /= N;
+CompoundDensityObj::_to_param_indices(size_t i, const std::vector<size_t> &Ns, std::vector<size_t> &idxs) const {
+  for (size_t j=0; j<Ns.size(); j++) {
+    idxs[j] = i%Ns[j]; i /= Ns[j];
   }
 }
 

@@ -251,7 +251,10 @@ ExactSamplerObj::_sample_compound(ExactSamplerObj *self, VarObj *var, Eigen::Mat
   CompoundObj *comp = static_cast<CompoundObj *>(var);
 
   std::vector<size_t> p_idxs; p_idxs.reserve(comp->distribution().nParams());
-
+  // Get indices of parameters
+  for (size_t i=0; i<p_idxs.size(); i++) {
+    p_idxs[i] = self->_varmap[*comp->parameter(i)];
+  }
   size_t Z  = self->_varmap[comp];
 
   Eigen::VectorXd params(p_idxs.size());

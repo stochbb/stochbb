@@ -44,7 +44,7 @@ protected:
    * @param i Specifies the running index.
    * @param N Specifies the number of dimensions per index.
    * @param idxs On exit, contains the vector of indices. */
-  void _to_param_indices(size_t i, size_t N, std::vector<size_t> &idxs) const;
+  void _to_param_indices(size_t i, const std::vector<size_t> &N, std::vector<size_t> &idxs) const;
 
 protected:
   /** Holds a reference to the distribution instance. */
@@ -71,9 +71,14 @@ public:
   /** Retruns the distribution of the compound variable. */
   Distribution distribution();
 
+  /** Returns the i-th parameter variable. */
+  Var parameter(size_t i) const;
+
 protected:
   /** A reference to the density. */
   CompoundDensityObj *_density;
+  /** The vector of parameter variables. */
+  std::vector<Var> _parameters;
 };
 
 }
