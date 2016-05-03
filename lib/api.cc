@@ -260,6 +260,145 @@ Distribution::sample(const Eigen::Ref<const Eigen::VectorXd> params) const {
 
 
 /* ********************************************************************************************* *
+ * Implementation of DeltaDistribution container
+ * ********************************************************************************************* */
+DeltaDistribution::DeltaDistribution(DeltaDistributionObj *delta)
+  : Distribution(delta), _delta(delta)
+{
+  // pass...
+}
+
+DeltaDistribution::DeltaDistribution(const DeltaDistribution &other)
+  : Distribution(other), _delta(other._delta)
+{
+  // pass...
+}
+
+DeltaDistribution &
+DeltaDistribution::operator= (const DeltaDistribution &other)
+{
+  Distribution::operator=(other);
+  _delta = other._delta;
+  return *this;
+}
+
+/* ********************************************************************************************* *
+ * Implementation of UniformDistribution container
+ * ********************************************************************************************* */
+UniformDistribution::UniformDistribution(UniformDistributionObj *uniform)
+  : Distribution(uniform), _uniform(uniform)
+{
+  // pass...
+}
+
+UniformDistribution::UniformDistribution(const UniformDistribution &other)
+  : Distribution(other), _uniform(other._uniform)
+{
+  // pass...
+}
+
+UniformDistribution &
+UniformDistribution::operator= (const UniformDistribution &other)
+{
+  Distribution::operator=(other);
+  _uniform = other._uniform;
+  return *this;
+}
+
+/* ********************************************************************************************* *
+ * Implementation of NormalDistribution container
+ * ********************************************************************************************* */
+NormalDistribution::NormalDistribution(NormalDistributionObj *normal)
+  : Distribution(normal), _normal(normal)
+{
+  // pass...
+}
+
+NormalDistribution::NormalDistribution(const NormalDistribution &other)
+  : Distribution(other), _normal(other._normal)
+{
+  // pass...
+}
+
+NormalDistribution &
+NormalDistribution::operator= (const NormalDistribution &other)
+{
+  Distribution::operator=(other);
+  _normal = other._normal;
+  return *this;
+}
+
+/* ********************************************************************************************* *
+ * Implementation of GammaDistribution container
+ * ********************************************************************************************* */
+GammaDistribution::GammaDistribution(GammaDistributionObj *gamma)
+  : Distribution(gamma), _gamma(gamma)
+{
+  // pass...
+}
+
+GammaDistribution::GammaDistribution(const GammaDistribution &other)
+  : Distribution(other), _gamma(other._gamma)
+{
+  // pass...
+}
+
+GammaDistribution &
+GammaDistribution::operator= (const GammaDistribution &other)
+{
+  Distribution::operator=(other);
+  _gamma = other._gamma;
+  return *this;
+}
+
+/* ********************************************************************************************* *
+ * Implementation of InvGammaDistribution container
+ * ********************************************************************************************* */
+InvGammaDistribution::InvGammaDistribution(InvGammaDistributionObj *invgamma)
+  : Distribution(invgamma), _invgamma(invgamma)
+{
+  // pass...
+}
+
+InvGammaDistribution::InvGammaDistribution(const InvGammaDistribution &other)
+  : Distribution(other), _invgamma(other._invgamma)
+{
+  // pass...
+}
+
+InvGammaDistribution &
+InvGammaDistribution::operator= (const InvGammaDistribution &other)
+{
+  Distribution::operator=(other);
+  _invgamma = other._invgamma;
+  return *this;
+}
+
+/* ********************************************************************************************* *
+ * Implementation of WeibullDistribution container
+ * ********************************************************************************************* */
+WeibullDistribution::WeibullDistribution(WeibullDistributionObj *weibull)
+  : Distribution(weibull), _weibull(weibull)
+{
+  // pass...
+}
+
+WeibullDistribution::WeibullDistribution(const WeibullDistribution &other)
+  : Distribution(other), _weibull(other._weibull)
+{
+  // pass...
+}
+
+WeibullDistribution &
+WeibullDistribution::operator= (const WeibullDistribution &other)
+{
+  Distribution::operator=(other);
+  _weibull = other._weibull;
+  return *this;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AtomicDensity container
  * ********************************************************************************************* */
 AtomicDensity::AtomicDensity(AtomicDensityObj *obj)
@@ -284,6 +423,16 @@ AtomicDensity::operator =(const AtomicDensity &other) {
 void
 AtomicDensity::sample(Eigen::VectorXd &out) const {
   _atomic_density->sample(out);
+}
+
+Distribution
+AtomicDensity::distribution() const {
+  return _atomic_density->distribution();
+}
+
+double
+AtomicDensity::parameter(size_t i) const {
+  return _atomic_density->parameter(i);
 }
 
 

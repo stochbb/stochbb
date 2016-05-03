@@ -11,6 +11,9 @@ public:
   ConvolutionTest();
 
   void testAlignment();
+  void testDeltaReduction();
+  void testNormalReduction();
+  void testGammaReduction();
 
 public:
   static UnitTest::TestSuite *suite();

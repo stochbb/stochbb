@@ -1,6 +1,8 @@
 #include "convolutiontest.hh"
 #include "lib/api.hh"
 #include "lib/chain.hh"
+#include "lib/distribution.hh"
+
 
 using namespace stochbb;
 using namespace stochbb::UnitTest;
@@ -29,10 +31,63 @@ ConvolutionTest::testAlignment() {
   }
 }
 
+void
+ConvolutionTest::testDeltaReduction() {
+  Var X = delta(10);
+  Var Y = gamma(10,10);
+  Var Z = X + Y;
+
+  UT_ASSERT(Z.density().is<AtomicDensity>());
+  // Cast to atomic density
+  AtomicDensity Zatom = Z.density().as<AtomicDensity>();
+  // Check distribution type
+  UT_ASSERT(Zatom.distribution().is<GammaDistribution>());
+  // Check parameters
+  UT_ASSERT_EQUAL(10., Zatom.parameter(0));
+  UT_ASSERT_EQUAL(10., Zatom.parameter(1));
+  UT_ASSERT_EQUAL(10., Zatom.parameter(2));
+}
+
+void
+ConvolutionTest::testNormalReduction() {
+  Var X = normal(1,1);
+  Var Y = normal(1,1);
+  Var Z = X + Y;
+
+  UT_ASSERT(Z.density().is<AtomicDensity>());
+  // Cast to atomic density
+  AtomicDensity Zatom = Z.density().as<AtomicDensity>();
+  // Check distribution type
+  UT_ASSERT(Zatom.distribution().is<NormalDistribution>());
+  // Check parameters
+  UT_ASSERT_EQUAL(2., Zatom.parameter(0));
+  UT_ASSERT_EQUAL(std::sqrt(2), Zatom.parameter(1));
+}
+
+void
+ConvolutionTest::testGammaReduction() {
+  Var X = gamma(1,1);
+  Var Y = gamma(1,1);
+  Var Z = X + Y;
+
+  UT_ASSERT(Z.density().is<AtomicDensity>());
+  // Cast to atomic density
+  AtomicDensity Zatom = Z.density().as<AtomicDensity>();
+  // Check distribution type
+  UT_ASSERT(Zatom.distribution().is<GammaDistribution>());
+  // Check parameters
+  UT_ASSERT_EQUAL(2., Zatom.parameter(0));
+  UT_ASSERT_EQUAL(1., Zatom.parameter(1));
+  UT_ASSERT_EQUAL(0., Zatom.parameter(2));
+}
+
 TestSuite *
 ConvolutionTest::suite() {
   TestSuite *suite = new TestSuite("Convolution");
   suite->addTest(new TestCaller<ConvolutionTest>("alignment", &ConvolutionTest::testAlignment));
+  suite->addTest(new TestCaller<ConvolutionTest>("delta reduction", &ConvolutionTest::testDeltaReduction));
+  suite->addTest(new TestCaller<ConvolutionTest>("normal reduction", &ConvolutionTest::testNormalReduction));
+  suite->addTest(new TestCaller<ConvolutionTest>("gamma reduction", &ConvolutionTest::testNormalReduction));
   return suite;
 }
 

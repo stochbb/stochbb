@@ -20,6 +20,12 @@ namespace stochbb {
 // Forward declarations
 class DensityObj;
 class DistributionObj;
+class DeltaDistributionObj;
+class UniformDistributionObj;
+class NormalDistributionObj;
+class GammaDistributionObj;
+class InvGammaDistributionObj;
+class WeibullDistributionObj;
 class AtomicDensityObj;
 class VarObj;
 class AtomicVarObj;
@@ -189,6 +195,137 @@ protected:
 };
 
 
+/** Represents the family of delta distributions.
+ * @ingroup api */
+class DeltaDistribution: public Distribution
+{
+public:
+  /** The object type of the container. */
+  typedef DeltaDistributionObj ObjectType;
+
+public:
+  /** Packs the given @c DeltaDistributionObj and takes the reference. */
+  DeltaDistribution(DeltaDistributionObj *obj);
+  /** Copy constructor. */
+  DeltaDistribution(const DeltaDistribution &other);
+  /** Assigment operator. */
+  DeltaDistribution &operator=(const DeltaDistribution &other);
+
+protected:
+  /** The reference to the @c DeltaDistributionObj instance. */
+  DeltaDistributionObj *_delta;
+};
+
+
+/** Represents the family of uniform distributions.
+ * @ingroup api */
+class UniformDistribution: public Distribution
+{
+public:
+  /** The object type of the container. */
+  typedef UniformDistributionObj ObjectType;
+
+public:
+  /** Packs the given @c UniformDistributionObj and takes the reference. */
+  UniformDistribution(UniformDistributionObj *obj);
+  /** Copy constructor. */
+  UniformDistribution(const UniformDistribution &other);
+  /** Assigment operator. */
+  UniformDistribution &operator=(const UniformDistribution &other);
+
+protected:
+  /** The reference to the @c UniformDistributionObj instance. */
+  UniformDistributionObj *_uniform;
+};
+
+
+/** Represents the family of normal distributions.
+ * @ingroup api */
+class NormalDistribution: public Distribution
+{
+public:
+  /** The object type of the container. */
+  typedef NormalDistributionObj ObjectType;
+
+public:
+  /** Packs the given @c NormalDistributionObj and takes the reference. */
+  NormalDistribution(NormalDistributionObj *obj);
+  /** Copy constructor. */
+  NormalDistribution(const NormalDistribution &other);
+  /** Assigment operator. */
+  NormalDistribution &operator=(const NormalDistribution &other);
+
+protected:
+  /** The reference to the @c NormalDistributionObj instance. */
+  NormalDistributionObj *_normal;
+};
+
+
+/** Represents the family of gamma distributions.
+ * @ingroup api */
+class GammaDistribution: public Distribution
+{
+public:
+  /** The object type of the container. */
+  typedef GammaDistributionObj ObjectType;
+
+public:
+  /** Packs the given @c GammaDistributionObj and takes the reference. */
+  GammaDistribution(GammaDistributionObj *obj);
+  /** Copy constructor. */
+  GammaDistribution(const GammaDistribution &other);
+  /** Assigment operator. */
+  GammaDistribution &operator=(const GammaDistribution &other);
+
+protected:
+  /** The reference to the @c GammaDistributionObj instance. */
+  GammaDistributionObj *_gamma;
+};
+
+/** Represents the family of inverse gamma distributions.
+ * @ingroup api */
+class InvGammaDistribution: public Distribution
+{
+public:
+  /** The object type of the container. */
+  typedef InvGammaDistributionObj ObjectType;
+
+public:
+  /** Packs the given @c InvGammaDistributionObj and takes the reference. */
+  InvGammaDistribution(InvGammaDistributionObj *obj);
+  /** Copy constructor. */
+  InvGammaDistribution(const InvGammaDistribution &other);
+  /** Assigment operator. */
+  InvGammaDistribution &operator=(const InvGammaDistribution &other);
+
+protected:
+  /** The reference to the @c InvGammaDistributionObj instance. */
+  InvGammaDistributionObj *_invgamma;
+};
+
+
+/** Represents the family of Weibull distributions.
+ * @ingroup api */
+class WeibullDistribution: public Distribution
+{
+public:
+  /** The object type of the container. */
+  typedef WeibullDistributionObj ObjectType;
+
+public:
+  /** Packs the given @c WeibullDistributionObj and takes the reference. */
+  WeibullDistribution(WeibullDistributionObj *obj);
+  /** Copy constructor. */
+  WeibullDistribution(const WeibullDistribution &other);
+  /** Assigment operator. */
+  WeibullDistribution &operator=(const WeibullDistribution &other);
+
+protected:
+  /** The reference to the @c WeibullDistributionObj instance. */
+  WeibullDistributionObj *_weibull;
+};
+
+
 /** The densities of @c AtomicVar.
  * This is the base class of all densities of atomic random variables, that is a random variable
  * that does not depend on others. */
@@ -215,6 +352,11 @@ public:
 
   /** Samples from the random variable. */
   void sample(Eigen::VectorXd &out) const;
+
+  /** Returns the distribution object of the density. */
+  Distribution distribution() const;
+  /** Returns the i-th parameter. */
+  double parameter(size_t i) const;
 
 protected:
   /** Holds the reference to the object instance. */
