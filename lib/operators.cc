@@ -562,3 +562,13 @@ Density
 stochbb::directConvolve(const Density &a, const Density &b, const Density &c) {
   return directConvolve(std::vector<Density> {a,b,c});
 }
+
+std::ostream &
+operator<<(std::ostream &stream, const stochbb::Container &x) {
+  if (x.isNull()) {
+    stream << "<null>";
+  } else {
+    x->print(stream);
+  }
+  return stream;
+}

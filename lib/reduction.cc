@@ -3,7 +3,8 @@
 #include "distribution.hh"
 #include "compound.hh"
 #include "chain.hh"
-
+#include "logger.hh"
+#include "operators.hh"
 
 using namespace stochbb;
 
@@ -262,9 +263,8 @@ NormalCompoundRule::test(const Density &a) const {
   CompoundDensityObj *comp = dynamic_cast<CompoundDensityObj *>(*a);
   if (! (comp && dynamic_cast<NormalDistributionObj *>(*comp->distribution())))
     return false;
-  Density sigma = comp->parameter(1);
-  AtomicDensityObj *sigma_atomic = dynamic_cast<AtomicDensityObj *>(*sigma);
   // if sigma is fixed
+  AtomicDensityObj *sigma_atomic = dynamic_cast<AtomicDensityObj *>(*comp->parameter(1));
   return (sigma_atomic && dynamic_cast<DeltaDistributionObj *>(*sigma_atomic->distribution()));
 }
 

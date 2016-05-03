@@ -192,7 +192,7 @@ UniformDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref
 
 void
 UniformDistributionObj::print(std::ostream &stream) const {
-  stream << "<DeltaDistributionObj #" << this << ">";
+  stream << "<UniformDistributionObj #" << this << ">";
 }
 
 
@@ -264,7 +264,7 @@ void NormalDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen:
 
 void
 NormalDistributionObj::print(std::ostream &stream) const {
-  stream << "<DeltaDistributionObj #" << this << ">";
+  stream << "<NormalDistributionObj #" << this << ">";
 }
 
 
@@ -339,7 +339,7 @@ GammaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<c
 
 void
 GammaDistributionObj::print(std::ostream &stream) const {
-  stream << "<DeltaDistributionObj #" << this << ">";
+  stream << "<GammaDistributionObj #" << this << ">";
 }
 
 
@@ -419,7 +419,7 @@ InvGammaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out,
 
 void
 InvGammaDistributionObj::print(std::ostream &stream) const {
-  stream << "<DeltaDistributionObj #" << this << ">";
+  stream << "<InvGammaDistributionObj #" << this << ">";
 }
 
 
@@ -504,6 +504,6 @@ WeibullDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref
 
 void
 WeibullDistributionObj::print(std::ostream &stream) const {
-  stream << "<DeltaDistributionObj #" << this << ">";
+  stream << "<WeibullDistributionObj #" << this << ">";
 }
 

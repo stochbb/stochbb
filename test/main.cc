@@ -4,12 +4,15 @@
 #include "convolutiontest.hh"
 #include "compoundtest.hh"
 #include "exactsamplertest.hh"
+#include "lib/logger.hh"
 
 using namespace stochbb;
 using namespace stochbb::UnitTest;
 
 
 int main(int argc, char *argv[]) {
+
+  Logger::addHandler(IOLogHandler());
 
   // Construct test-runner
   TestRunner runner(std::cout);

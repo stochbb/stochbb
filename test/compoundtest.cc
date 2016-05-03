@@ -1,5 +1,6 @@
 #include "compoundtest.hh"
 #include "lib/api.hh"
+#include "lib/density.hh"
 #include <iostream>
 
 using namespace stochbb;
@@ -36,6 +37,15 @@ CompoundTest::testNormalCompound() {
 }
 
 void
+CompoundTest::testNormalCompoundReduction() {
+  // parameter distr.
+  Var mu = normal(10, 10);
+  // compound distr.
+  Var X = normal(mu, 10);
+  UT_ASSERT(X.density().is<AtomicDensity>());
+}
+
+void
 CompoundTest::testGammaCompound() {
   Var k = uniform(0,4);
   Var X = gamma(5*k+5, 10);
@@ -49,6 +59,7 @@ TestSuite *
 CompoundTest::suite() {
   TestSuite *suite = new TestSuite("Compound");
   suite->addTest(new TestCaller<CompoundTest>("normalCompound", &CompoundTest::testNormalCompound));
+  suite->addTest(new TestCaller<CompoundTest>("normalCompound reduction", &CompoundTest::testNormalCompoundReduction));
   suite->addTest(new TestCaller<CompoundTest>("gammaCompound", &CompoundTest::testGammaCompound));
   return suite;
 }
