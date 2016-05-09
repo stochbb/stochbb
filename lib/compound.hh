@@ -17,7 +17,8 @@ namespace stochbb {
  * space. The bounds for this integration are obtained for each parameter using the
  * @c stochbb::Density::rangeEst method for each parameter density. For the sake of efficientcy,
  * delta-distributed parameters are handled separately, reducing the dimension of the parameter
- * space to intergrate over. */
+ * space to intergrate over.
+ * @ingroup density */
 class CompoundDensityObj: public DensityObj
 {
 public:
@@ -63,7 +64,9 @@ protected:
 };
 
 
-/** Base class of all compound random variables. */
+/** Represents a compound random variable, that is a random variable being distributed
+ * according to some parametric distribution, where at least on parameter is a random variable too.
+ * @ingroup rv */
 class CompoundObj : public DerivedVarObj
 {
 public:
@@ -83,7 +86,13 @@ public:
   /** Returns the i-th parameter variable. */
   Var parameter(size_t i) const;
 
+  virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                      Eigen::Ref<Eigen::MatrixXd> samples) const;
+
 protected:
+  /** Holds the parametric distribution of the compound distribution. Please note that the
+   * density of this object may not be an instance of this distribution as it may have been reduced
+   * to some other density upon construction. */
   DistributionObj *_distribution;
   /** A reference to the density. */
   DensityObj *_density;

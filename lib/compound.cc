@@ -62,6 +62,22 @@ CompoundObj::parameter(size_t i) const {
   return _parameters[i];
 }
 
+void
+CompoundObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                    Eigen::Ref<Eigen::MatrixXd> samples) const
+{
+  Eigen::VectorXd val(1);
+  Eigen::VectorXd params(this->_parameters.size());
+  for (int i=0; i<samples.rows(); i++) {
+    // assemble parameter vector
+    for (int j=0; j<params.size(); j++) {
+      params(j) = samples(i, indices(j));
+    }
+    _distribution->sample(val, params);
+    samples(i,outIdx) = val(0);
+  }
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of GenericCompoundDensityObj

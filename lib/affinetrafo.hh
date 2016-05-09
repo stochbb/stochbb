@@ -9,7 +9,8 @@ namespace stochbb {
 /** Represents an affine transformation of a random variable.
  * That is, \f$Y = a\,X + b\f$, where the real parameter \f$a\f$ is called the scale (dillatation)
  * and \f$b\f$ the shift (translation). If \f$X\sim f(x)\f$ then
- * \f$Y = f\left(\frac{x-b}{a}\right)\f$. */
+ * \f$Y = f\left(\frac{x-b}{a}\right)\f$.
+ * @ingroup rv */
 class AffineTrafoObj : public DerivedVarObj
 {
 public:
@@ -27,6 +28,9 @@ public:
   inline double shift() const { return _shift; }
 
   virtual void print(std::ostream &stream) const;
+
+  virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                      Eigen::Ref<Eigen::MatrixXd> samples) const;
 
 protected:
   /** The density of the scaled and shifted RV. */

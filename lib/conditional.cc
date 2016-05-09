@@ -114,6 +114,16 @@ ConditionalObj::density() {
   return _density;
 }
 
+void
+ConditionalObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                       Eigen::Ref<Eigen::MatrixXd> samples) const
+{
+  for (int i=0; i<samples.rows(); i++) {
+    samples(i, outIdx) = samples(i, indices(0)) < samples(i, indices(1)) ?
+          samples(i, indices(2)) : samples(i, indices(3));
+  }
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of CondChainDensityObj
@@ -281,4 +291,14 @@ Density
 CondChainObj::density() {
   _density->ref();
   return _density;
+}
+
+void
+CondChainObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                     Eigen::Ref<Eigen::MatrixXd> samples) const
+{
+  for (int i=0; i<samples.rows(); i++) {
+    samples(i, outIdx) = samples(i, indices(0)) < samples(i, indices(1)) ?
+          samples(i, indices(2)) + samples(i, indices(0)) : samples(i, indices(3)) + samples(i, indices(1));
+  }
 }

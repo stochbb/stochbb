@@ -11,6 +11,7 @@ class ExactSamplerTest: public UnitTest::TestCase
 public:
   ExactSamplerTest();
 
+  void testChain();
   void testGammaCompound();
 
 public:

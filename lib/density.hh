@@ -1,3 +1,6 @@
+/** @defgroup density Densities
+ * @ingroup internal */
+
 #ifndef __SBB_DENSITY_HH__
 #define __SBB_DENSITY_HH__
 
@@ -8,7 +11,8 @@
 
 namespace stochbb {
 
-/** Base class of all densities. */
+/** Base class of all densities.
+ * @ingroup density */
 class DensityObj: public Object
 {
 protected:
@@ -64,7 +68,8 @@ public:
 
 
 /** Represents a specific "instantiation" of a distribution as a @c DensityObj for an atomic random
- * variable. */
+ * variable.
+ * @ingroup density */
 class AtomicDensityObj: public DensityObj
 {
 public:

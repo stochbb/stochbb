@@ -8,7 +8,8 @@
 
 namespace stochbb {
 
-/** A utility class to measure the CPU time used by some algorithms. */
+/** A utility class to measure the CPU time used by some algorithms.
+ * @ingroup internal */
 class CpuTime
 {
 public:
@@ -27,7 +28,8 @@ protected:
 };
 
 
-/** A utility class to measure the real time used by some algorithms. */
+/** A utility class to measure the real time used by some algorithms.
+ * @ingroup internal */
 class RealTime
 {
 public:

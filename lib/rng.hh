@@ -8,7 +8,7 @@ namespace stochbb {
 /** Singleton class of the random number generator using the @c MersenneTwister.
  * The singleton instance is not directly accessible, but random numbers can be drawn using the
  * static methods.
- * @ingroup internal */
+ * @ingroup math */
 class RNG: protected MersenneTwister
 {
 protected:

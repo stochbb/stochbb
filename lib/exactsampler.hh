@@ -13,7 +13,8 @@ namespace stochbb {
  * depend on others, is sampled only once. Moreover, the samples of derived random variables need
  * to be cached for performance. Upon construction, this class first determines which and in
  * which order the random variables must be sampled. By calling @c sample, a sample is drawn from
- * the system. */
+ * the system.
+ * @ingroup internal */
 class ExactSamplerObj : public Object
 {
 public:
@@ -34,31 +35,8 @@ public:
   void sample(Eigen::Ref<Eigen::MatrixXd> out);
 
 protected:
-  /** Internal used fucntion type to sample a specific variable type. */
-  typedef void (*sampler_f)(ExactSamplerObj *, VarObj *, Eigen::MatrixXd &out);
-
   /** Assembles the sampling queue recusrively. */
   void _add_to_queue(VarObj *var) throw (TypeError);
-  /** Chooses the correct sampler for the given variable. */
-  sampler_f _choose_sampler(VarObj *var) throw (TypeError);
-  /** Samples from an atomic random variable. */
-  static void _sample_atomic(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from an affine transformed random variable. */
-  static void _sample_affine(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a chain of random variables. */
-  static void _sample_chain(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a maximum of random variables. */
-  static void _sample_minimum(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a minimum of random variables. */
-  static void _sample_maximum(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a mixture of random variables. */
-  static void _sample_mixture(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a conditional random variable. */
-  static void _sample_conditional(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a conditional chain random variable. */
-  static void _sample_condchain(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
-  /** Samples from a compound random variable. */
-  static void _sample_compound(ExactSamplerObj *self, VarObj *var, Eigen::MatrixXd &out);
 
 protected:
   /** The variables selected for output. */
@@ -67,8 +45,6 @@ protected:
   std::vector<VarObj *> _queue;
   /** A table mapping a random variable to its index in the queue. */
   std::map<VarObj *, size_t> _varmap;
-  /** The vector of samplers for each variable in the queue. */
-  std::vector<sampler_f> _sampler;
 };
 
 }

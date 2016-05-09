@@ -268,3 +268,13 @@ ChainObj::print(std::ostream &stream) const {
   }
   stream << " #" << this << ">";
 }
+
+void
+ChainObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                 Eigen::Ref<Eigen::MatrixXd> samples) const
+{
+  samples.col(outIdx).setZero();
+  for (size_t i=0; i<this->numVariables(); i++) {
+    samples.col(outIdx) += samples.col(indices(i));
+  }
+}

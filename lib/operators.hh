@@ -244,53 +244,72 @@ Var conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) thro
  * @ingroup api */
 Var condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw (Error);
 
+/** Performs a direct convolution of the given densities without resorting to analytical solutions.
+ * This function is mainly used for testing the numerical convolution algorithm.
+ * @ingroup api */
 Density directConvolve(const std::vector<Density> &densities);
+
+/** Performs a direct convolution of the given densities without resorting to analytical solutions.
+ * This function is mainly used for testing the numerical convolution algorithm.
+ * @ingroup api */
 Density directConvolve(const Density &a, const Density &b);
+
+/** Performs a direct convolution of the given densities without resorting to analytical solutions.
+ * This function is mainly used for testing the numerical convolution algorithm.
+ * @ingroup api */
 Density directConvolve(const Density &a, const Density &b, const Density &c);
 }
 
 /** Overloads the +-operator to construct a @c Chain.
- * See also @c sbb::chain() function. */
+ * See also @c sbb::chain() function.
+ * @ingroup api */
 inline stochbb::Var operator +(const stochbb::Var &a, const stochbb::Var &b) {
   std::vector<stochbb::Var> args; args.reserve(2);
   args.push_back(a); args.push_back(b);
   return stochbb::chain(args);
 }
 
-/** Overloads the +-operator to construct an affine transform of the variable. */
+/** Overloads the +-operator to construct an affine transform of the variable.
+ * @ingroup api */
 inline stochbb::Var operator +(const stochbb::Var &var, double b) {
   return stochbb::affine(var, 1, b);
 }
-/** Overloads the +-operator to construct an affine transform of the variable. */
+/** Overloads the +-operator to construct an affine transform of the variable.
+ * @ingroup api */
 inline stochbb::Var operator +(double b, const stochbb::Var &var) {
   return stochbb::affine(var, 1, b);
 }
-/** Overloads the *-operator to construct an affine transform of the variable. */
+/** Overloads the *-operator to construct an affine transform of the variable.
+ * @ingroup api */
 inline stochbb::Var operator *(double a, const stochbb::Var &var) {
   return stochbb::affine(var, a, 0);
 }
-/** Overloads the *-operator to construct an affine transform of the variable. */
+/** Overloads the *-operator to construct an affine transform of the variable.
+ * @ingroup api */
 inline stochbb::Var operator *(const stochbb::Var &var, double a) {
   return stochbb::affine(var, a, 0);
 }
 
+/** Serializes a string representation of the object held in @c x to the given stream.
+ * @ingroup api */
 std::ostream &operator<<(std::ostream &stream, const stochbb::Container &x);
 
 namespace std {
 
-/** Overloads the standard library @c max function to construct a @c Maximum RV. */
+/** Overloads the standard library @c max function to construct a @c Maximum RV.
+ * @ingroup api */
 inline  stochbb::Var min(const stochbb::Var &a, const stochbb::Var &b) {
   std::vector<stochbb::Var> args; args.reserve(2); args.push_back(a); args.push_back(b);
   return stochbb::minimum(args);
 }
 
-/** Overloads the standard library @c min function to construct a @c Minimum RV. */
+/** Overloads the standard library @c min function to construct a @c Minimum RV.
+ * @ingroup api */
 inline  stochbb::Var max(const stochbb::Var &a, const stochbb::Var &b) {
   std::vector<stochbb::Var> args; args.reserve(2); args.push_back(a); args.push_back(b);
   return stochbb::maximum(args);
 }
 
 }
-
 
 #endif // __SSB_OPERATORS_HH__

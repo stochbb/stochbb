@@ -1,3 +1,6 @@
+/** @defgroup rv Random variables
+ * @ingroup internal */
+
 #ifndef __SBB_RANDOMVARIABLE_HH__
 #define __SBB_RANDOMVARIABLE_HH__
 
@@ -11,7 +14,7 @@
 namespace stochbb {
 
 /** Base class of all random variable objects.
- * @ingroup internal */
+ * @ingroup rv */
 class VarObj: public Object
 {
 protected:
@@ -70,7 +73,7 @@ protected:
 
 /** Implements a generic RV defined only through its density and does not depend on other
  * random variables.
- * @ingroup internal */
+ * @ingroup rv */
 class AtomicVarObj: public VarObj
 {
 public:
@@ -100,9 +103,13 @@ protected:
  * Derived random variables are defined as a function of other random variables, hence they
  * cannot be sampled independently from others. Use the @c ExactSampler class to sample
  * from one or more dependent random variables.
- * @ingroup internal */
+ * @ingroup rv */
 class DerivedVarObj: public VarObj
 {
+public:
+  /** Index vector type. */
+  typedef Eigen::Matrix<size_t, Eigen::Dynamic, 1> IndexVector;
+
 protected:
   /** Hidden constructor.
    * @param variables Specifies the variables, this random variable depends on.
@@ -114,10 +121,16 @@ public:
 
   /** Returns the number of underlying random variables. */
   inline size_t numVariables() const { return _variables.size(); }
+
   /** Returns the i-th underlying random variable. */
   inline Var variable(size_t i) { _variables[i]->ref(); return _variables[i]; }
 
   virtual void print(std::ostream &stream) const;
+  /** "Samples" from a derived random variable. It determines the result using the samples of the
+   * random variables it depends on, at the given indices and stores the result at the specified
+   * output index. */
+  virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                      Eigen::Ref<Eigen::MatrixXd> samples) const = 0;
 
 protected:
   /** References to the underlaying random variables. */

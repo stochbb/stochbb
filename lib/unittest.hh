@@ -1,3 +1,6 @@
+/** @defgroup unittest
+ * @ingroup internal */
+
 #ifndef __SBB_UNITTEST_HH__
 #define __SBB_UNITTEST_HH__
 

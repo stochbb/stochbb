@@ -13,7 +13,9 @@ namespace stochbb {
  * parameters (@c GenericAtomicDensityObj).
  *
  * Almost all densities (except delta) have at least 2 parameters which are \f$[scale, shift, ...]\f$
- * such that a specific density can be expressed as \f$f\left(\frac{x-shift}{scale}, ...\right)\f$. */
+ * such that a specific density can be expressed as \f$f\left(\frac{x-shift}{scale}, ...\right)\f$.
+ * @see AtomicDensity @see Compound
+ * @ingroup density */
 class DistributionObj: public Object
 {
 protected:
@@ -52,7 +54,8 @@ public:
 };
 
 
-/** The family of delta densities. */
+/** The family of delta distributions.
+ * @ingroup density */
 class DeltaDistributionObj: public DistributionObj
 {
 public:
@@ -74,7 +77,8 @@ public:
 };
 
 
-/** The family of uniform densities. */
+/** The family of uniform distributions.
+ * @ingroup density */
 class UniformDistributionObj: public DistributionObj
 {
 public:
@@ -97,7 +101,8 @@ public:
 };
 
 
-/** The family of normal densities. */
+/** The family of normal distributions.
+ * @ingroup density */
 class NormalDistributionObj: public DistributionObj
 {
 public:
@@ -120,7 +125,8 @@ public:
 };
 
 
-/** The family of gamma densities. */
+/** The family of gamma distributions.
+ * @ingroup density */
 class GammaDistributionObj: public DistributionObj
 {
 public:
@@ -143,7 +149,8 @@ public:
 };
 
 
-/** The family of inverse gamma densities. */
+/** The family of inverse gamma distributions.
+ * @ingroup density */
 class InvGammaDistributionObj: public DistributionObj
 {
 public:
@@ -166,7 +173,8 @@ public:
 };
 
 
-/** The family of Weibull densities. */
+/** The family of Weibull distributions.
+ * @ingroup density */
 class WeibullDistributionObj: public DistributionObj
 {
 public:
@@ -187,7 +195,6 @@ public:
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void print(std::ostream &stream) const;
 };
-
 
 }
 

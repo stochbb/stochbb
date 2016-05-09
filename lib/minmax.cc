@@ -287,6 +287,18 @@ MaximumObj::density() {
   return _density;
 }
 
+void
+MaximumObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                   Eigen::Ref<Eigen::MatrixXd> samples) const
+{
+  for (int i=0; i<samples.rows(); i++) {
+    samples(i,outIdx) = samples(i, indices(0));
+    for (size_t j=1; j<this->numVariables(); j++) {
+      samples(i,outIdx) = std::max(samples(i,outIdx), samples(i, indices(j)));
+    }
+  }
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of MinimumObj
@@ -313,4 +325,16 @@ MinimumObj::mark() {
 Density MinimumObj::density() {
   _density->ref();
   return _density;
+}
+
+void
+MinimumObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                   Eigen::Ref<Eigen::MatrixXd> samples) const
+{
+  for (int i=0; i<samples.rows(); i++) {
+    samples(i,outIdx) = samples(i, indices(0));
+    for (size_t j=1; j<this->numVariables(); j++) {
+      samples(i,outIdx) = std::min(samples(i,outIdx), samples(i, indices(j)));
+    }
+  }
 }

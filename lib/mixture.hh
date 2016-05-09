@@ -8,7 +8,8 @@
 
 namespace stochbb {
 
-/** Implements a mixture density. */
+/** Implements a mixture density.
+ * @ingroup density */
 class MixtureDensityObj: public DensityObj
 {
 protected:
@@ -39,7 +40,8 @@ protected:
 };
 
 
-/** Represents a random variable being a mixture of other random variables. */
+/** Represents a random variable being a mixture of other random variables.
+ * @ingroup rv */
 class MixtureObj : public DerivedVarObj
 {
 public:
@@ -52,6 +54,9 @@ public:
 
   /** Returns the weight of the i-th random variable. */
   inline double weight(size_t i) const { return _weights[i]; }
+
+  virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                      Eigen::Ref<Eigen::MatrixXd> samples) const;
 
 protected:
   /** The vector of weights. */

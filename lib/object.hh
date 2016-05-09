@@ -1,4 +1,4 @@
-/** \internal \page mem Memory Management
+/** \page mem Memory Management
  * The classes in StochBB are separated into two groups API are all classes intended to be
  * used by other software using libstochbb, while all remainnig classes should
  * only be used within libstochbb. Dividing them into two groups provides two advantages: (a) The
@@ -24,6 +24,7 @@
  * unreachable Objects are freed.
  */
 
+/** @defgroup internal Internal used objects and functions */
 #ifndef __SBB_OBJECT_HH__
 #define __SBB_OBJECT_HH__
 
@@ -39,7 +40,8 @@ namespace stochbb {
 // Forward declaration
 class Object;
 
-/** Garbage collector. */
+/** Garbage collector.
+ * @ingroup internal */
 class GC
 {
 protected:
@@ -68,7 +70,8 @@ protected:
 };
 
 
-/** Base class of all managed objects. */
+/** Base class of all managed objects.
+ * @ingroup internal */
 class Object
 {
 protected:

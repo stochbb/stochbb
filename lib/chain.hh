@@ -7,7 +7,8 @@
 
 namespace stochbb {
 
-/** Implements the convolution of several PDFs using the FFT convolution. */
+/** Implements the convolution of several PDFs using the FFT convolution.
+ * @ingroup density */
 class ConvolutionDensityObj: public DensityObj
 {
 protected:
@@ -60,10 +61,12 @@ protected:
 
 /** Returns the convoultion of the given densities.
  * This function first tries to perform the convolutions analytically and
- * resorts to the numerical convolution if necessary. */
+ * resorts to the numerical convolution if necessary.
+ * @ingroup density */
 Density convolve(const std::vector<Density> &densities, double scale=1, double shift=0);
 
-/** Represetns the sum of several independent random variables. */
+/** Represetns the sum of several independent random variables.
+ * @ingroup rv */
 class ChainObj : public DerivedVarObj
 {
 public:
@@ -76,6 +79,8 @@ public:
   virtual Density density();
 
   virtual void print(std::ostream &stream) const;
+  virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                      Eigen::Ref<Eigen::MatrixXd> samples) const;
 
 protected:
   /** The density of the sum, the convolution of all PDFs of the underlaying random variables. */

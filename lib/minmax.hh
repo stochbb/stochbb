@@ -8,7 +8,8 @@
 namespace stochbb {
 
 /** Implements the density of a random variable being the maximum of several independent random
- * variables. */
+ * variables.
+ * @ingroup density */
 class MaximumDensityObj: public DensityObj
 {
 protected:
@@ -64,7 +65,8 @@ protected:
 
 
 /** Implements the density of a random variable being the minimum of several independent random
- * variables. */
+ * variables.
+ * @ingroup density */
 class MinimumDensityObj: public DensityObj
 {
 protected:
@@ -117,7 +119,8 @@ protected:
 
 
 /** Implements the random variable being the maximum of several independent random
- * variables. */
+ * variables.
+ * @ingroup rv */
 class MaximumObj: public DerivedVarObj
 {
 public:
@@ -130,6 +133,8 @@ public:
 
   virtual Density density();
 
+  virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                      Eigen::Ref<Eigen::MatrixXd> samples) const;
 protected:
   /** The density object. */
   MaximumDensityObj *_density;
@@ -137,7 +142,8 @@ protected:
 
 
 /** Implements the random variable being the minimum of several independent random
- * variables. */
+ * variables.
+ * @ingroup rv */
 class MinimumObj: public DerivedVarObj
 {
 public:
@@ -151,6 +157,8 @@ public:
 
   virtual Density density();
 
+  virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                      Eigen::Ref<Eigen::MatrixXd> samples) const;
 protected:
   /** The density object of this random variable. */
   MinimumDensityObj *_density;

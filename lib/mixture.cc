@@ -1,8 +1,18 @@
 #include "mixture.hh"
 #include "exception.hh"
+#include "rng.hh"
 
 using namespace stochbb;
 
+inline size_t
+_find_index(double p, size_t a, size_t b, const std::vector<double> &cdf) {
+  while (1 < (b-a)) {
+    size_t mid = a+(b-a)/2;
+    if (p < cdf[mid]) { b = mid; }
+    else { a = mid; }
+  }
+  return b;
+}
 
 
 /* ********************************************************************************************* *
@@ -112,4 +122,29 @@ Density
 MixtureObj::density() {
   _density->ref();
   return _density;
+}
+
+
+void
+MixtureObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
+                   Eigen::Ref<Eigen::MatrixXd> samples) const
+{
+  // compute cummulative distribution of weights
+  std::vector<double> cum; cum.reserve(this->numVariables());
+  for (size_t i=0; i<this->numVariables(); i++) {
+    cum[i] = (i>0) ? (cum[i-1]+this->weight(i)) : this->weight(i);
+  }
+  // normalize cdf
+  for (size_t i=0; i<this->numVariables(); i++) {
+    cum[i] /= cum[this->numVariables()-1];
+  }
+
+  for (int i=0; i<samples.rows(); i++) {
+    // select a variable randomly
+    double p = RNG::unif();
+    size_t idx = (p < cum[0]) ? 0 : _find_index(p, 0, this->numVariables()-1, cum);
+    // select sample
+    samples(i, outIdx) = samples(i, indices(idx));
+  }
+
 }
