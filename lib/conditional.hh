@@ -35,6 +35,8 @@ public:
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
   virtual void rangeEst(double alpha, double &a, double &b) const;
+  virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &stream) const;
 
 protected:
   /** First condition RV. */
@@ -71,6 +73,8 @@ public:
   virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
                       Eigen::Ref<Eigen::MatrixXd> samples) const;
 
+  virtual void print(std::ostream &stream) const;
+
 protected:
   /** A reference to the density object. */
   ConditionalDensityObj *_density;
@@ -102,12 +106,13 @@ public:
   CondChainDensityObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw (Error);
   virtual void mark();
 
-  void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
-  Density affine(double scale, double shift) const;
-  void rangeEst(double alpha, double &a, double &b) const;
+  virtual void eval(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
+  virtual Density affine(double scale, double shift) const;
+  virtual void rangeEst(double alpha, double &a, double &b) const;
 
-  void print(std::ostream &out) const;
+  virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &out) const;
 
 protected:
   /** Density of the first condition variable. */
@@ -144,6 +149,7 @@ public:
 
   virtual Density density();
 
+  virtual void print(std::ostream &stream) const;
   virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
                       Eigen::Ref<Eigen::MatrixXd> samples) const;
 

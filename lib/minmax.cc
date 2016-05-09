@@ -123,10 +123,14 @@ MaximumDensityObj::compare(const DensityObj &other) const {
 
 void
 MaximumDensityObj::print(std::ostream &stream) const {
-  stream << "<MaximumDensityObj of";
+  stream << "<MaximumDensity of";
   for (size_t i=0; i<_densities.size(); i++) {
     stream << " "; _densities[i]->print(stream);
   }
+  if (_shift)
+    stream << " shift=" << _shift;
+  if (1 != _scale)
+    stream << " scale=" << _scale;
   stream << " #" << this << ">";
 }
 
@@ -251,10 +255,14 @@ MinimumDensityObj::compare(const DensityObj &other) const {
 
 void
 MinimumDensityObj::print(std::ostream &stream) const {
-  stream << "<MinimumDensityObj of";
+  stream << "<MinimumDensity of";
   for (size_t i=0; i<_densities.size(); i++) {
     stream << " "; _densities[i]->print(stream);
   }
+  if (_shift)
+    stream << " shift=" << _shift;
+  if (1 != _scale)
+    stream << " scale=" << _scale;
   stream << " #" << this << ">";
 }
 
@@ -299,6 +307,16 @@ MaximumObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
   }
 }
 
+void
+MaximumObj::print(std::ostream &stream) const {
+  stream << "<Maximum of";
+  for (size_t i=0; i<_variables.size(); i++) {
+    stream << " "; _variables[i]->print(stream);
+  }
+  stream << " density="; _density->print(stream);
+  stream << " #" << this << ">";
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of MinimumObj
@@ -337,4 +355,14 @@ MinimumObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
       samples(i,outIdx) = std::min(samples(i,outIdx), samples(i, indices(j)));
     }
   }
+}
+
+void
+MinimumObj::print(std::ostream &stream) const {
+  stream << "<Minimum of";
+  for (size_t i=0; i<_variables.size(); i++) {
+    stream << " "; _variables[i]->print(stream);
+  }
+  stream << " density="; _density->print(stream);
+  stream << " #" << this << ">";
 }

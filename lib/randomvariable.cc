@@ -107,7 +107,7 @@ DerivedVarObj::mark() {
 
 void
 DerivedVarObj::print(std::ostream &stream) const {
-  stream << "<DerivedVarObj #" << (void *)this << ">";
+  stream << "<DerivedVar #" << (void *)this << ">";
 }
 
 

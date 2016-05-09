@@ -93,6 +93,43 @@ MixtureDensityObj::rangeEst(double alpha, double &a, double &b) const {
   }
 }
 
+int
+MixtureDensityObj::compare(const DensityObj &other) const {
+  // compare by type
+  if (int cmp = DensityObj::compare(other))
+    return cmp;
+  const MixtureDensityObj &oobj = dynamic_cast<const MixtureDensityObj &>(other);
+
+  // compare by number of mixed densities.
+  if (_densities.size() < oobj._densities.size()) { return -1; }
+  else if (_densities.size() > oobj._densities.size()) { return 1; }
+
+  // compare mixed densities element by element
+  for (size_t i=0; i<_densities.size(); i++) {
+    if (int cmp = _densities[i]->compare(* oobj._densities[i]))
+      return cmp;
+    if (_weights[i] < oobj._weights[i])
+      return -1;
+    if (_weights[i] > oobj._weights[i])
+      return 1;
+  }
+
+  return 0;
+}
+
+void
+MixtureDensityObj::print(std::ostream &stream) const {
+  stream << "<MixtureDensity of";
+  for (size_t i=0; i<_densities.size(); i++) {
+    stream << " " << _weights[i] << "*"; _densities[i]->print(stream);
+  }
+  if (_shift)
+    stream << " shift=" << _shift;
+  if (1 != _scale)
+    stream << " scale=" << _scale;
+  stream << " #" << this << ">";
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of MixtrueObj
@@ -146,5 +183,15 @@ MixtureObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
     // select sample
     samples(i, outIdx) = samples(i, indices(idx));
   }
-
 }
+
+void
+MixtureObj::print(std::ostream &stream) const {
+  stream << "<Mixture of";
+  for (size_t i=0; i<_variables.size(); i++) {
+    stream << " " << _weights[i] << "*"; _variables[i]->print(stream);
+  }
+  stream << " density="; _density->print(stream);
+  stream << " #" << this << ">";
+}
+

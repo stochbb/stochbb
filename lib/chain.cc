@@ -207,13 +207,15 @@ ConvolutionDensityObj::compare(const DensityObj &other) const {
 
 void
 ConvolutionDensityObj::print(std::ostream &stream) const {
-  stream << "<ConvolutionDensityObj of";
+  stream << "<ConvolutionDensity of";
   for (size_t i=0; i<_densities.size(); i++) {
     stream << " "; _densities[i]->print(stream);
   }
-  stream << " shift=" << _shift
-         << " scale=" << _scale
-         << " #" << this << ">";
+  if (_shift)
+    stream << " shift=" << _shift;
+  if (1 != _scale)
+    stream << " scale=" << _scale;
+  stream << " #" << this << ">";
 }
 
 
@@ -262,10 +264,11 @@ Density ChainObj::density() {
 
 void
 ChainObj::print(std::ostream &stream) const {
-  stream << "<ChainObj";
+  stream << "<Chain";
   for (size_t i=0; i<_variables.size(); i++) {
     stream << " "; _variables[i]->print(stream);
   }
+  stream << " density="; _density->print(stream);
   stream << " #" << this << ">";
 }
 

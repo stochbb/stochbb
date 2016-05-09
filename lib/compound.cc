@@ -63,6 +63,19 @@ CompoundObj::parameter(size_t i) const {
 }
 
 void
+CompoundObj::print(std::ostream &stream) const {
+  stream << "<Compound distr=";
+  _distribution->print(stream);
+  stream << " params=[";
+  _parameters[0]->print(stream);
+  for (size_t i=1; i<_parameters.size(); i++) {
+    stream << ", "; _parameters[i]->print(stream);
+  }
+  stream << " desity="; _density->print(stream);
+  stream << " #" << this << ">";
+}
+
+void
 CompoundObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
                     Eigen::Ref<Eigen::MatrixXd> samples) const
 {
@@ -288,8 +301,8 @@ CompoundDensityObj::compare(const DensityObj &other) const {
 
 void
 CompoundDensityObj::print(std::ostream &stream) const {
-  stream << "<CompoundDensity of "; _distribution->print(stream);
-  stream << " with [";
+  stream << "<CompoundDensity distr="; _distribution->print(stream);
+  stream << " param=[";
   _parameters[0]->print(stream);
   for (size_t i=1; i<_parameters.size(); i++) {
     stream << ", ";

@@ -86,6 +86,8 @@ public:
   /** Returns the i-th parameter variable. */
   Var parameter(size_t i) const;
 
+  virtual void print(std::ostream &stream) const;
+
   virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
                       Eigen::Ref<Eigen::MatrixXd> samples) const;
 

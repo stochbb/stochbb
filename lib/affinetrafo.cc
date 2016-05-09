@@ -24,7 +24,7 @@ AffineTrafoObj::density() {
 
 void
 AffineTrafoObj::print(std::ostream &stream) const {
-  stream << "<AffineTrafoObj " << _scale << " * ";
+  stream << "<AffineTrafo " << _scale << " * ";
   _variables[0]->print(stream);
   stream << " + " << _shift << " #" << this << ">";
 }

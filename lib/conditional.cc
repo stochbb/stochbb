@@ -74,6 +74,38 @@ ConditionalDensityObj::rangeEst(double alpha, double &a, double &b) const {
   b = std::max(b_x1, std::max(b_x2, std::max(b_y1, b_y2)));
 }
 
+int
+ConditionalDensityObj::compare(const DensityObj &other) const {
+  // compare by type
+  if (int cmp = DensityObj::compare(other))
+    return cmp;
+  const ConditionalDensityObj &oobj = dynamic_cast<const ConditionalDensityObj &>(other);
+
+  // compare X1, X2, Y1 and Y2;
+  if (int cmp = _X1->compare(*oobj._X1))
+    return cmp;
+  if (int cmp = _X2->compare(*oobj._X2))
+    return cmp;
+  if (int cmp = _Y1->compare(*oobj._Y1))
+    return cmp;
+  if (int cmp = _Y2->compare(*oobj._Y2))
+    return cmp;
+  return 0;
+}
+
+void
+ConditionalDensityObj::print(std::ostream &stream) const {
+  stream << "<ConditionalDensity of X1~";
+  _X1->print(stream);
+  stream << " X2~";
+  _X2->print(stream);
+  stream << " Y1~";
+  _Y1->print(stream);
+  stream << " Y2~";
+  _Y2->print(stream);
+  stream << " #" << this << ">";
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of ConditionalObj
@@ -122,6 +154,16 @@ ConditionalObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
     samples(i, outIdx) = samples(i, indices(0)) < samples(i, indices(1)) ?
           samples(i, indices(2)) : samples(i, indices(3));
   }
+}
+
+void
+ConditionalObj::print(std::ostream &stream) const {
+  stream << "<Conditonal X1="; _variables[0]->print(stream);
+  stream << " X2="; _variables[1]->print(stream);
+  stream << " Y1="; _variables[2]->print(stream);
+  stream << " Y2="; _variables[3]->print(stream);
+  stream << " density="; _density->print(stream);
+  stream << " #" << this << ">";
 }
 
 
@@ -242,15 +284,34 @@ CondChainDensityObj::rangeEst(double alpha, double &a, double &b) const {
   b = std::max(a, std::max(a_x2+a_y2, a_x1+a_y1));
 }
 
+int
+CondChainDensityObj::compare(const DensityObj &other) const {
+  // compare by type
+  if (int cmp = DensityObj::compare(other))
+    return cmp;
+  const CondChainDensityObj &oobj = dynamic_cast<const CondChainDensityObj &>(other);
+
+  // compare X1, X2, Y1 and Y2;
+  if (int cmp = _X1->compare(*oobj._X1))
+    return cmp;
+  if (int cmp = _X2->compare(*oobj._X2))
+    return cmp;
+  if (int cmp = _Y1->compare(*oobj._Y1))
+    return cmp;
+  if (int cmp = _Y2->compare(*oobj._Y2))
+    return cmp;
+  return 0;
+}
+
 void
 CondChainDensityObj::print(std::ostream &stream) const {
-  stream << "<CondChainDensity of X1=";
+  stream << "<CondChainDensity of X1~";
   _X1->print(stream);
-  stream << ", X2=";
+  stream << " X2~";
   _X2->print(stream);
-  stream << ", Y1=";
+  stream << " Y1~";
   _Y1->print(stream);
-  stream << ", Y2=";
+  stream << " Y2~";
   _Y2->print(stream);
   stream << " #" << this << ">";
 }
@@ -291,6 +352,16 @@ Density
 CondChainObj::density() {
   _density->ref();
   return _density;
+}
+
+void
+CondChainObj::print(std::ostream &stream) const {
+  stream << "<CondChain X1="; _variables[0]->print(stream);
+  stream << " X2="; _variables[1]->print(stream);
+  stream << " Y1="; _variables[2]->print(stream);
+  stream << " Y2="; _variables[3]->print(stream);
+  stream << " density="; _density->print(stream);
+  stream << " #" << this << ">";
 }
 
 void

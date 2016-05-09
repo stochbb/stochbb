@@ -43,7 +43,7 @@ DensityObj::compare(const DensityObj &other) const {
 
 void
 DensityObj::print(std::ostream &stream) const {
-  stream << "<DensityObj #" << (void *)this << ">";
+  stream << "<Density #" << (void *)this << ">";
 }
 
 
@@ -132,9 +132,8 @@ AtomicDensityObj::compare(const DensityObj &other) const {
 
 void
 AtomicDensityObj::print(std::ostream &stream) const {
-  stream << "<AtomicDensity ";
-  _distribution->print(stream);
-  stream << " @" << _params.transpose() << " #" << this << ">";
+  stream << "<AtomicDensity distr="; _distribution->print(stream);
+  stream << " params=[" << _params.transpose() << "] #" << this << ">";
 }
 
 

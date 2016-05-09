@@ -127,14 +127,19 @@ public:
   /** Constructor from a vector of random variables.
    * @throws AssumptionError If these random variables are not independent. */
   MaximumObj(const std::vector<Var> &variables, const std::string &name="");
+
   /** Destructor. */
   virtual ~MaximumObj();
+
   virtual void mark();
 
   virtual Density density();
 
   virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
                       Eigen::Ref<Eigen::MatrixXd> samples) const;
+
+  virtual void print(std::ostream &stream) const;
+
 protected:
   /** The density object. */
   MaximumDensityObj *_density;
@@ -150,6 +155,7 @@ public:
   /** Constructor from a vector of random variables.
    * @throws AssumptionError If these random variables are not independent. */
   MinimumObj(const std::vector<Var> &variables, const std::string &name="");
+
   /** Destructor. */
   virtual ~MinimumObj();
 
@@ -159,6 +165,9 @@ public:
 
   virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
                       Eigen::Ref<Eigen::MatrixXd> samples) const;
+
+  virtual void print(std::ostream &stream) const;
+
 protected:
   /** The density object of this random variable. */
   MinimumDensityObj *_density;

@@ -27,6 +27,8 @@ public:
   virtual void evalCDF(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out) const;
   virtual Density affine(double scale, double shift) const;
   virtual void rangeEst(double alpha, double &a, double &b) const;
+  virtual int compare(const DensityObj &other) const;
+  virtual void print(std::ostream &stream) const;
 
 protected:
   /** The vector of weights (normalized). */
@@ -57,6 +59,7 @@ public:
 
   virtual void sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
                       Eigen::Ref<Eigen::MatrixXd> samples) const;
+  virtual void print(std::ostream &stream) const;
 
 protected:
   /** The vector of weights. */
