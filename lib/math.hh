@@ -29,6 +29,10 @@ double erfinv(double p);
  * @ingroup math */
 double betai(double a, double b, double x);
 
+/** Inverse regularized incomplete beta function.
+ * @ingroup math */
+double invbetai(double a, double b, double x);
+
 /** PDF of the standard normal distribution.
  * @ingroup math */
 double dnorm(double x);

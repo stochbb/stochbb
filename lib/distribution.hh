@@ -45,7 +45,7 @@ public:
   virtual void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const = 0;
   /** Changes the given set of parameter densities such that the distribution is an affine
    * transformed. */
-  virtual void affine(double scale, double shift, std::vector<DensityObj *> &params) const = 0;
+  virtual void affine(double scale, double shift, std::vector<Density> &params) const = 0;
   /** Draws some samples from the distribution with the specified parameters. */
   virtual void sample(Eigen::Ref<Eigen::VectorXd> out,
                       const Eigen::Ref<const Eigen::VectorXd> params) const = 0;
@@ -71,7 +71,7 @@ public:
   void cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
-  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
+  void affine(double scale, double shift, std::vector<Density> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void print(std::ostream &stream) const;
 };
@@ -95,7 +95,7 @@ public:
            const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
-  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
+  void affine(double scale, double shift, std::vector<Density> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void print(std::ostream &stream) const;
 };
@@ -119,7 +119,7 @@ public:
            const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
-  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
+  void affine(double scale, double shift, std::vector<Density> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void print(std::ostream &stream) const;
 };
@@ -143,7 +143,7 @@ public:
            const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
-  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
+  void affine(double scale, double shift, std::vector<Density> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void print(std::ostream &stream) const;
 };
@@ -167,7 +167,7 @@ public:
            const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
-  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
+  void affine(double scale, double shift, std::vector<Density> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void print(std::ostream &stream) const;
 };
@@ -191,7 +191,29 @@ public:
            const Eigen::Ref<const Eigen::VectorXd> params) const;
   void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
-  void affine(double scale, double shift, std::vector<DensityObj *> &params) const;
+  void affine(double scale, double shift, std::vector<Density> &params) const;
+  void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void print(std::ostream &stream) const;
+};
+
+
+/** The family of (non-standardized) Student's t distributions.
+ * @ingroup density */
+class StudtDistributionObj: public DistributionObj
+{
+public:
+  /** Constructor. */
+  StudtDistributionObj();
+  virtual ~StudtDistributionObj();
+
+  size_t nParams() const;
+  void pdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
+           const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
+           const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const;
+  void affine(double scale, double shift, std::vector<Density> &params) const;
   void sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const;
   void print(std::ostream &stream) const;
 };

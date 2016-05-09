@@ -264,8 +264,13 @@ CompoundDensityObj::affine(double scale, double shift) const {
   _distribution->ref();
   // Copy, reference to _distribution is taken by the constructor
   CompoundDensityObj *res = new CompoundDensityObj(_distribution, _parameters);
+  std::vector<Density> params; params.reserve(_parameters.size());
+  for (size_t i=0; i<_parameters.size(); i++) {
+    _parameters[i]->ref();
+    params.push_back(Density(_parameters[i]));
+  }
   // perform affine transform on parameter distributions
-  _distribution->affine(scale, shift, res->_parameters);
+  _distribution->affine(scale, shift, params);
   // done, reference is transferred to Density container.
   return res;
 }

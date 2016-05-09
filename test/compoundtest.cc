@@ -58,9 +58,9 @@ CompoundTest::testGammaCompound() {
 TestSuite *
 CompoundTest::suite() {
   TestSuite *suite = new TestSuite("Compound");
-  suite->addTest(new TestCaller<CompoundTest>("normalCompound", &CompoundTest::testNormalCompound));
-  suite->addTest(new TestCaller<CompoundTest>("normalCompound reduction", &CompoundTest::testNormalCompoundReduction));
-  suite->addTest(new TestCaller<CompoundTest>("gammaCompound", &CompoundTest::testGammaCompound));
+  suite->addTest(new TestCaller<CompoundTest>("normal compound", &CompoundTest::testNormalCompound));
+  suite->addTest(new TestCaller<CompoundTest>("normal compound reduction", &CompoundTest::testNormalCompoundReduction));
+  suite->addTest(new TestCaller<CompoundTest>("gamma compound", &CompoundTest::testGammaCompound));
   return suite;
 }
 

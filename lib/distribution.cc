@@ -94,8 +94,8 @@ DeltaDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Vecto
 }
 
 void
-DeltaDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
-  params[0] = *(params[0]->affine(scale, shift));
+DeltaDistributionObj::affine(double scale, double shift, std::vector<Density> &params) const {
+  params[0] = params[0].affine(scale, shift);
 }
 
 void
@@ -171,13 +171,13 @@ UniformDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Vec
 }
 
 void
-UniformDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
+UniformDistributionObj::affine(double scale, double shift, std::vector<Density> &params) const {
   if (scale>0) {
-    params[0] = *(params[0]->affine(scale, shift));
-    params[1] = *(params[1]->affine(scale, shift));
+    params[0] = params[0].affine(scale, shift);
+    params[1] = params[1].affine(scale, shift);
   } else {
-    params[0] = *(params[0]->affine(scale, shift));
-    params[1] = *(params[1]->affine(scale, shift));
+    params[0] = params[0].affine(scale, shift);
+    params[1] = params[1].affine(scale, shift);
     std::swap(params[0], params[1]);
   }
 }
@@ -244,10 +244,10 @@ NormalDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Vect
 }
 
 void
-NormalDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
-  DensityObj *mu = params[0], *sigma = params[1];
-  params[0] = *mu->affine(scale, shift);
-  params[1] = *sigma->affine(scale,0);
+NormalDistributionObj::affine(double scale, double shift, std::vector<Density> &params) const {
+  Density mu = params[0], sigma = params[1];
+  params[0] = mu.affine(scale, shift);
+  params[1] = sigma.affine(scale,0);
 }
 
 void NormalDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
@@ -318,10 +318,10 @@ GammaDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Vecto
 }
 
 void
-GammaDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
-  DensityObj *theta = params[1], *s = params[2];
-  params[1] = *theta->affine(scale, 0);
-  params[2] = *s->affine(scale,shift);
+GammaDistributionObj::affine(double scale, double shift, std::vector<Density> &params) const {
+  Density theta = params[1], s = params[2];
+  params[1] = theta.affine(scale, 0);
+  params[2] = s.affine(scale,shift);
 }
 
 void GammaDistributionObj::quantile(double &lower, double &upper, double p, const Eigen::Ref<const Eigen::VectorXd> params) const {
@@ -393,10 +393,10 @@ InvGammaDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Ve
 }
 
 void
-InvGammaDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
-  DensityObj *beta = params[1], *s = params[2];
-  params[1] = *beta->affine(scale, 0);
-  params[2] = *s->affine(scale,shift);
+InvGammaDistributionObj::affine(double scale, double shift, std::vector<Density> &params) const {
+  Density beta = params[1], s = params[2];
+  params[1] = beta.affine(scale, 0);
+  params[2] = s.affine(scale,shift);
 }
 
 void
@@ -480,10 +480,10 @@ WeibullDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::Vec
 }
 
 void
-WeibullDistributionObj::affine(double scale, double shift, std::vector<DensityObj *> &params) const {
-  DensityObj *lambda = params[1], *s = params[2];
-  params[1] = *lambda->affine(scale, 0);
-  params[2] = *s->affine(scale,shift);
+WeibullDistributionObj::affine(double scale, double shift, std::vector<Density> &params) const {
+  Density lambda = params[1], s = params[2];
+  params[1] = lambda.affine(scale, 0);
+  params[2] = s.affine(scale,shift);
 }
 
 void
@@ -507,3 +507,98 @@ WeibullDistributionObj::print(std::ostream &stream) const {
   stream << "<WeibullDistribution #" << this << ">";
 }
 
+
+/* ********************************************************************************************* *
+ * Implementation of StudtDistObj
+ * ********************************************************************************************* */
+StudtDistributionObj::StudtDistributionObj()
+  : DistributionObj()
+{
+  // pass...
+}
+
+StudtDistributionObj::~StudtDistributionObj() {
+  // pass...
+}
+
+size_t
+StudtDistributionObj::nParams() const {
+  return 3;
+}
+
+void
+StudtDistributionObj::pdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
+                          const Eigen::Ref<const Eigen::VectorXd> params) const
+{
+  double nu=params[0], sigma=params[1], mu=params[2];
+  Tmin = (Tmin - mu)/sigma;
+  Tmax = (Tmax - mu)/sigma;
+  double t=Tmin, dt=(Tmax-Tmin)/out.size();
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    out(i) = std::exp(
+          std::lgamma((nu+1)/2)-std::lgamma(nu/2) - 0.5*std::log(M_PI*nu) - std::log(sigma)
+          -(nu+1)*std::log(1+t*t/nu)/2);
+  }
+}
+
+void
+StudtDistributionObj::cdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> out,
+                          const Eigen::Ref<const Eigen::VectorXd> params) const
+{
+  double nu=params[0], sigma=params[1], mu=params[2];
+  Tmin = (Tmin - mu)/sigma;
+  Tmax = (Tmax - mu)/sigma;
+  double t=Tmin, dt=(Tmax-Tmin)/out.size();
+  for (int i=0; i<out.size(); i++, t+=dt) {
+    double x = nu/(t*t+nu);
+    if (0 >= t) {
+      out(i) = 0.5*stochbb::betai(nu/2, 0.5, x);
+    } else {
+      out(i) = 1-0.5*stochbb::betai(nu/2, 0.5, x);
+    }
+  }
+}
+
+void
+StudtDistributionObj::quantile(double &lower, double &upper, double p,
+                               const Eigen::Ref<const Eigen::VectorXd> params) const
+{
+  double nu=params[0], sigma=params[1], mu=params[2];
+  // get inverse reg. incomplete beta function
+  upper = invbetai(nu/2, 0.5, 1-p/2);
+  // map
+  upper = std::sqrt(nu/upper - nu);
+  // symm.
+  lower = -upper;
+  // scale/shift
+  upper = sigma*upper+mu;
+  lower = sigma*lower+mu;
+}
+
+void
+StudtDistributionObj::affine(double scale, double shift, Eigen::Ref<Eigen::VectorXd> params) const {
+  params[1] *= scale;
+  params[2] = scale*params[2] + shift;
+}
+
+void
+StudtDistributionObj::affine(double scale, double shift, std::vector<Density> &params) const {
+  Density sigma = params[1], mu = params[2];
+  params[1] = sigma.affine(scale, 0);
+  params[2] = mu.affine(scale,shift);
+}
+
+void
+StudtDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out,
+                             const Eigen::Ref<const Eigen::VectorXd> params) const
+{
+  double df=params[0], sigma=params[1], mu = params[2];
+  for (int i=0; i<out.size(); i++) {
+    out(i) = sigma*RNG::norm()/sqrt(RNG::gamma(df/2, df/2)) + mu;
+  }
+}
+
+void
+StudtDistributionObj::print(std::ostream &stream) const {
+  stream << "<Student's t-Distribution #" << this << ">";
+}
