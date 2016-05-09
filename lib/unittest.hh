@@ -1,4 +1,4 @@
-/** @defgroup unittest
+/** @defgroup unittest Functions and classes for unit tests.
  * @ingroup internal */
 
 #ifndef __SBB_UNITTEST_HH__

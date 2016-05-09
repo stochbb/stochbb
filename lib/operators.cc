@@ -234,6 +234,25 @@ stochbb::weibull(const Var &k, const Var& lambda, const std::string &name) throw
                          new WeibullDistributionObj(), name);
 }
 
+/* ********************************************************************************************* *
+ * Implementation of sbb::studt()
+ * ********************************************************************************************* */
+Var
+stochbb::studt(double nu, const std::string &name) throw (Error) {
+  Eigen::VectorXd param(3); param << nu, 1, 0;
+  return new AtomicVarObj(
+        new AtomicDensityObj(new StudtDistributionObj(), param), name);
+}
+
+Var
+stochbb::studt(const Var &nu, const std::string &name) throw (Error) {
+  AtomicDensityObj *nu_a = dynamic_cast<AtomicDensityObj *>(* nu.density());
+  if (nu_a && dynamic_cast<DeltaDistributionObj *>(* nu_a->distribution())) {
+    return studt(nu_a->parameter(0), name);
+  }
+  return new CompoundObj(std::vector<Var> {nu, delta(1), delta(0)},
+                         new StudtDistributionObj(), name);
+}
 
 
 /* ********************************************************************************************* *

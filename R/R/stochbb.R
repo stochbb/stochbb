@@ -55,6 +55,14 @@ weibull <- function(k, lambda, name="") {
   }
 }
 
+studt <- function(nu, name="") {
+  if (is.numeric(k)) {
+    stochbb::"_studtrv"(nu, name);
+  } else {
+    stochbb::"_compstudtrv"(nu, name);
+  }
+}
+
 chain <- function(X1, X2, ...) {
   args <- c(X1, X2, ...)
   stochbb::"_chain"(args);

@@ -92,6 +92,14 @@ Var weibull(double k, const Var& lambda, const std::string &name="") throw (Erro
  * @ingroup api */
 Var weibull(const Var& k, const Var& lambda, const std::string &name="") throw (Error);
 
+/** Constructs a Student's t distributed random variable with degree-of-freedom @c nu.
+ * @ingroup api */
+Var studt(double nu, const std::string &name="") throw (Error);
+/** Constructs a compound Student's t distributed random variable with degree-of-freedom @c nu,
+ * being a random variable too.
+ * @ingroup api */
+Var studt(const Var &nu, const std::string &name="") throw (Error);
+
 /** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
  * That is
  * \f[

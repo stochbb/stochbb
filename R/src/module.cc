@@ -127,6 +127,11 @@ RCPP_MODULE(stochbb) {
   function<Var, const Var &, const Var &, const std::string &>(
         "_compweibullrv", &weibull);
 
+  function<Var, double, const std::string &>(
+        "_studtrv", &studt);
+  function<Var, const Var &, const std::string &>(
+        "_compstudtrv", &studt);
+
   function<Var, const Var &, double, double>(
         "affine", &affine);
 

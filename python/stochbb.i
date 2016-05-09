@@ -306,6 +306,11 @@ Var weibull(double k, const Var& lam) throw (Error);
 Var weibull(const Var& k, const Var& lam) throw (Error);
 
 %feature("autodoc", "1");
+Var studt(double nu) throw (Error);
+%feature("autodoc", "1");
+Var studt(const Var& nu) throw (Error);
+
+%feature("autodoc", "1");
 Var affine(const Var &var, double scale, double shift);
 
 %feature("autodoc", "1");
