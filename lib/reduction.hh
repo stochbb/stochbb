@@ -1,5 +1,6 @@
 /** @defgroup red Analytic density reductions
  * @ingroup internal */
+
 #ifndef REDUCTION_H
 #define REDUCTION_H
 
@@ -22,7 +23,7 @@ public:
 
   /** Returns @c true if the rule can be applied. */
   virtual bool test(const Density &a, const Density &b) const = 0;
-  /** Applies the rule to the densities. */
+  /** Applies the rule to the densities if @c test returned @c true. */
   virtual Density apply(const Density &a, const Density &b) const = 0;
 };
 
@@ -130,7 +131,8 @@ public:
 
   /** Returns @c true if the rule can be applied on the given density. */
   virtual bool test(const Density &a) const = 0;
-  /** Applies the rule on the given density and returns the reduced density. */
+  /** Applies the rule on the given density and returns the reduced density if @c test returned
+   * @c true. */
   virtual Density apply(const Density &a) const = 0;
 };
 

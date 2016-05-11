@@ -54,6 +54,8 @@ AtomicDensityObj::AtomicDensityObj(const Distribution &dist, Eigen::Ref<Eigen::V
   : DensityObj(), _distribution(*dist), _params(params)
 {
   assume(size_t(_params.size()) == _distribution->nParams());
+  logDebug() << "Construct " << dist
+             << " density with parameters [" << params.transpose() << "].";
 }
 
 AtomicDensityObj::~AtomicDensityObj() {

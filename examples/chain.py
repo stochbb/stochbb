@@ -6,7 +6,7 @@ from matplotlib import pylab
 import cProfile
 
 # Install Logger
-#stochbb.Logger.addHandler(stochbb.IOLogHandler())
+stochbb.Logger.addHandler(stochbb.IOLogHandler())
 
 #
 # Corpus model
@@ -34,7 +34,6 @@ M = stochbb.gamma(10, 30)
 # response latency is simply R = L + S + M
 R = L+S+M
 
-print R, R.density()
 Tmin, Tmax, N = 0, 1200, 1000;
 t = linspace(Tmin, Tmax, N); dt = float(Tmax-Tmin)/N
 pL = empty(N,); L.density().eval(Tmin, Tmax, pL)

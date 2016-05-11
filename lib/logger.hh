@@ -74,6 +74,9 @@ public:
    * instance. */
   virtual ~LogMessageStream();
 
+  /** Serializes a container. */
+  LogMessageStream &operator<< (const Container &obj);
+
 protected:
   /** The name of the file where the message originated. */
   std::string _filename;

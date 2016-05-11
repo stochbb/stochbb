@@ -34,9 +34,11 @@ MarginalSamplerObj::mark() {
 void
 MarginalSamplerObj::sample(Eigen::Ref<Eigen::VectorXd> out) {
   double dt = (_Tmax-_Tmin)/_cdf.size();
+  RNG &rng = RNG::get();
+  std::uniform_real_distribution<double> sampler(0,1);
   // First, sample probabilities from unif(0,1)
   for (int i=0; i<out.size(); i++) {
-    double p = RNG::unif();
+    double p = sampler(rng);
     if (p < _cdf[0]) {
       out[i] = _Tmin;
     } else if (p >= _cdf[_cdf.size()-1]) {

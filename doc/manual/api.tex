@@ -55,10 +55,11 @@ or atomic random-variable types defined in StochBB:
  Constructor & Parameters & Process description \\ \hline
  \function{stochbb::delta} & \code{delay} & A constant delay or a process with a fixed waiting time. \\
  \function{stochbb::unif} & \code{a}, \code{b} & A process with a uniform-distributed waiting time. \\
- \function{stochbb::norm} & \code{mu}, \code{sigma} & A process with a normal-distributed waiting time. \\
+ \function{stochbb::norm} & \code{mu}, \code{sigma} & A process with a normal-distributed \emph{waiting time}. \\
  \function{stochbb::gamma} & \code{k}, \code{theta} & A process with a gamma-distributed waiting time. \\
  \function{stochbb::invgamma} & \code{alpha}, \code{beta} & A process with an inverse gamma-distributed waiting time. \\
  \function{stochbb::weibull} & \code{k}, \code{lambda} & A process with a Weibull-distributed waiting time. \\
+ \function{stochbb::studt} & \code{nu} & A process with a Student's t-distributed \emph{waiting time}. \\
 \end{tabular}
 
 More complex processes can be derived by combining these atomic random variables or as special cases of them. 

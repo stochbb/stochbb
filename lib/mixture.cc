@@ -175,10 +175,11 @@ MixtureObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
   for (size_t i=0; i<this->numVariables(); i++) {
     cum[i] /= cum[this->numVariables()-1];
   }
-
+  RNG &rng = RNG::get();
+  std::uniform_real_distribution<double> sampler(0,1);
   for (int i=0; i<samples.rows(); i++) {
     // select a variable randomly
-    double p = RNG::unif();
+    double p = sampler(rng);
     size_t idx = (p < cum[0]) ? 0 : _find_index(p, 0, this->numVariables()-1, cum);
     // select sample
     samples(i, outIdx) = samples(i, indices(idx));

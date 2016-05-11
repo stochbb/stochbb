@@ -96,10 +96,16 @@ DeltaConvolutionRule::apply(const Density &a, const Density &b) const {
   AtomicDensityObj *b_atomic = dynamic_cast<AtomicDensityObj *>(*b);
 
   if (a_atomic && dynamic_cast<DeltaDistributionObj *>(*a_atomic->distribution())) {
-    return b.affine(1, a_atomic->parameter(0));
+    Density res = b.affine(1, a_atomic->parameter(0));
+    logDebug() << "Reduce convolution of " << a << " and " << b
+               << " to " << res << ".";
+    return res;
   }
 
-  return a.affine(1, b_atomic->parameter(0));
+  Density res = a.affine(1, b_atomic->parameter(0));
+  logDebug() << "Reduce convolution of " << a << " and " << b
+             << " to " << res << ".";
+  return res;
 }
 
 
@@ -131,7 +137,10 @@ NormalConvolutionRule::apply(const Density &a, const Density &b) const {
   double a_mu = a_atomic->parameter(0), b_mu = b_atomic->parameter(0),
       a_sig = a_atomic->parameter(1), b_sig = b_atomic->parameter(1);
   Eigen::VectorXd params(2); params << a_mu+b_mu, std::sqrt(a_sig*a_sig + b_sig*b_sig);
-  return new AtomicDensityObj(new NormalDistributionObj(), params);
+  Density res(new AtomicDensityObj(new NormalDistributionObj(), params));
+  logDebug() << "Reduce convolution of " << a << " and " << b
+             << " to " << res << ".";
+  return res;
 }
 
 
@@ -165,7 +174,10 @@ GammaConvolutionRule::apply(const Density &a, const Density &b) const {
       a_theta = a_atomic->parameter(1),
       a_shift = a_atomic->parameter(2), b_shift = b_atomic->parameter(2);
   Eigen::VectorXd params(3); params << a_k+b_k, a_theta, a_shift+b_shift;
-  return new AtomicDensityObj(new GammaDistributionObj(), params);
+  Density res(new AtomicDensityObj(new GammaDistributionObj(), params));
+  logDebug() << "Reduce convolution of " << a << " and " << b
+             << " to " << res << ".";
+  return res;
 }
 
 
@@ -243,6 +255,8 @@ DeltaCompoundRule::test(const Density &a) const {
 Density
 DeltaCompoundRule::apply(const Density &a) const {
   CompoundDensityObj *comp = dynamic_cast<CompoundDensityObj *>(*a);
+  logDebug() << "Reduce compound " << a
+             << " to " << comp->parameter(0) << ".";
   return comp->parameter(0);
 }
 
@@ -282,7 +296,9 @@ NormalCompoundRule::apply(const Density &a) const {
 
   // check if conv. of S & mu can be reduced further
   if (ConvolutionReductionRule *rule = ConvolutionReductions::get().find(S, mu)) {
-    return rule->apply(S, mu);
+    Density res = rule->apply(S, mu);
+    logDebug() << "Reduce compound " << a << " to " << res << ".";
+    return res;
   }
 
   // If convolution cannot be reduced -> constrcut conv. density
@@ -291,6 +307,8 @@ NormalCompoundRule::apply(const Density &a) const {
   densities.push_back(S);
 
   // done
-  return new ConvolutionDensityObj(densities);
+  Density res(new ConvolutionDensityObj(densities));
+  logDebug() << "Reduce compound " << a << " to " << res << ".";
+  return res;
 }
 

@@ -81,6 +81,12 @@ LogMessageStream::~LogMessageStream() {
   Logger::log(LogMessage(_filename, _line, _level, this->str()));
 }
 
+LogMessageStream &
+LogMessageStream::operator<<(const Container &obj) {
+  obj->print(*this);
+  return *this;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of LogHandlerObj

@@ -2,6 +2,7 @@
 #include "math.hh"
 #include "rng.hh"
 #include <iostream>
+#include "rng.hh"
 
 using namespace stochbb;
 
@@ -185,8 +186,10 @@ UniformDistributionObj::affine(double scale, double shift, std::vector<Density> 
 void
 UniformDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double a=params[0], b=params[1];
+  RNG &rng = RNG::get();
+  std::uniform_real_distribution<double> sampler(a, b);
   for (int i=0; i<out.size(); i++) {
-   out(i) = RNG::unif()*(b-a) + a;
+   out(i) = sampler(rng);
   }
 }
 
@@ -257,8 +260,10 @@ void NormalDistributionObj::quantile(double &lower, double &upper, double p, con
 
 void NormalDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double mu=params[0], sigma=params[1];
+  RNG &rng = RNG::get();
+  std::normal_distribution<double> sampler(mu, sigma);
   for (int i=0; i<out.size(); i++) {
-    out(i) = RNG::norm()*sigma + mu;
+    out(i) = sampler(rng);
   }
 }
 
@@ -332,8 +337,10 @@ void GammaDistributionObj::quantile(double &lower, double &upper, double p, cons
 void
 GammaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], theta=params[1], shift=params[2];
+  RNG &rng = RNG::get();
+  std::gamma_distribution<double> sampler(k, 1./theta);
   for (int i=0; i<out.size(); i++) {
-    out(i) = RNG::gamma(k, theta) + shift;
+    out(i) = sampler(rng) + shift;
   }
 }
 
@@ -412,8 +419,10 @@ InvGammaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out,
                                 const Eigen::Ref<const Eigen::VectorXd> params) const
 {
   double alpha=params[0], beta=params[1], shift=params[2];
+  RNG &rng=RNG::get();
+  std::inverse_gamma_distribution<double> sampler(alpha, beta);
   for (int i=0; i<out.size(); i++) {
-    out(i) = RNG::invgamma(alpha, beta) + shift;
+    out(i) =  sampler(rng) + shift;
   }
 }
 
@@ -497,8 +506,10 @@ WeibullDistributionObj::quantile(double &lower, double &upper, double p,
 void
 WeibullDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], lambda=params[1], shift=params[2];
+  RNG &rng = RNG::get();
+  std::weibull_distribution<double> sampler(k, lambda);
   for (int i=0; i<out.size(); i++) {
-    out(i) = RNG::invgamma(k, lambda) + shift;
+    out(i) = sampler(rng) + shift;
   }
 }
 
@@ -593,8 +604,10 @@ StudtDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out,
                              const Eigen::Ref<const Eigen::VectorXd> params) const
 {
   double df=params[0], sigma=params[1], mu = params[2];
+  RNG &rng = RNG::get();
+  std::student_t_distribution<double> sampler(df);
   for (int i=0; i<out.size(); i++) {
-    out(i) = sigma*RNG::norm()/sqrt(RNG::gamma(df/2, df/2)) + mu;
+    out(i) = sigma*sampler(rng) + mu;
   }
 }
 
