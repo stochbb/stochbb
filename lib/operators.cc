@@ -15,6 +15,12 @@ using namespace stochbb;
 /* ********************************************************************************************* *
  * Implementation of sbb::delta()
  * ********************************************************************************************* */
+bool
+stochbb::is_delta(const Density &dens) {
+  AtomicDensityObj *at = dynamic_cast<AtomicDensityObj *>(* dens);
+  return at && dynamic_cast<DeltaDistributionObj *>(*at->distribution());
+}
+
 Var
 stochbb::delta(double value) {
   Eigen::VectorXd param(1); param << value;
@@ -26,6 +32,12 @@ stochbb::delta(double value) {
 /* ********************************************************************************************* *
  * Implementation of sbb::uniform()
  * ********************************************************************************************* */
+bool
+stochbb::is_uniform(const Density &dens) {
+  AtomicDensityObj *at = dynamic_cast<AtomicDensityObj *>(* dens);
+  return at && dynamic_cast<UniformDistributionObj *>(*at->distribution());
+}
+
 Var
 stochbb::uniform(double a, double b, const std::string &name) throw (Error) {
   Eigen::VectorXd param(2); param << a, b;
@@ -37,6 +49,12 @@ stochbb::uniform(double a, double b, const std::string &name) throw (Error) {
 /* ********************************************************************************************* *
  * Implementation of sbb::normal()
  * ********************************************************************************************* */
+bool
+stochbb::is_normal(const Density &dens) {
+  AtomicDensityObj *at = dynamic_cast<AtomicDensityObj *>(* dens);
+  return at && dynamic_cast<NormalDistributionObj *>(*at->distribution());
+}
+
 Var
 stochbb::normal(double mu, double sigma, const std::string &name) throw (Error) {
   Eigen::VectorXd param(2); param << mu, sigma;
@@ -89,6 +107,12 @@ stochbb::normal(const Var &mu, const Var &sigma, const std::string &name) throw 
 /* ********************************************************************************************* *
  * Implementation of sbb::gamma()
  * ********************************************************************************************* */
+bool
+stochbb::is_gamma(const Density &dens) {
+  AtomicDensityObj *at = dynamic_cast<AtomicDensityObj *>(* dens);
+  return at && dynamic_cast<GammaDistributionObj *>(*at->distribution());
+}
+
 Var
 stochbb::gamma(double k, double theta, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << k, theta, 0;
@@ -141,6 +165,12 @@ stochbb::gamma(const Var &k, const Var &theta, const std::string &name) throw (E
 /* ********************************************************************************************* *
  * Implementation of sbb::invgamma()
  * ********************************************************************************************* */
+bool
+stochbb::is_invgamma(const Density &dens) {
+  AtomicDensityObj *at = dynamic_cast<AtomicDensityObj *>(* dens);
+  return at && dynamic_cast<InvGammaDistributionObj *>(*at->distribution());
+}
+
 Var
 stochbb::invgamma(double alpha, double beta, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << alpha, beta, 0;
@@ -193,6 +223,12 @@ stochbb::invgamma(const Var &alpha, const Var &beta, const std::string &name) th
 /* ********************************************************************************************* *
  * Implementation of sbb::weibull()
  * ********************************************************************************************* */
+bool
+stochbb::is_weibull(const Density &dens) {
+  AtomicDensityObj *at = dynamic_cast<AtomicDensityObj *>(* dens);
+  return at && dynamic_cast<WeibullDistributionObj *>(*at->distribution());
+}
+
 Var
 stochbb::weibull(double k, double lambda, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << k, lambda, 0;
@@ -237,6 +273,12 @@ stochbb::weibull(const Var &k, const Var& lambda, const std::string &name) throw
 /* ********************************************************************************************* *
  * Implementation of sbb::studt()
  * ********************************************************************************************* */
+bool
+stochbb::is_studt(const Density &dens) {
+  AtomicDensityObj *at = dynamic_cast<AtomicDensityObj *>(* dens);
+  return at && dynamic_cast<StudtDistributionObj *>(*at->distribution());
+}
+
 Var
 stochbb::studt(double nu, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << nu, 1, 0;

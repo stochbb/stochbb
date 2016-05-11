@@ -23,13 +23,23 @@ bool independent(const Var &a, const Var &b);
  * @ingroup api */
 bool independent(const Var &a, const Var &b, const Var &c);
 
+/** Retruns @c true if the given density is an atomic delta density. */
+bool is_delta(const Density &dens);
+
 /** Constructs a delta-distributed random variable (constant) located as the given value.
  * @ingroup api */
 Var delta(double value);
 
+
+/** Retruns @c true if the given density is an atomic uniform density. */
+bool is_uniform(const Density &dens);
+
 /** Constructs a uniformly-distributed random variable on the interval [a,b].
  * @ingroup api */
 Var uniform(double a, double b, const std::string &name="") throw (Error);
+
+/** Retruns @c true if the given density is an atomic normal density. */
+bool is_normal(const Density &dens);
 
 /** Constructs a normal-distributed random variable for the given mean and standard deviation.
  * @ingroup api */
@@ -47,6 +57,9 @@ Var normal(double mu, const Var &sigma, const std::string &name="") throw (Error
  * @ingroup api */
 Var normal(const Var& mu, const Var &sigma, const std::string &name="") throw (Error);
 
+/** Retruns @c true if the given density is an atomic gamma density. */
+bool is_gamma(const Density &dens);
+
 /** Constructs a gamma-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
 Var gamma(double k, double theta, const std::string &name="") throw (Error);
@@ -62,6 +75,9 @@ Var gamma(double k, const Var &theta, const std::string &name="") throw (Error);
  * Where both, the shape and scale parameter are random variables.
  * @ingroup api */
 Var gamma(const Var& k, const Var &theta, const std::string &name="") throw (Error);
+
+/** Retruns @c true if the given density is an atomic inverse gamma density. */
+bool is_invgamma(const Density &dens);
 
 /** Constructs an inverse gamma-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
@@ -79,6 +95,9 @@ Var invgamma(double alpha, const Var &beta, const std::string &name="") throw (E
  * @ingroup api */
 Var invgamma(const Var& alpha, const Var &beta, const std::string &name="") throw (Error);
 
+/** Retruns @c true if the given density is an atomic weibull density. */
+bool is_weibull(const Density &dens);
+
 /** Constructs a Weibull-distributed random variable for the given shape and scale parameters.
  * @ingroup api */
 Var weibull(double k, double lambda, const std::string &name="") throw (Error);
@@ -92,6 +111,9 @@ Var weibull(double k, const Var& lambda, const std::string &name="") throw (Erro
  * @ingroup api */
 Var weibull(const Var& k, const Var& lambda, const std::string &name="") throw (Error);
 
+/** Retruns @c true if the given density is an atomic Student's t density. */
+bool is_studt(const Density &dens);
+
 /** Constructs a Student's t distributed random variable with degree-of-freedom @c nu.
  * @ingroup api */
 Var studt(double nu, const std::string &name="") throw (Error);
@@ -99,6 +121,7 @@ Var studt(double nu, const std::string &name="") throw (Error);
  * being a random variable too.
  * @ingroup api */
 Var studt(const Var &nu, const std::string &name="") throw (Error);
+
 
 /** Constructs a random variable \f$Y\f$ as the sum of the given random variables.
  * That is

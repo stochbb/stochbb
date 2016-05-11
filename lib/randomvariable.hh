@@ -126,6 +126,7 @@ public:
   inline Var variable(size_t i) { _variables[i]->ref(); return _variables[i]; }
 
   virtual void print(std::ostream &stream) const;
+
   /** "Samples" from a derived random variable. It determines the result using the samples of the
    * random variables it depends on, at the given indices and stores the result at the specified
    * output index. */

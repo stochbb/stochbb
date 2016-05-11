@@ -338,7 +338,7 @@ void
 GammaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out, const Eigen::Ref<const Eigen::VectorXd> params) const {
   double k=params[0], theta=params[1], shift=params[2];
   RNG &rng = RNG::get();
-  std::gamma_distribution<double> sampler(k, 1./theta);
+  std::gamma_distribution<double> sampler(k, theta);
   for (int i=0; i<out.size(); i++) {
     out(i) = sampler(rng) + shift;
   }
@@ -420,7 +420,7 @@ InvGammaDistributionObj::sample(Eigen::Ref<Eigen::VectorXd> out,
 {
   double alpha=params[0], beta=params[1], shift=params[2];
   RNG &rng=RNG::get();
-  std::inverse_gamma_distribution<double> sampler(alpha, beta);
+  std::inverse_gamma_distribution<double> sampler(alpha, 1./beta);
   for (int i=0; i<out.size(); i++) {
     out(i) =  sampler(rng) + shift;
   }
