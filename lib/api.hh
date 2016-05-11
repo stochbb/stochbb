@@ -26,6 +26,7 @@ class NormalDistributionObj;
 class GammaDistributionObj;
 class InvGammaDistributionObj;
 class WeibullDistributionObj;
+class StudtDistributionObj;
 class AtomicDensityObj;
 class VarObj;
 class AtomicVarObj;
@@ -75,6 +76,8 @@ public:
 
   /** Returns @c true if the container is empty. */
   bool isNull() const;
+  /** Returns @c true if the container is not empty. */
+  bool isValid() const;
 
   /** Returns @c true if the object can be casted to the given container. */
   template <class T>
@@ -282,6 +285,7 @@ protected:
   GammaDistributionObj *_gamma;
 };
 
+
 /** Represents the family of inverse gamma distributions.
  * @ingroup api */
 class InvGammaDistribution: public Distribution
@@ -323,6 +327,28 @@ public:
 protected:
   /** The reference to the @c WeibullDistributionObj instance. */
   WeibullDistributionObj *_weibull;
+};
+
+
+/** Represents the family of Student's t distributions.
+ * @ingroup api */
+class StudtDistribution: public Distribution
+{
+public:
+  /** The object type of the container. */
+  typedef StudtDistributionObj ObjectType;
+
+public:
+  /** Packs the given @c StudtDistributionObj and takes the reference. */
+  StudtDistribution(StudtDistributionObj *studt);
+  /** Copy constructor. */
+  StudtDistribution(const StudtDistribution &other);
+  /** Assigment operator. */
+  StudtDistribution &operator=(const StudtDistribution &other);
+
+protected:
+  /** The reference to the @c StudtDistributionObj instance. */
+  StudtDistributionObj *_studt;
 };
 
 

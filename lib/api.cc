@@ -60,6 +60,11 @@ Container::isNull() const {
   return 0 == _object;
 }
 
+bool
+Container::isValid() const {
+  return 0 != _object;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of RandomVariable container
@@ -394,6 +399,30 @@ WeibullDistribution::operator= (const WeibullDistribution &other)
 {
   Distribution::operator=(other);
   _weibull = other._weibull;
+  return *this;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of StudtDistribution container
+ * ********************************************************************************************* */
+StudtDistribution::StudtDistribution(StudtDistributionObj *studt)
+  : Distribution(studt), _studt(studt)
+{
+  // pass...
+}
+
+StudtDistribution::StudtDistribution(const StudtDistribution &other)
+  : Distribution(other), _studt(other._studt)
+{
+  // pass...
+}
+
+StudtDistribution &
+StudtDistribution::operator= (const StudtDistribution &other)
+{
+  Distribution::operator=(other);
+  _studt = other._studt;
   return *this;
 }
 
