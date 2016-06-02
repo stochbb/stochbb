@@ -14,10 +14,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="proc.svg"
-   inkscape:export-filename="/home/hannes.matuschek/Software/stochbb/shared/icons/proc_32.png"
-   inkscape:export-xdpi="11.25"
-   inkscape:export-ydpi="11.25">
+   sodipodi:docname="output.svg"
+   inkscape:export-filename="/home/hannes.matuschek/Software/stochbb/shared/icons/output_64.png"
+   inkscape:export-xdpi="22.5"
+   inkscape:export-ydpi="22.5">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -46,7 +46,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -68,13 +68,6 @@
        width="35.120197"
        height="35.120197"
        x="20.188433"
-       y="905.14752" />
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#505050;stroke-width:10;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3755-4"
-       width="35.120197"
-       height="35.120197"
-       x="200.23543"
        y="905.14752" />
   </g>
 </svg>
