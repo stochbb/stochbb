@@ -1,11 +1,11 @@
 /** @defgroup api Application programming interface
- * This module collects all classes and functions forming the StochBB API.
+ * Here you find all classes and functions that are part of the public API.
  *
- * StochBB implements a simple mark & sweep garbage collector (GC) for freeing all unreachable
- * objects. For this GC to work, all directly reachable objects are held within containers (classes
- * derived from @c stochbb::Container). These container classes form the API of StochBB and are
- * listed below.
- */
+ * StochBB implements a simple mark & sweep garbage collector (GC, @ref mem) for freeing all
+ * unreachable objects. For this GC to work, all directly reachable objects are held within
+ * containers (classes derived from @c stochbb::Container). These container classes form the API of
+ * StochBB and are listed below. */
+
 #ifndef __SBB_API_HH__
 #define __SBB_API_HH__
 

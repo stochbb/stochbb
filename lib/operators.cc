@@ -301,82 +301,14 @@ Var stochbb::minimum(const Var &X1, const Var &X2, const Var &X3) throw (Error) 
 
 Var
 stochbb::minimum(const std::vector<Var> &variables) throw (Error) {
-  // Check size of variables
-  if (0 == variables.size()) {
+  std::vector<Var> args(variables);
+  Var common = splitCommon(args);
+  if (! independent(args)) {
     AssumptionError err;
-    err << "Cannot construct the minimum of no variable.";
+    err << "Cannot construct maximum of variables, variables are not independent.";
     throw err;
-  } else if (1 == variables.size()) {
-    // If only one variable is given -> return it
-    return variables[0];
   }
-
-  // Expand minimum objects, e.g. min(min(A,B),C) -> min(A,B,C)
-  std::vector<Var> vars; vars.reserve(variables.size());
-  for (size_t i=0; i<variables.size(); i++) {
-    if (variables[i].is<Minimum>()) {
-      Minimum min = variables[i].as<Minimum>();
-      for (size_t j=0; j<min.numVariables(); j++) {
-        vars.push_back(min.variable(j));
-      }
-    } else {
-      vars.push_back(variables[i]);
-    }
-  }
-
-  // Find the common part of the variables formed as a sum
-  std::vector<VarSet> indepvars;
-  for (size_t i=0; i<vars.size(); i++) {
-    if (vars[i].is<Chain>()) {
-      indepvars.push_back(VarSet());
-      Chain chain = vars[i].as<Chain>();
-      for (size_t i=0; i<chain.numVariables(); i++) {
-        indepvars.back().add(chain.variable(i));
-      }
-    } else {
-      indepvars.push_back(VarSet());
-      indepvars.back().add(vars[i]);
-    }
-  }
-  // Get the intersection of all variable sets
-  VarSet common = indepvars[0].intersect(indepvars[1]);
-  for (size_t j=2; j<indepvars.size(); j++) {
-    common = common.intersect(indepvars[j]);
-  }
-  // Remove common part from all sets
-  for (size_t i=0; i<indepvars.size(); i++) {
-    indepvars[i] = indepvars[i].difference(common);
-  }
-  // Assemble result
-  VarObj *result = 0;
-  std::vector<Var> args; args.reserve(indepvars.size());
-  for (size_t i=0; i<indepvars.size(); i++) {
-    if (1 == indepvars[i].size()) {
-      args.push_back(*indepvars[i].begin());
-    } else {
-      std::vector<Var> chain_args; chain_args.reserve(indepvars[i].size());
-      VarSet::iterator item = indepvars[i].begin();
-      for (; item != indepvars[i].end(); item++) {
-        chain_args.push_back(*item);
-      }
-      args.push_back(new ChainObj(chain_args));
-    }
-    result = new MinimumObj(args);
-  }
-
-  // If there is a common part -> assemble chain
-  if (! common.isEmpty()) {
-    std::vector<Var> chain_args; chain_args.reserve(common.size()+1);
-    chain_args.push_back(result);
-    VarSet::iterator item = common.begin();
-    for (; item != common.end(); item++) {
-      chain_args.push_back(*item);
-    }
-    result = new ChainObj(chain_args);
-  }
-
-  // done.
-  return result;
+  return Var(new MinimumObj(args)) + common;
 }
 
 
@@ -393,87 +325,14 @@ Var stochbb::maximum(const Var &X1, const Var &X2, const Var &X3) throw (Error) 
 
 Var
 stochbb::maximum(const std::vector<Var> &variables) throw (Error) {
-  // Check size of variables
-  if (0 == variables.size()) {
+  std::vector<Var> args(variables);
+  Var common = splitCommon(args);
+  if (! independent(args)) {
     AssumptionError err;
-    err << "Cannot construct the maximum of no variable.";
+    err << "Cannot construct maximum of variables, variables are not independent.";
     throw err;
   }
-
-  // If only one variable is given -> return it
-  if (1 == variables.size()) {
-    return variables[0];
-  }
-
-  // Expand maximum objects, e.g. max(max(A,B),C) -> max(A,B,C)
-  std::vector<Var> vars; vars.reserve(variables.size());
-  for (size_t i=0; i<variables.size(); i++) {
-    if (variables[i].is<Maximum>()) {
-      Maximum max = variables[i].as<Maximum>();
-      for (size_t j=0; j<max.numVariables(); j++) {
-        vars.push_back(max.variable(j));
-      }
-    } else {
-      vars.push_back(variables[i]);
-    }
-  }
-
-  // Find the common part of the variables formed as a sum
-  std::vector<VarSet> indepvars;
-  for (size_t i=0; i<vars.size(); i++) {
-    if (vars[i].is<Chain>()) {
-      indepvars.push_back(VarSet());
-      Chain chain = vars[i].as<Chain>();
-      for (size_t i=0; i<chain.numVariables(); i++) {
-        indepvars.back().add(chain.variable(i));
-      }
-    } else {
-      indepvars.push_back(VarSet());
-      indepvars.back().add(vars[i]);
-    }
-  }
-
-  // Get the intersection of all variable sets
-  VarSet common = indepvars[0].intersect(indepvars[1]);
-  for (size_t j=2; j<indepvars.size(); j++) {
-    common = common.intersect(indepvars[j]);
-  }
-
-  // Remove common part from all sets
-  for (size_t i=0; i<indepvars.size(); i++) {
-    indepvars[i] = indepvars[i].difference(common);
-  }
-
-  // Assemble result
-  VarObj *result = 0;
-  std::vector<Var> args; args.reserve(indepvars.size());
-  for (size_t i=0; i<indepvars.size(); i++) {
-    if (1 == indepvars[i].size()) {
-      args.push_back(*indepvars[i].begin());
-    } else {
-      std::vector<Var> chain_args; chain_args.reserve(indepvars[i].size());
-      VarSet::iterator item = indepvars[i].begin();
-      for (; item != indepvars[i].end(); item++) {
-        chain_args.push_back(*item);
-      }
-      args.push_back(new ChainObj(chain_args));
-    }
-    result = new MaximumObj(args);
-  }
-
-  // If there is a common part -> assemble chain
-  if (! common.isEmpty()) {
-    std::vector<Var> chain_args; chain_args.reserve(common.size()+1);
-    chain_args.push_back(result);
-    VarSet::iterator item = common.begin();
-    for (; item != common.end(); item++) {
-      chain_args.push_back(*item);
-    }
-    result = new ChainObj(chain_args);
-  }
-
-  // done.
-  return result;
+  return Var(new MaximumObj(args)) + common;
 }
 
 
@@ -500,6 +359,73 @@ stochbb::independent(const Var &a, const Var &b) {
 bool
 stochbb::independent(const Var &a, const Var &b, const Var &c) {
   return independent(std::vector<Var> {a, b, c});
+}
+
+/* ********************************************************************************************* *
+ * Implementation of splitCommon
+ * ********************************************************************************************* */
+Var
+stochbb::splitCommon(std::vector<Var> &vars) {
+  if (0 == vars.size())
+    return delta(0);
+  if (1 == vars.size()) {
+    Var res = vars.back();
+    vars.pop_back();
+    return res;
+  }
+
+  // Find the common part of the variables formed as a sum
+  std::vector<VarSet> indepvars; indepvars.reserve(vars.size());
+  for (size_t i=0; i<vars.size(); i++) {
+    if (vars[i].is<Chain>()) {
+      indepvars.push_back(VarSet());
+      Chain chain = vars[i].as<Chain>();
+      for (size_t i=0; i<chain.numVariables(); i++) {
+        indepvars.back().add(chain.variable(i));
+      }
+    } else {
+      indepvars.push_back(VarSet());
+      indepvars.back().add(vars[i]);
+    }
+  }
+
+  // Get the intersection of all variable sets
+  VarSet common = indepvars[0].intersect(indepvars[1]);
+  for (size_t j=2; j<indepvars.size(); j++) {
+    common = common.intersect(indepvars[j]);
+  }
+
+  // Remove common part from all sets
+  for (size_t i=0; i<indepvars.size(); i++) {
+    indepvars[i] = indepvars[i].difference(common);
+  }
+
+  // Assemble result
+  for (size_t i=0; i<indepvars.size(); i++) {
+    if (1 == indepvars[i].size()) {
+      vars[i] = *indepvars[i].begin();
+    } else {
+      std::vector<Var> chain_args; chain_args.reserve(indepvars[i].size());
+      VarSet::iterator item = indepvars[i].begin();
+      for (; item != indepvars[i].end(); item++) {
+        chain_args.push_back(*item);
+      }
+      vars[i] = new ChainObj(chain_args);
+    }
+  }
+
+  if (common.isEmpty())
+    return delta(0);
+  if (1 == common.size())
+    return *common.begin();
+
+  std::vector<Var> chain_args; chain_args.reserve(common.size());
+  VarSet::iterator item = common.begin();
+  for (; item != common.end(); item++) {
+    chain_args.push_back(*item);
+  }
+
+  return new ChainObj(chain_args);
 }
 
 
@@ -584,7 +510,15 @@ stochbb::mixture(const std::vector<double> &weights, const std::vector<Var> &var
  * ********************************************************************************************* */
 Var
 stochbb::conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw (Error) {
-  return new ConditionalObj(X1, X2, Y1, Y2);
+  std::vector<Var> args = {X1, X2};
+  splitCommon(args);
+  if (! independent(args)) {
+    AssumptionError err;
+    err << "Cannot instantiate conditional (X1<X2) ? Y1 : Y2."
+           " Variables X1, X2 are not mutually independent.";
+    throw err;
+  }
+  return new ConditionalObj(args[0], args[1], Y1, Y2);
 }
 
 
@@ -593,7 +527,22 @@ stochbb::conditional(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2)
  * ********************************************************************************************* */
 Var
 stochbb::condchain(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2) throw (Error) {
-  return new CondChainObj(X1, X2, Y1, Y2);
+  std::vector<Var> args = {X1, X2};
+  Var common = splitCommon(args);
+  // Check for independence (Y1 and Y2 are allowed to be dependent RVs).
+  if (! independent(std::vector<Var> {args[0], args[1], Y1})) {
+    AssumptionError err;
+    err << "Cannot instantiate conditional (X1<X2) ? X1+Y1 : X2+Y2."
+           " Variables X1, X2, Y1 are not mutually independent.";
+    throw err;
+  }
+  if (! independent(std::vector<Var> {args[0], args[1], Y2})) {
+    AssumptionError err;
+    err << "Cannot instantiate conditional (X1<X2) ? X1+Y1 : X2+Y2."
+           " Variables X1, X2, Y2 are not mutually independent.";
+    throw err;
+  }
+  return Var(new CondChainObj(args[0], args[1], Y1, Y2)) + common;
 }
 
 

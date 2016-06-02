@@ -303,13 +303,19 @@ stochbb::pgamma(double x, double k, double theta) {
 
 double
 stochbb::qgamma(double p, double k, double theta) {
-  /// @todo Write a better approximation of the gamma-quantile function.
   // Solve p = pgamma(x, k, theta) by simple Newton
+  // initial guess
   double x = k*theta;
-  for (size_t i=0; i<100; i++) {
-    double dx = (p-stochbb::pgamma(x, k, theta))/stochbb::dgamma(x, k, theta);
-    x += dx;
+  // p(x)
+  double p2 = stochbb::pgamma(x, k, theta);
+  // do Newton
+  while (std::abs(p-p2)>1e-8) {
+    // update x
+    x += (p-p2)/stochbb::dgamma(x, k, theta);
+    // get new p(x)
+    p2 = stochbb::pgamma(x, k, theta);
   }
+  // done.
   return x;
 }
 
@@ -328,13 +334,18 @@ stochbb::pinvgamma(double x, double alpha, double beta) {
 
 double
 stochbb::qinvgamma(double p, double alpha, double beta) {
-  /// @todo Write a better approximation of the gamma-quantile function.
   // Solve p = pgamma(x, k, theta) by simple Newton
+  // Initial quess
   double x = beta/(alpha+1);
-  for (size_t i=0; i<100; i++) {
-    double dx = (p-stochbb::pinvgamma(x, alpha, beta))/stochbb::dinvgamma(x, alpha, beta);
-    x += dx;
+  // get p(x)
+  double p2 = stochbb::pinvgamma(x, alpha, beta);
+  while (std::abs(p-p2)>1e-8) {
+    // update x
+    x += (p-p2)/stochbb::dinvgamma(x, alpha, beta);
+    // update p(x)
+    p2 = stochbb::pinvgamma(x, alpha, beta);
   }
+  // done.
   return x;
 }
 

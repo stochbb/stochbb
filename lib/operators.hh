@@ -149,6 +149,10 @@ Var chain(const Var &X1, const Var &X2) throw (Error);
  * @ingroup api */
 Var chain(const Var &X1, const Var &X2, const Var &X3) throw (Error);
 
+/** Finds the common part of several sums of random variables removes it and
+ * returns the common part. */
+Var splitCommon(std::vector<Var> &vars);
+
 /** Constructs a random variable \f$Y\f$ as the minimum of the given random variables.
  * That is
  * \f[

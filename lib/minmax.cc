@@ -340,8 +340,10 @@ MinimumObj::mark() {
   if (_density) { _density->mark(); }
 }
 
-Density MinimumObj::density() {
-  _density->ref();
+Density
+MinimumObj::density() {
+  if (_density)
+    _density->ref();
   return _density;
 }
 

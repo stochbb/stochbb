@@ -259,5 +259,10 @@ and the CDF is obtained analogously as
  F_X(x) = \int F_{X|A}(x;a)\,g(a)\,da\,.\nonumber
 \end{equation}
 
-StochBB determines the PDF and CDF of $X$ by performing the integral numerically.
+StochBB determines the PDF and CDF of $X$ by performing the following reductions
+\begin{align}
+ X\sim\delta(x-Y), Y\sim f(y) &\longrightarrow X \sim f(x)\,, \nonumber \\
+ X\sim\mathcal{N}(Y,\sigma^2), Y\sim f(y) &\longrightarrow X \sim \mathcal{N}(0, \sigma^2) \ast f(y)\,, \nonumber
+\end{align}
+or solves the integral numerically.
 

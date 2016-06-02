@@ -323,20 +323,6 @@ CondChainDensityObj::print(std::ostream &stream) const {
 CondChainObj::CondChainObj(const Var &X1, const Var &X2, const Var &Y1, const Var &Y2, const std::string &name)
   : DerivedVarObj(std::vector<Var> {X1, X2, Y1, Y2}, name), _density(0)
 {
-  // Check for independence (Y1 and Y2 are allowed to be dependent RVs).
-  if (! independent(std::vector<Var> {X1, X2, Y1})) {
-    AssumptionError err;
-    err << "Cannot instantiate conditional (X1<X2) ? X1+Y1 : X2+Y2."
-           " Variables X1, X2, Y1 are not mutually independent.";
-    throw err;
-  }
-  if (! independent(std::vector<Var> {X1, X2, Y2})) {
-    AssumptionError err;
-    err << "Cannot instantiate conditional (X1<X2) ? X1+Y1 : X2+Y2."
-           " Variables X1, X2, Y2 are not mutually independent.";
-    throw err;
-  }
-
   _density = new CondChainDensityObj(X1, X2, Y1, Y2);
   _density->unref();
 }
@@ -345,12 +331,14 @@ void
 CondChainObj::mark() {
   if (isMarked()) { return; }
   DerivedVarObj::mark();
-  if (_density) { _density->mark(); }
+  if (_density)
+    _density->mark();
 }
 
 Density
 CondChainObj::density() {
-  _density->ref();
+  if (_density)
+    _density->ref();
   return _density;
 }
 
@@ -360,7 +348,9 @@ CondChainObj::print(std::ostream &stream) const {
   stream << " X2="; _variables[1]->print(stream);
   stream << " Y1="; _variables[2]->print(stream);
   stream << " Y2="; _variables[3]->print(stream);
-  stream << " density="; _density->print(stream);
+  if (_density) {
+    stream << " density="; _density->print(stream);
+  }
   stream << " #" << this << ">";
 }
 

@@ -24,7 +24,12 @@
  * unreachable Objects are freed.
  */
 
-/** @defgroup internal Internal used objects and functions */
+/** @defgroup internal Internal used objects and functions.
+ * This group collects all classes and functions that are not directly accessible through the API.
+ * These objects are derived from the basic @c stochbb::Object class wich implements the reference
+ * counting and interfaces for the mark & sweep grabage collector. All classes documented here are only of
+ * interest if you want to understand the implementation of StochBB or if you want to extend it. */
+
 #ifndef __SBB_OBJECT_HH__
 #define __SBB_OBJECT_HH__
 

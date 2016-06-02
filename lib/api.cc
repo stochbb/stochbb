@@ -38,7 +38,8 @@ Container::Container(const Container &other)
 
 Container::~Container() {
   // Decrement reference count
-  if (_object) { _object->unref(); }
+  if (_object)
+    _object->unref();
   _object = 0;
 }
 
@@ -200,7 +201,9 @@ Density::rangeEst(double alpha, double &a, double &b) const {
 
 int
 Density::compare(const Density &other) const {
-  return _density->compare(**other);
+  if (_density)
+    return _density->compare(**other);
+  return -1;
 }
 
 

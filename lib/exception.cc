@@ -6,7 +6,7 @@ using namespace stochbb;
 Error::Error()
   : std::exception(), std::stringstream()
 {
-  // pass...
+  this->str("");
 }
 
 Error::Error(const Error &other)

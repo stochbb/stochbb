@@ -1,5 +1,5 @@
 /** @mainpage
- * The aim of StochBB is to provide a set of classes and functions (see @ref api) that allows
+ * StochBB provides a set of classes and functions (see @ref api) that allows
  * to assemble complex systems of random variables (RVs) and to obtain their PDFs and CDFs
  * numerically rather than by means of stochastic simulation. Additionally, it is possible to
  * sample from these RVs for verification. For some in-depth description of StochBB, consider
