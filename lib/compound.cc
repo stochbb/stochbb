@@ -98,6 +98,8 @@ CompoundObj::sample(size_t outIdx, const Eigen::Ref<IndexVector> &indices,
 CompoundDensityObj::CompoundDensityObj(const Distribution &dist, const std::vector<DensityObj *> &params)
   : DensityObj(), _distribution(*dist), _parameters(params)
 {
+  logDebug() << "Construct compound density object for distribution " << dist << "...";
+
   assume(_distribution->nParams() == _parameters.size());
 }
 

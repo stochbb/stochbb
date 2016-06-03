@@ -60,6 +60,16 @@ NetEditWidget::addCompoundInvGammaProc() {
 }
 
 void
+NetEditWidget::addWeibullProc() {
+  _netview->addNode(new WeibullProcessNode(_netview));
+}
+
+void
+NetEditWidget::addCompoundWeibullProc() {
+  _netview->addNode(new CompoundWeibullProcessNode(_netview));
+}
+
+void
 NetEditWidget::addMinimum() {
   _netview->addNode(new MinimumNode(_netview));
 }
@@ -81,7 +91,7 @@ NetEditWidget::addAffine() {
 
 void
 NetEditWidget::addStimulus() {
-  _netview->addNode(new StimulusNode(_netview));
+  _netview->addNode(new TriggerNode(_netview));
 }
 
 void
@@ -90,19 +100,64 @@ NetEditWidget::addConstant() {
 }
 
 void
+NetEditWidget::addUniformVar() {
+  _netview->addNode(new UniformVarNode(_netview));
+}
+
+void
+NetEditWidget::addNormalVar() {
+  _netview->addNode(new NormalVarNode(_netview));
+}
+
+void
+NetEditWidget::addCompoundNormalVar() {
+  _netview->addNode(new CompoundNormalVarNode(_netview));
+}
+
+void
 NetEditWidget::addGammaVar() {
   _netview->addNode(new GammaVarNode(_netview));
 }
 
 void
-NetEditWidget::addGammaCompoundVar() {
+NetEditWidget::addCompoundGammaVar() {
   _netview->addNode(new CompoundGammaVarNode(_netview));
+}
+
+void
+NetEditWidget::addInvGammaVar() {
+  _netview->addNode(new InvGammaVarNode(_netview));
+}
+
+void
+NetEditWidget::addCompoundInvGammaVar() {
+  _netview->addNode(new CompoundInvGammaVarNode(_netview));
+}
+
+void
+NetEditWidget::addWeibullVar() {
+  _netview->addNode(new WeibullVarNode(_netview));
+}
+
+void
+NetEditWidget::addCompoundWeibullVar() {
+  _netview->addNode(new CompoundWeibullVarNode(_netview));
 }
 
 void
 NetEditWidget::addMarginalPlot() {
   _netview->addNode(new MarginalPlotNode(_netview));
   _netview->update();
+}
+
+void
+NetEditWidget::addScatterPlot() {
+  _netview->addNode(new ScatterPlotNode(_netview));
+}
+
+void
+NetEditWidget::addKDEPlot() {
+  _netview->addNode(new KDEPlotNode(_netview));
 }
 
 void
@@ -129,5 +184,6 @@ NetEditWidget::zoomOut() {
 
 void
 NetEditWidget::onEditNodeConfig(NodeBase *node) {
-  NodeConfigDialog(node).exec();
+  if (QDialog::Accepted == NodeConfigDialog(node).exec())
+    _netview->setModified(true);
 }

@@ -9,6 +9,7 @@
 
 
 class Network;
+class Assembler;
 class QLineEdit;
 
 
@@ -46,6 +47,11 @@ public:
   void addSocket(QNetSocket *socket);
   virtual QDomElement serialize(QDomDocument &doc) const;
 
+  virtual bool needsPreprocessing(Assembler &assembler) const;
+  virtual bool preprocess(Assembler &assembler) const;
+  virtual bool processable(Assembler &assembler) const;
+  virtual bool assemble(Assembler &assembler) const = 0;
+
 public:
   static NodeBase *fromXml(const QDomElement &node);
 
@@ -58,17 +64,18 @@ protected:
 };
 
 
-class StimulusNode: public NodeBase
+class TriggerNode: public NodeBase
 {
   Q_OBJECT
 
 public:
-  StimulusNode(Network *parent=0);
+  TriggerNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static StimulusNode *fromXml(const QDomElement &node);
+  static TriggerNode *fromXml(const QDomElement &node);
 };
 
 
@@ -80,6 +87,7 @@ public:
   DelayNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static DelayNode *fromXml(const QDomElement &node);
@@ -94,10 +102,12 @@ public:
   RandomDelayNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static RandomDelayNode *fromXml(const QDomElement &node);
 };
+
 
 class GammaProcessNode: public NodeBase
 {
@@ -107,6 +117,7 @@ public:
   GammaProcessNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static GammaProcessNode *fromXml(const QDomElement &node);
@@ -121,6 +132,7 @@ public:
   CompoundGammaProcessNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static CompoundGammaProcessNode *fromXml(const QDomElement &node);
@@ -135,6 +147,7 @@ public:
   InvGammaProcessNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static InvGammaProcessNode *fromXml(const QDomElement &node);
@@ -149,9 +162,40 @@ public:
   CompoundInvGammaProcessNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static CompoundInvGammaProcessNode *fromXml(const QDomElement &node);
+};
+
+
+class WeibullProcessNode: public NodeBase
+{
+  Q_OBJECT
+
+public:
+  WeibullProcessNode(Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
+
+public:
+  static WeibullProcessNode *fromXml(const QDomElement &node);
+};
+
+
+class CompoundWeibullProcessNode: public NodeBase
+{
+  Q_OBJECT
+
+public:
+  CompoundWeibullProcessNode(Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
+
+public:
+  static CompoundWeibullProcessNode *fromXml(const QDomElement &node);
 };
 
 
@@ -163,6 +207,7 @@ public:
   MinimumNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static MinimumNode *fromXml(const QDomElement &node);
@@ -177,6 +222,7 @@ public:
   MaximumNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static MaximumNode *fromXml(const QDomElement &node);
@@ -192,6 +238,10 @@ public:
 
   QDomElement serialize(QDomDocument &doc) const;
 
+  bool needsPreprocessing(Assembler &assembler) const;
+  bool preprocess(Assembler &assembler) const;
+  bool assemble(Assembler &assembler) const;
+
 public:
   static InhibitionNode *fromXml(const QDomElement &node);
 };
@@ -205,6 +255,7 @@ public:
   AffineNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static AffineNode *fromXml(const QDomElement &node);
@@ -219,10 +270,12 @@ public:
   ConstantNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static ConstantNode *fromXml(const QDomElement &node);
 };
+
 
 class GammaVarNode: public NodeBase
 {
@@ -232,10 +285,12 @@ public:
   GammaVarNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static GammaVarNode *fromXml(const QDomElement &node);
 };
+
 
 class CompoundGammaVarNode: public NodeBase
 {
@@ -245,9 +300,70 @@ public:
   CompoundGammaVarNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static CompoundGammaVarNode *fromXml(const QDomElement &node);
+};
+
+
+class InvGammaVarNode: public NodeBase
+{
+  Q_OBJECT
+
+public:
+  InvGammaVarNode(Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
+
+public:
+  static InvGammaVarNode *fromXml(const QDomElement &node);
+};
+
+
+class CompoundInvGammaVarNode: public NodeBase
+{
+  Q_OBJECT
+
+public:
+  CompoundInvGammaVarNode(Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
+
+public:
+  static CompoundInvGammaVarNode *fromXml(const QDomElement &node);
+};
+
+
+class WeibullVarNode: public NodeBase
+{
+  Q_OBJECT
+
+public:
+  WeibullVarNode(Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
+
+public:
+  static WeibullVarNode *fromXml(const QDomElement &node);
+};
+
+
+class CompoundWeibullVarNode: public NodeBase
+{
+  Q_OBJECT
+
+public:
+  CompoundWeibullVarNode(Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
+
+public:
+  static CompoundWeibullVarNode *fromXml(const QDomElement &node);
 };
 
 
@@ -259,9 +375,40 @@ public:
   UniformVarNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   static UniformVarNode *fromXml(const QDomElement &node);
+};
+
+
+class NormalVarNode: public NodeBase
+{
+  Q_OBJECT
+
+public:
+  NormalVarNode(Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
+
+public:
+  static NormalVarNode *fromXml(const QDomElement &node);
+};
+
+
+class CompoundNormalVarNode: public NodeBase
+{
+  Q_OBJECT
+
+public:
+  CompoundNormalVarNode(Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+  virtual bool assemble(Assembler &assembler) const;
+
+public:
+  static CompoundNormalVarNode *fromXml(const QDomElement &node);
 };
 
 
@@ -271,6 +418,7 @@ class OutputNode: public NodeBase
 
 protected:
   OutputNode(const QString &label, QNetView *parent=0);
+  virtual bool assemble(Assembler &assembler) const;
 
 public:
   virtual void execute(const QHash<Socket *, stochbb::Var> &vartable) = 0;
@@ -291,6 +439,39 @@ public:
 
 public:
   static MarginalPlotNode *fromXml(const QDomElement &node);
+};
+
+
+class ScatterPlotNode: public OutputNode
+{
+  Q_OBJECT
+
+public:
+  ScatterPlotNode(Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+
+  void execute(const QHash<Socket *, stochbb::Var> &vartable);
+
+public:
+  static ScatterPlotNode *fromXml(const QDomElement &node);
+};
+
+
+class KDEPlotNode: public OutputNode
+{
+  Q_OBJECT
+
+public:
+  KDEPlotNode(Network *parent=0);
+
+  bool setParameter(const QString &name, double value);
+  QDomElement serialize(QDomDocument &doc) const;
+
+  void execute(const QHash<Socket *, stochbb::Var> &vartable);
+
+public:
+  static KDEPlotNode *fromXml(const QDomElement &node);
 };
 
 

@@ -366,7 +366,7 @@ QNetEdge::select(bool selected) {
  * Implementation of QNetView
  * ********************************************************************************************* */
 QNetView::QNetView(QWidget *parent)
-  : QWidget(parent), _scale(1), _dragging(0),  _dragPos(0,0), _connecting(0),
+  : QWidget(parent), _scale(1), _modified(false), _dragging(0), _dragPos(0,0), _connecting(0),
     _selectedNode(0), _selectedEdge(0)
 {
   updateLayout();
@@ -387,6 +387,7 @@ void
 QNetView::addNode(QNetNode *node) {
   node->setParent(this);
   _nodes.append(node);
+  setModified();
   updateLayout();
 }
 
@@ -412,15 +413,17 @@ QNetView::remNode(QNetNode *node) {
   if (_selectedNode == node)
     _selectedNode = 0;
   node->deleteLater();
-
+  setModified();
   updateLayout();
 }
 
 void
 QNetView::clear() {
+  bool mod = _nodes.size();
   while (_nodes.size()) {
     this->remNode(_nodes.first());
   }
+  setModified(mod);
 }
 
 QNetView::nodeIterator
@@ -447,6 +450,7 @@ void
 QNetView::addEdge(QNetEdge *edge) {
   edge->setParent(this);
   _edges.append(edge);
+  setModified();
   updateLayout();
 }
 
@@ -458,6 +462,7 @@ QNetView::remEdge(QNetEdge *edge) {
   if (_selectedEdge == edge)
     _selectedEdge = 0;
   edge->deleteLater();
+  setModified();
   updateLayout();
 }
 
@@ -506,6 +511,19 @@ QNetView::findDestinations(QNetSocket *src) {
   return sockets;
 }
 
+bool
+QNetView::isModified() const{
+  return _modified;
+}
+
+void
+QNetView::setModified(bool mod) {
+  bool ismod = _modified ^ mod;
+  _modified = mod;
+  if (ismod)
+    emit modified();
+}
+
 void
 QNetView::updateLayout() {
   QRect bb(QPoint(), this->minimumSize());
@@ -525,14 +543,7 @@ QNetView::updateLayout() {
 }
 
 void
-QNetView::paintEvent(QPaintEvent *evt) {
-  QPainter painter(this);
-  painter.setRenderHint(QPainter::Antialiasing);
-  painter.fillRect(evt->rect(), Qt::white);
-
-  QTransform scale; scale.scale(_scale, _scale);
-  painter.setTransform(scale);
-
+QNetView::paint(QPainter &painter) {
   foreach (QNetNode *node, _nodes) {
     node->paint(painter);
   }
@@ -559,6 +570,18 @@ QNetView::paintEvent(QPaintEvent *evt) {
     painter.setBrush(Qt::NoBrush);
     painter.drawPath(path);
   }
+}
+
+void
+QNetView::paintEvent(QPaintEvent *evt) {
+  QPainter painter(this);
+  painter.setRenderHint(QPainter::Antialiasing);
+  painter.fillRect(evt->rect(), Qt::white);
+
+  QTransform scale; scale.scale(_scale, _scale);
+  painter.setTransform(scale);
+
+  paint(painter);
 }
 
 void
@@ -629,6 +652,7 @@ QNetView::mouseMoveEvent(QMouseEvent *evt) {
 
   if (_dragging) {
     _dragging->setPosition(evt->pos()/_scale+_dragPos);
+    setModified();
     updateLayout();
     update();
   }

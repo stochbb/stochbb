@@ -2,6 +2,7 @@
 #define MAINWINDOW_HH
 
 #include <QMainWindow>
+#include "logwindow.hh"
 
 class NetEditWidget;
 
@@ -20,9 +21,15 @@ protected slots:
   void onLoad();
   void onCheck();
   void onRun();
+  void onHelp();
+  void onAbout();
+  void updateTitle();
+  void onShowLog();
+  void onQuit();
 
 protected:
   NetEditWidget *_netedit;
+  LogWindow *_log;
 };
 
 #endif // MAINWINDOW_HH

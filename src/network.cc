@@ -66,8 +66,8 @@ Network::filename() const {
 
 void
 Network::clear() {
-  QNetView::clear();
   _filepath.clear();
+  QNetView::clear();
 }
 
 bool
@@ -108,6 +108,7 @@ Network::save(const QString &file) {
   fd.close();
 
   _filepath = file;
+  setModified(false);
   return true;
 }
 
@@ -137,6 +138,8 @@ Network::load(const QDomDocument &doc) {
       return false;
     this->addEdge(obj);
   }
+
+  setModified(false);
 
   return true;
 }

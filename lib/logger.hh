@@ -117,11 +117,9 @@ public:
   /** Object type of the container. */
   typedef LogHandlerObj ObjectType;
 
-protected:
-  /** Hidden constructor. */
-  LogHandler(LogHandlerObj *obj);
-
 public:
+  /** Constructor. */
+  LogHandler(LogHandlerObj *obj);
   /** Copy constructor. */
   LogHandler(const LogHandler &other);
   /** Destructor. */

@@ -10,5 +10,6 @@
         <file>icons/play_64.png</file>
         <file>icons/check_64.png</file>
         <file>icons/output_64.png</file>
+        <file>about.html</file>
     </qresource>
 </RCC>

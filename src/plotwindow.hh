@@ -1,18 +1,18 @@
 #ifndef PLOTWINDOW_HH
 #define PLOTWINDOW_HH
 
-#include <QWidget>
+#include <QMainWindow>
 #include "lib/api.hh"
 #include "qcustomplot.hh"
 
 
-class PlotWindow: public QWidget
+class MarginalPlotWindow: public QMainWindow
 {
   Q_OBJECT
 
 public:
-  PlotWindow(double tmin, double tmax, size_t nstep, const QVector<stochbb::Var> &vars,
-             QWidget *parent=0);
+  MarginalPlotWindow(double tmin, double tmax, size_t nstep, const QVector<stochbb::Var> &vars,
+                     QWidget *parent=0);
 
 protected:
   double _tmin;
@@ -21,5 +21,48 @@ protected:
   QVector<stochbb::Var> _vars;
 };
 
+
+class ScatterPlotWindow: public QMainWindow
+{
+  Q_OBJECT
+
+public:
+  ScatterPlotWindow(size_t nsamples, const stochbb::Var &X, const stochbb::Var &Y, QWidget *parent=0);
+
+protected:
+  Eigen::MatrixXd _samples;
+};
+
+
+class KDE
+{
+public:
+  explicit KDE(const Eigen::Ref<Eigen::VectorXd> &samples);
+
+  double eval(double x) const;
+  double min() const;
+  double max() const;
+
+protected:
+  double _min, _max, _bw;
+  Eigen::Ref<Eigen::VectorXd> _samples;
+};
+
+
+class KDEPlotWindow: public QMainWindow
+{
+  Q_OBJECT
+
+public:
+  KDEPlotWindow(size_t nsamples, const QVector<stochbb::Var> &vars,
+                QWidget *parent=0);
+  virtual ~KDEPlotWindow();
+
+protected:
+  size_t _nsamples;
+  size_t _nbins;
+  QVector<stochbb::Var> _vars;
+  QVector<KDE *> _densities;
+};
 
 #endif // PLOTWINDOW_HH

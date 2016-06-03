@@ -22,9 +22,9 @@ stochbb::is_delta(const Density &dens) {
 }
 
 Var
-stochbb::delta(double value) {
+stochbb::delta(double value, const std::__1::string &name) {
   Eigen::VectorXd param(1); param << value;
-  return new AtomicVarObj(new AtomicDensityObj(new DeltaDistributionObj(), param));
+  return new AtomicVarObj(new AtomicDensityObj(new DeltaDistributionObj(), param), name);
 }
 
 /* ********************************************************************************************* *
@@ -39,7 +39,7 @@ stochbb::is_uniform(const Density &dens) {
 Var
 stochbb::uniform(double a, double b, const std::string &name) throw (Error) {
   Eigen::VectorXd param(2); param << a, b;
-  return new AtomicVarObj(new AtomicDensityObj(new UniformDistributionObj(), param));
+  return new AtomicVarObj(new AtomicDensityObj(new UniformDistributionObj(), param), name);
 }
 
 /* ********************************************************************************************* *
@@ -54,7 +54,7 @@ stochbb::is_normal(const Density &dens) {
 Var
 stochbb::normal(double mu, double sigma, const std::string &name) throw (Error) {
   Eigen::VectorXd param(2); param << mu, sigma;
-  return new AtomicVarObj(new AtomicDensityObj(new NormalDistributionObj(), param));
+  return new AtomicVarObj(new AtomicDensityObj(new NormalDistributionObj(), param), name);
 }
 
 Var
@@ -111,7 +111,7 @@ stochbb::is_gamma(const Density &dens) {
 Var
 stochbb::gamma(double k, double theta, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << k, theta, 0;
-  return new AtomicVarObj(new AtomicDensityObj(new GammaDistributionObj(), param));
+  return new AtomicVarObj(new AtomicDensityObj(new GammaDistributionObj(), param), name);
 }
 
 Var
@@ -168,7 +168,7 @@ stochbb::is_invgamma(const Density &dens) {
 Var
 stochbb::invgamma(double alpha, double beta, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << alpha, beta, 0;
-  return new AtomicVarObj(new AtomicDensityObj(new InvGammaDistributionObj(), param));
+  return new AtomicVarObj(new AtomicDensityObj(new InvGammaDistributionObj(), param), name);
 }
 
 Var
@@ -225,14 +225,14 @@ stochbb::is_weibull(const Density &dens) {
 Var
 stochbb::weibull(double k, double lambda, const std::string &name) throw (Error) {
   Eigen::VectorXd param(3); param << k, lambda, 0;
-  return new AtomicVarObj(new AtomicDensityObj(new WeibullDistributionObj(), param));
+  return new AtomicVarObj(new AtomicDensityObj(new WeibullDistributionObj(), param), name);
 }
 
 Var
 stochbb::weibull(const Var &k, double lambda, const std::string &name) throw (Error) {
   AtomicDensity k_atomic = k.density().as<AtomicDensity>();
   if (k_atomic.isValid() && k_atomic.distribution().is<DeltaDistribution>()) {
-    return stochbb::weibull(k_atomic.parameter(0), lambda);
+    return stochbb::weibull(k_atomic.parameter(0), lambda, name);
   }
   return new CompoundObj(std::vector<Var> {k, delta(lambda), delta(0)},
                          new WeibullDistributionObj(), name);
@@ -242,7 +242,7 @@ Var
 stochbb::weibull(double k, const Var &lambda, const std::string &name) throw (Error) {
   AtomicDensity lambda_atomic = lambda.density().as<AtomicDensity>();
   if (lambda_atomic.isValid() && lambda_atomic.distribution().is<DeltaDistribution>()) {
-    return stochbb::weibull(k, lambda_atomic.parameter(0));
+    return stochbb::weibull(k, lambda_atomic.parameter(0), name);
   }
   return new CompoundObj(std::vector<Var> {delta(k), lambda, delta(0)},
                          new WeibullDistributionObj(), name);
@@ -253,10 +253,10 @@ stochbb::weibull(const Var &k, const Var& lambda, const std::string &name) throw
   AtomicDensity k_atomic = k.density().as<AtomicDensity>();
   AtomicDensity lambda_atomic = lambda.density().as<AtomicDensity>();
   if (k_atomic.isValid() && k_atomic.distribution().is<DeltaDistribution>()) {
-    return stochbb::weibull(k_atomic.parameter(0), lambda);
+    return stochbb::weibull(k_atomic.parameter(0), lambda, name);
   }
   if (lambda_atomic.isValid() && lambda_atomic.distribution().is<DeltaDistribution>()) {
-    return stochbb::weibull(k, lambda_atomic.parameter(0));
+    return stochbb::weibull(k, lambda_atomic.parameter(0), name);
   }
   return new CompoundObj(std::vector<Var> {k, lambda, delta(0)},
                          new WeibullDistributionObj(), name);

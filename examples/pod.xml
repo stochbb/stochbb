@@ -1,5 +1,5 @@
 <net>
- <node type="stimulus" label="Stimulus" x="5" y="110" id="0x7fbe4c5d8780">
+ <node type="trigger" label="Stimulus" x="5" y="110" id="0x7fbe4c5d8780">
   <parameter name="time">0</parameter>
  </node>
  <node type="gammap" label="common" x="123" y="110" id="0x7fbe4c634e20">

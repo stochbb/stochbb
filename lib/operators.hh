@@ -28,7 +28,7 @@ bool is_delta(const Density &dens);
 
 /** Constructs a delta-distributed random variable (constant) located as the given value.
  * @ingroup api */
-Var delta(double value);
+Var delta(double value, const std::string &name="");
 
 
 /** Retruns @c true if the given density is an atomic uniform density. */

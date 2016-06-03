@@ -7,10 +7,7 @@
 #include <QSet>
 #include <QTextStream>
 
-
-class Socket;
-class NodeBase;
-class Network;
+#include "nodes.hh"
 
 class Message
 {
@@ -53,21 +50,21 @@ protected:
 class Assembler
 {
 public:
+  bool hasVariable(Socket *sock) const;
+  bool addVariable(Socket *sock, const stochbb::Var &var);
+  Socket *socket(const NodeBase *node, const QString &name);
+  stochbb::Var sourceVar(const NodeBase *node, const QString &name);
+
+public:
   static bool assemble(Network *net, QHash<Socket *, stochbb::Var> &varTable);
   static bool assemble(Network *net, QHash<Socket *, stochbb::Var> &varTable, Messages &messages);
+
 protected:
   typedef QList<NodeBase *> Queue;
 
 protected:
   Assembler(Network *net, QHash<Socket *, stochbb::Var> &varTable);
   bool assemble();
-  bool needsPreprocessing(NodeBase *node);
-  bool preprocess(NodeBase *node);
-  bool processable(NodeBase *node);
-  bool process(NodeBase *node);
-  bool addVariable(Socket *sock, const stochbb::Var &var);
-  Socket *socket(NodeBase *node, const QString &name);
-  stochbb::Var sourceVar(NodeBase *node, const QString &name);
 
   const Messages &messages() const;
 

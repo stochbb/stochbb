@@ -1,9 +1,9 @@
 SET(stochbb_SOURCES main.cc assembler.cc
     qcustomplot.cc qnetview.cc mainwindow.cc neteditwidget.cc nodes.cc edge.cc network.cc
-    plotwindow.cc)
+    plotwindow.cc logwindow.cc)
 SET(stochbb_MOC_HEADERS
     qcustomplot.hh qnetview.hh mainwindow.hh neteditwidget.hh nodes.hh edge.hh network.hh
-    plotwindow.hh)
+    plotwindow.hh logwindow.hh)
 SET(stochbb_HEADERS assembler.hh ${stochbb_MOC_HEADERS})
 
 qt5_wrap_cpp(stochbb_MOC_SOURCES ${stochbb_MOC_HEADERS})

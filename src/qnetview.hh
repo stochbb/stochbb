@@ -175,6 +175,15 @@ public:
   QList<QNetSocket *> findSources(QNetSocket *dest);
   QList<QNetSocket *> findDestinations(QNetSocket *src);
 
+  bool isModified() const;
+
+public slots:
+  void setModified(bool modified=true);
+  void paint(QPainter &painter);
+
+signals:
+  void modified();
+
 protected:
   void updateLayout();
 
@@ -187,6 +196,8 @@ protected:
   double _scale;
   QList<QNetNode*> _nodes;
   QList<QNetEdge*> _edges;
+  bool _modified;
+
   QNetNode *_dragging;
   QPoint   _dragPos;
   QNetSocket *_connecting;
