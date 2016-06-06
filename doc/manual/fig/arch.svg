@@ -9,8 +9,8 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="640.15704"
-   height="411.23691"
+   width="641.15625"
+   height="444.76819"
    id="svg2"
    version="1.1"
    inkscape:version="0.48.5 r10040"
@@ -25,10 +25,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="434.21566"
-     inkscape:cy="37.899249"
+     inkscape:cx="434.71566"
+     inkscape:cy="71.430539"
      inkscape:document-units="px"
-     inkscape:current-layer="g3779-8"
+     inkscape:current-layer="layer1"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
@@ -57,7 +57,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-62.765845,-169.64147)">
+     transform="translate(-62.265847,-169.64147)">
     <g
        id="g3870"
        transform="translate(-59.599,90.913729)">
@@ -65,10 +65,10 @@
          transform="translate(-1.0101526,55.55839)"
          id="g3769">
         <rect
-           style="fill:#ffffff;fill-opacity:1;stroke:#505050;stroke-width:11.86271381;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           style="fill:#ffffff;fill-opacity:1;stroke:#505050;stroke-width:12.82347107;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
            id="rect2985"
            width="628.31488"
-           height="196.24101"
+           height="229.31523"
            x="129.29953"
            y="232.22362" />
         <text
@@ -86,25 +86,33 @@
            xml:space="preserve"
            style="font-size:24px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
            x="147.48227"
-           y="313.94067"
+           y="319.94067"
            id="text3759"
            sodipodi:linespacing="125%"><tspan
              sodipodi:role="line"
              id="tspan3761"
              x="147.48227"
-             y="313.94067">- Variable representation</tspan><tspan
+             y="319.94067">- Variable representation</tspan><tspan
              sodipodi:role="line"
              x="147.48227"
-             y="343.94067"
+             y="349.94067"
+             id="tspan3030">- Distributions</tspan><tspan
+             sodipodi:role="line"
+             x="147.48227"
+             y="379.94067"
              id="tspan3763">- Transformations</tspan><tspan
              sodipodi:role="line"
              x="147.48227"
-             y="373.94067"
+             y="409.94067"
              id="tspan3765">- Reductions</tspan><tspan
              sodipodi:role="line"
              x="147.48227"
-             y="403.94067"
-             id="tspan3767">- Numerics</tspan></text>
+             y="439.94067"
+             id="tspan3767">- Numerics</tspan><tspan
+             sodipodi:role="line"
+             x="147.48227"
+             y="469.94067"
+             id="tspan3028" /></text>
       </g>
       <g
          id="g3779"
@@ -193,14 +201,14 @@
         <text
            xml:space="preserve"
            style="font-size:32px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-           x="147.44989"
+           x="141.44989"
            y="271.63052"
            id="text3842"
            sodipodi:linespacing="125%"><tspan
              sodipodi:role="line"
              id="tspan3844"
-             x="147.44989"
-             y="271.63052">Python inerface</tspan></text>
+             x="141.44989"
+             y="271.63052">Python interface</tspan></text>
         <text
            xml:space="preserve"
            style="font-size:24px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
