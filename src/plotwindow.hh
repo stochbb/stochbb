@@ -2,7 +2,7 @@
 #define PLOTWINDOW_HH
 
 #include <QMainWindow>
-#include "lib/api.hh"
+#include <stochbb/api.hh>
 #include "qcustomplot.hh"
 
 class PlotWindow: public QMainWindow

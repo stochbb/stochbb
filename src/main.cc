@@ -1,6 +1,6 @@
-#include "lib/api.hh"
-#include "lib/option_parser.hh"
-#include "lib/logger.hh"
+#include <stochbb/api.hh>
+#include <stochbb/option_parser.hh>
+#include <stochbb/logger.hh>
 #include "qcustomplot.hh"
 #include "mainwindow.hh"
 

@@ -10,6 +10,6 @@ qt5_wrap_cpp(stochbb_MOC_SOURCES ${stochbb_MOC_HEADERS})
 qt5_add_resources(stochbb_RCC_SOURCES ../shared/resources.qrc)
 
 add_executable(stochbb ${stochbb_SOURCES} ${stochbb_MOC_SOURCES} ${stochbb_RCC_SOURCES})
-target_link_libraries(stochbb ${LIBS} libsbb)
+target_link_libraries(stochbb ${LIBS})
 
 install(TARGETS stochbb DESTINATION "bin/")

@@ -1,0 +1,91 @@
+<net>
+ <node type="gammap" x="189" y="117" id="0x7f8cf64a5ba0" label="slow">
+  <parameter type="float" name="theta">3</parameter>
+  <parameter type="float" name="k">30</parameter>
+  <description>A slow semantic procssing stage. A gamma process with k=30 and theta=3. Please note that this stage has the same mean waiting time like the "fast" stage but slightly more skewed towards longer waiting times.</description>
+ </node>
+ <node type="gammap" x="191" y="66" id="0x7f8cf63655c0" label="fast">
+  <parameter type="float" name="theta">30</parameter>
+  <parameter type="float" name="k">3</parameter>
+  <description>A fast semantic procssing stage. A gamma process with k=3 and theta=30. Please note that this stage has the same mean waiting time like the "slow" stage but slightly more skewed towards shorter waiting times.</description>
+ </node>
+ <node type="trigger" x="12" y="220" id="0x7f8cf3d357b0" label="Stimulus">
+  <parameter type="float" name="time">0</parameter>
+  <description>The initial stimulus at T=0ms.</description>
+ </node>
+ <node type="minimum" x="302" y="93" id="0x7f8cf63573a0" label="Min">
+  <description>The minimum of the "fast" and "slow" processing stages.</description>
+ </node>
+ <node type="trigger" x="157" y="168" id="0x7f8cf63595b0" label="Interrupt (fast)">
+  <parameter type="float" name="time">150</parameter>
+  <description>A fast iterrupt trigger, presented 150ms after the stimulus.</description>
+ </node>
+ <node type="minimum" x="416" y="96" id="0x7f8cf6360490" label="Min">
+  <description>Iterrupts the "normal" processing of the simulus by an additional stimulus after 150ms. This stage stops any ongoing processing of the initial stimulus and triggers a response once the interrupt signal passed the visual stage.</description>
+ </node>
+ <node type="gammap" x="513" y="97" id="0x7f8cf6366050" label="Resp (fast Int)">
+  <parameter type="float" name="theta">50</parameter>
+  <parameter type="float" name="k">3</parameter>
+  <description>Final response stage under the assumption that there is a fast interrupt trigger (150ms after the stimulus). 
+
+Please note that all response stages are identical, a Gamma process with k=3 and theta=50 (about 150ms mean waiting time).</description>
+ </node>
+ <node type="gammap" x="87" y="89" id="0x7f8cf6368b40" label="vis">
+  <parameter type="float" name="theta">100</parameter>
+  <parameter type="float" name="k">1</parameter>
+  <description>First visual stage. A gamma process with k=1, theta=100. (mean 100ms)</description>
+ </node>
+ <node type="marginalplot" x="678" y="91" id="0x7f8cf6369dd0" label="Plot">
+  <parameter type="int" name="steps">100</parameter>
+  <parameter type="float" name="min">0</parameter>
+  <parameter type="float" name="max">1200</parameter>
+  <parameter type="int" name="graphs">3</parameter>
+  <description>Plots the comparison of the response times under the tree conditions (no iterrupt, interrupt after 150ms and interrupt afer 300ms). While the fast interrupt shortens the mean response time significantly, the slow interrupt has almost no effect. In both cases, however, a "true" divergence point appears. One at 150ms and the other at 300ms.</description>
+ </node>
+ <node type="gammap" x="511" y="51" id="0x7f8cf63623e0" label="Resp (no Int)">
+  <parameter type="float" name="theta">50</parameter>
+  <parameter type="float" name="k">3</parameter>
+  <description>Final response stage under the assumption that there is no interrupt trigger. Please note that all response stages are identical, a Gamma process with k=3 and theta=50 (about 150ms mean waiting time).</description>
+ </node>
+ <node type="gammap" x="312" y="168" id="0x7f8cf6644bd0" label="vis">
+  <parameter type="float" name="theta">100</parameter>
+  <parameter type="float" name="k">1</parameter>
+  <description>First visual stage. A gamma process with k=1, theta=100. (mean 100ms)</description>
+ </node>
+ <node type="minimum" x="415" y="217" id="0x7f8cf63a3c10" label="Min">
+  <description>Iterrupts the "normal" processing of the simulus by an additional stimulus after 300ms. This stage stops any ongoing processing of the initial stimulus and triggers a response once the interrupt signal passed the visual stage.</description>
+ </node>
+ <node type="gammap" x="312" y="223" id="0x7f8cf6392f70" label="vis">
+  <parameter type="float" name="theta">100</parameter>
+  <parameter type="float" name="k">1</parameter>
+  <description>First visual stage. A gamma process with k=1, theta=100. (mean 100ms)</description>
+ </node>
+ <node type="trigger" x="152" y="223" id="0x7f8cf6381570" label="Interrupt (slow)">
+  <parameter type="float" name="time">300</parameter>
+  <description>A slow interrupt trigger, presented 300ms after the stimulus.</description>
+ </node>
+ <node type="gammap" x="512" y="218" id="0x7f8cf63cd430" label="Resp (slow Int)">
+  <parameter type="float" name="theta">50</parameter>
+  <parameter type="float" name="k">3</parameter>
+  <description>Final response stage under the assumption that there is a fast interrupt trigger (150ms after the stimulus). 
+
+Please note that all response stages are identical, a Gamma process with k=3 and theta=50 (about 150ms mean waiting time).</description>
+ </node>
+ <edge destSocket="X" srcNode="0x7f8cf63655c0" srcSocket="out" destNode="0x7f8cf63573a0"/>
+ <edge destSocket="Y" srcNode="0x7f8cf64a5ba0" srcSocket="out" destNode="0x7f8cf63573a0"/>
+ <edge destSocket="X" srcNode="0x7f8cf63573a0" srcSocket="out" destNode="0x7f8cf6360490"/>
+ <edge destSocket="in" srcNode="0x7f8cf6360490" srcSocket="out" destNode="0x7f8cf6366050"/>
+ <edge destSocket="in" srcNode="0x7f8cf3d357b0" srcSocket="out" destNode="0x7f8cf6368b40"/>
+ <edge destSocket="in" srcNode="0x7f8cf6368b40" srcSocket="out" destNode="0x7f8cf63655c0"/>
+ <edge destSocket="in" srcNode="0x7f8cf6368b40" srcSocket="out" destNode="0x7f8cf64a5ba0"/>
+ <edge destSocket="in" srcNode="0x7f8cf63573a0" srcSocket="out" destNode="0x7f8cf63623e0"/>
+ <edge destSocket="1" srcNode="0x7f8cf63623e0" srcSocket="out" destNode="0x7f8cf6369dd0"/>
+ <edge destSocket="2" srcNode="0x7f8cf6366050" srcSocket="out" destNode="0x7f8cf6369dd0"/>
+ <edge destSocket="Y" srcNode="0x7f8cf6644bd0" srcSocket="out" destNode="0x7f8cf6360490"/>
+ <edge destSocket="in" srcNode="0x7f8cf63595b0" srcSocket="out" destNode="0x7f8cf6644bd0"/>
+ <edge destSocket="X" srcNode="0x7f8cf63573a0" srcSocket="out" destNode="0x7f8cf63a3c10"/>
+ <edge destSocket="Y" srcNode="0x7f8cf6392f70" srcSocket="out" destNode="0x7f8cf63a3c10"/>
+ <edge destSocket="in" srcNode="0x7f8cf6381570" srcSocket="out" destNode="0x7f8cf6392f70"/>
+ <edge destSocket="in" srcNode="0x7f8cf63a3c10" srcSocket="out" destNode="0x7f8cf63cd430"/>
+ <edge destSocket="3" srcNode="0x7f8cf63cd430" srcSocket="out" destNode="0x7f8cf6369dd0"/>
+</net>

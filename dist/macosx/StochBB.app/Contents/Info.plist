@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>stochbb</string>
+
+	<key>CFBundleGetInfoString</key>
+	<string>StochBB 1.0.0</string>
+	
+	<key>CFBundleIdentifier</key>
+	<string>io.github.stochbb.stochbb</string>
+	
+	<key>CFBundleIconFile</key>
+	<string>stochbb.icns</string>
+	
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>1.0</string>
+	
+	<key>CFBundleName</key>
+	<string>StochBB</string>
+
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+
+	<key>CFBundleVersion</key>
+	<string>1.0.0</string>
+
+	<key>LSMinimumSystemVersion</key>
+	<string>10.9.0</string>
+</dict>
+</plist>

@@ -1,7 +1,7 @@
 #ifndef ASSEMBLER_HH
 #define ASSEMBLER_HH
 
-#include "lib/api.hh"
+#include <stochbb/api.hh>
 #include <QHash>
 #include <QList>
 #include <QSet>

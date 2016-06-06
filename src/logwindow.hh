@@ -3,7 +3,7 @@
 
 #include <QListWidget>
 
-#include "lib/logger.hh"
+#include <stochbb/logger.hh>
 
 class LogModelHandler: public QObject, public stochbb::LogHandlerObj
 {

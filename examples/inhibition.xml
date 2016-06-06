@@ -1,0 +1,31 @@
+<net>
+ <node type="gammav" x="52" y="48" id="0x7f8cf66bda50" label="Γ">
+  <parameter type="float" name="theta">1</parameter>
+  <parameter type="float" name="k">1</parameter>
+ </node>
+ <node type="gammav" x="53" y="102" id="0x7f8cf664b0a0" label="Γ">
+  <parameter type="float" name="theta">1</parameter>
+  <parameter type="float" name="k">1</parameter>
+ </node>
+ <node type="delay" x="247" y="52" id="0x7f8cf66dfee0" label="δ">
+  <parameter type="float" name="delay">1</parameter>
+ </node>
+ <node type="delay" x="248" y="107" id="0x7f8cf667df40" label="δ">
+  <parameter type="float" name="delay">2</parameter>
+ </node>
+ <node type="inhibition" x="136" y="73" id="0x7f8cf3eca220" label="Inh"/>
+ <node type="join" x="331" sibling="0x7f8cf3eca220" y="78" id="0x7f8cf672c320" label="Join"/>
+ <node type="marginalplot" x="441" y="79" id="0x7f8cf6267320" label="Marginal Plot">
+  <parameter type="int" name="steps">100</parameter>
+  <parameter type="float" name="min">0</parameter>
+  <parameter type="float" name="max">5</parameter>
+  <parameter type="int" name="graphs">1</parameter>
+ </node>
+ <edge destSocket="X" srcNode="0x7f8cf66bda50" srcSocket="out" destNode="0x7f8cf3eca220"/>
+ <edge destSocket="Y" srcNode="0x7f8cf664b0a0" srcSocket="out" destNode="0x7f8cf3eca220"/>
+ <edge destSocket="in" srcNode="0x7f8cf3eca220" srcSocket="Xout" destNode="0x7f8cf66dfee0"/>
+ <edge destSocket="in" srcNode="0x7f8cf3eca220" srcSocket="Yout" destNode="0x7f8cf667df40"/>
+ <edge destSocket="X" srcNode="0x7f8cf66dfee0" srcSocket="out" destNode="0x7f8cf672c320"/>
+ <edge destSocket="Y" srcNode="0x7f8cf667df40" srcSocket="out" destNode="0x7f8cf672c320"/>
+ <edge destSocket="1" srcNode="0x7f8cf672c320" srcSocket="out" destNode="0x7f8cf6267320"/>
+</net>

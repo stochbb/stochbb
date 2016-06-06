@@ -6,7 +6,7 @@
 #include <QDomElement>
 #include <QDialog>
 #include "parameter.hh"
-#include "lib/api.hh"
+#include <stochbb/api.hh>
 
 
 class Network;
