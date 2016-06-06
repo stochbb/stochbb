@@ -18,13 +18,14 @@ protected slots:
   void onNewNetwork();
   void onSave();
   void onSaveAs();
+  void onImageExport();
   void onLoad();
   void onCheck();
   void onRun();
   void onHelp();
   void onAbout();
   void updateTitle();
-  void onShowLog();
+  void onShowLog(bool show);
   void onQuit();
 
 protected:

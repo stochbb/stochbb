@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+
+<!--
+  StochNBB network XML specification.
+
+  This document provides the XML Schema definition of the StochBB network markup language.
+
+  (c) 2016, Hannes Matuschek <hmatuschek at gmail dot com>
+//-->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+ <!-- All possible parameter type names. //-->
+ <xsd:simpleType name="parameterTypeName">
+  <xsd:restriction base="xsd:string">
+   <xsd:enumeration value="bool"/>
+   <xsd:enumeration value="int"/>
+   <xsd:enumeration value="float"/>
+   <xsd:enumeration value="string"/>
+  </xsd:restriction>
+ </xsd:simpleType>
+
+ <!-- The <parameter> element type. //-->
+ <xsd:complexType name="parameterElement">
+  <xsd:simpleContent>
+   <xsd:extension base="xsd:string">
+    <xsd:attribute name="name" type="xsd:string" use="required"/>
+    <xsd:attribute name="type" type="parameterTypeName" use="required"/>
+   </xsd:extension>
+  </xsd:simpleContent>
+ </xsd:complexType>
+
+ <!-- The <node> element type. //-->
+ <xsd:complexType name="nodeElement">
+  <xsd:sequence>
+   <xsd:element minOccurs="0" maxOccurs="unbounded" name="parameter" type="parameterElement"/>
+   <xsd:element minOccurs="0" maxOccurs="1" name="description" type="xsd:string"/>
+  </xsd:sequence>
+  <xsd:attribute name="id" type="xsd:string" use="required"/>
+  <xsd:attribute name="x" type="xsd:integer"/>
+  <xsd:attribute name="y" type="xsd:integer"/>
+  <xsd:attribute name="label" type="xsd:string"/>
+  <xsd:attribute name="sibling" type="xsd:string"/>
+  <xsd:attribute name="type" type="xsd:string" use="required"/>
+ </xsd:complexType>
+
+ <!-- The <edge> element type. //-->
+ <xsd:complexType name="edgeElement">
+  <xsd:attribute name="srcNode" type="xsd:string"/>
+  <xsd:attribute name="srcSocket" type="xsd:string"/>
+  <xsd:attribute name="destNode" type="xsd:string"/>
+  <xsd:attribute name="destSocket" type="xsd:string"/>
+ </xsd:complexType>
+
+ <!-- The network document structure.
+      It consists of a <net> root element with ... //-->
+ <xsd:element name="net">
+  <xsd:complexType>
+   <xsd:sequence>
+    <!-- ... any number of <node> elements. //-->
+    <xsd:element name="node" type="nodeElement" minOccurs="0" maxOccurs="unbounded"/>
+    <!-- ... and any number of <edge> elements. //-->
+    <xsd:element name="edge" type="edgeElement" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+</xsd:schema>

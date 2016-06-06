@@ -81,7 +81,10 @@ NetEditWidget::addMaximum() {
 
 void
 NetEditWidget::addInhibition() {
-  _netview->addNode(new InhibitionNode(_netview));
+  InhibitionNode *inh = new InhibitionNode(_netview);
+  JoinNode *join = new JoinNode(inh, _netview);
+  _netview->addNode(inh);
+  _netview->addNode(join);
 }
 
 void

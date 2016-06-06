@@ -11,13 +11,41 @@ QVector<QColor> colors(
 
 
 /* ******************************************************************************************** *
+ * Implementation of PlotWindow
+ * ******************************************************************************************** */
+PlotWindow::PlotWindow(QWidget *parent)
+  : QMainWindow(parent), _plot(0)
+{
+  _plot = new QCustomPlot(this);
+  _plot->setInteraction(QCP::iRangeZoom, true);
+  _plot->setInteraction(QCP::iRangeDrag, true);
+  setCentralWidget(_plot);
+
+  QToolBar *toolbar = new QToolBar();
+  toolbar->addAction(tr("Save"), this, SLOT(onSave()));
+  this->addToolBar(toolbar);
+}
+
+void
+PlotWindow::onSave() {
+  QString filename = QFileDialog::getSaveFileName(this, tr("Save plot as ..."), "",
+                                                  tr("Image Format (*.png *.pdf)"));
+  if (filename.isEmpty())
+    return;
+  QFileInfo info(filename);
+  if ("png" == info.suffix())
+    _plot->savePng(filename);
+  else if ("pdf" == info.suffix())
+    _plot->savePdf(filename);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of MarginalPlotWindow
  * ******************************************************************************************** */
 MarginalPlotWindow::MarginalPlotWindow(double tmin, double tmax, size_t nstep, const QVector<stochbb::Var> &vars, QWidget *parent)
-  : QMainWindow(parent), _tmin(tmin), _tmax(tmax), _nstep(nstep), _vars(vars)
+  : PlotWindow(parent), _tmin(tmin), _tmax(tmax), _nstep(nstep), _vars(vars)
 {
-  QCustomPlot *plot = new QCustomPlot();
-
   double t = _tmin, dt = (_tmax-_tmin)/_nstep;
   Eigen::VectorXd F(_nstep), T(_nstep);
   for (size_t i=0; i<_nstep; i++, t+=dt)
@@ -26,7 +54,7 @@ MarginalPlotWindow::MarginalPlotWindow(double tmin, double tmax, size_t nstep, c
   for (size_t i=0; i<_vars.size(); i++) {
     _vars[i].density().eval(tmin, tmax, F);
     ymax = std::max(ymax, F.maxCoeff());
-    QCPGraph *graph = plot->addGraph();
+    QCPGraph *graph = _plot->addGraph();
     for (size_t j=0; j<nstep; j++)
       graph->addData(T[j], F[j]);
     // Set pen color;
@@ -38,13 +66,11 @@ MarginalPlotWindow::MarginalPlotWindow(double tmin, double tmax, size_t nstep, c
       graph->setName(QString::fromStdString(_vars[i].name()));
     graph->addToLegend();
   }
-  plot->legend->setVisible(true);
+  _plot->legend->setVisible(true);
 
-  plot->xAxis->setRange(tmin, tmax);
-  plot->yAxis->setRange(0, ymax);
-  plot->replot();
-
-  setCentralWidget(plot);
+  _plot->xAxis->setRange(tmin, tmax);
+  _plot->yAxis->setRange(0, ymax);
+  _plot->replot();
 }
 
 
@@ -52,18 +78,17 @@ MarginalPlotWindow::MarginalPlotWindow(double tmin, double tmax, size_t nstep, c
  * Implementation of ScatterPlotWindow
  * ******************************************************************************************** */
 ScatterPlotWindow::ScatterPlotWindow(size_t nsamples, const stochbb::Var &X, const stochbb::Var &Y, QWidget *parent)
-  : QMainWindow(parent), _samples(nsamples,2)
+  : PlotWindow(parent), _samples(nsamples,2)
 {
   stochbb::ExactSampler sampler(X,Y);
   sampler.sample(_samples);
 
-  QCustomPlot *plot = new QCustomPlot();
   if (X.name().size())
-    plot->xAxis->setLabel(QString::fromStdString(X.name()));
+    _plot->xAxis->setLabel(QString::fromStdString(X.name()));
   if (Y.name().size())
-    plot->yAxis->setLabel(QString::fromStdString(Y.name()));
+    _plot->yAxis->setLabel(QString::fromStdString(Y.name()));
 
-  QCPGraph *graph = plot->addGraph();
+  QCPGraph *graph = _plot->addGraph();
   graph->setScatterStyle(QCPScatterStyle::ssPlus);
   graph->setLineStyle(QCPGraph::lsNone);
 
@@ -74,11 +99,9 @@ ScatterPlotWindow::ScatterPlotWindow(size_t nsamples, const stochbb::Var &X, con
     graph->addData(_samples(i, 0), _samples(i, 1));
   }
 
-  plot->xAxis->setRange(xmin, xmax);
-  plot->yAxis->setRange(ymin, ymax);
-  plot->replot();
-
-  setCentralWidget(plot);
+  _plot->xAxis->setRange(xmin, xmax);
+  _plot->yAxis->setRange(ymin, ymax);
+  _plot->replot();
 }
 
 
@@ -86,7 +109,7 @@ ScatterPlotWindow::ScatterPlotWindow(size_t nsamples, const stochbb::Var &X, con
  * Implementation of KDEPlotWindow
  * ******************************************************************************************** */
 KDEPlotWindow::KDEPlotWindow(size_t nsamples, const QVector<stochbb::Var> &vars, QWidget *parent)
-  : QMainWindow(parent), _nsamples(nsamples),  _vars(vars)
+  : PlotWindow(parent), _nsamples(nsamples),  _vars(vars)
 {
   Eigen::MatrixXd samples(_nsamples, _vars.size());
   stochbb::ExactSampler sampler(_vars.toStdVector());
@@ -110,11 +133,9 @@ KDEPlotWindow::KDEPlotWindow(size_t nsamples, const QVector<stochbb::Var> &vars,
   for (size_t i=0; i<nstep; i++, t+=dt)
     T(i) = t;
 
-  QCustomPlot *plot = new QCustomPlot();
-
   double ymax = 0;
   for (size_t i=0; i<_vars.size(); i++) {
-    QCPGraph *graph = plot->addGraph();
+    QCPGraph *graph = _plot->addGraph();
     for (size_t j=0; j<nstep; j++) {
       double y = _densities[i]->eval(T[j]);
       ymax = std::max(ymax, y);
@@ -129,13 +150,10 @@ KDEPlotWindow::KDEPlotWindow(size_t nsamples, const QVector<stochbb::Var> &vars,
       graph->setName(QString::fromStdString(_vars[i].name()));
     graph->addToLegend();
   }
-  plot->legend->setVisible(true);
-
-  plot->xAxis->setRange(min, max);
-  plot->yAxis->setRange(0, ymax);
-  plot->replot();
-
-  setCentralWidget(plot);
+  _plot->legend->setVisible(true);
+  _plot->xAxis->setRange(min, max);
+  _plot->yAxis->setRange(0, ymax);
+  _plot->replot();
 }
 
 KDEPlotWindow::~KDEPlotWindow() {
@@ -157,7 +175,6 @@ KDE::KDE(const Eigen::Ref<Eigen::VectorXd> &samples)
   _bw = std::exp( std::log(1.06) + std::log(sigma2)/2 - std::log(_samples.size())/5 );
   _min -= 3*_bw;
   _max += 3*_bw;
-  qDebug() << "Got BW " << _bw << "min" << _min << "max" << _max;
 }
 
 double

@@ -2,7 +2,6 @@
 #include "network.hh"
 #include "nodes.hh"
 #include "edge.hh"
-#include <QDebug>
 
 
 /* ********************************************************************************************* *
@@ -45,7 +44,6 @@ MessageBuilder::MessageBuilder(Message::Level level, Messages &lst)
 
 MessageBuilder::~MessageBuilder() {
   _lst.append(Message(_level, *(this->string())));
-  qDebug() << *(this->string());
 }
 
 
@@ -123,7 +121,9 @@ Assembler::assemble() {
   // If not progress has been made and the queue is empty
   // -> we are stuck, e.g. due to circular dependencies
   if (_queue.size()) {
-    msgError(_messages) << "Cannot process network. Some dependencies cannot be resolved.";
+    msgError(_messages) << "Cannot process network. Some dependencies cannot be resolved. "
+                        << "This is usually due to unconnected inputs or circular dependencies "
+                        << "between nodes.";
     // Stuck...
     return false;
   }

@@ -7,6 +7,7 @@
 class Socket;
 class Network;
 class NodeBase;
+class ParserInfo;
 
 class Edge : public QNetEdge
 {
@@ -18,7 +19,7 @@ public:
   QDomElement serialize(QDomDocument &doc) const;
 
 public:
-  static Edge *fromXml(const QDomElement &node, const QHash<QString, NodeBase *> &node_table);
+  static Edge *fromXml(const QDomElement &node, const QHash<QString, NodeBase *> &node_table, ParserInfo &info);
 };
 
 #endif // EDGE_HH

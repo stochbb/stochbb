@@ -16,7 +16,8 @@
 QNetNode::QNetNode(const QString &label, QNetView *parent)
   : QObject(parent), _borderPen(Qt::gray, 3), _altBorderPen(Qt::blue, 3),
     _backgroundBrush(Qt::white), _margin(5), _socketMargin(3),
-    _selected(false), _position(0,0), _labelFont("sans", 12, QFont::Bold), _label(label)
+    _selected(false), _position(0,0), _labelFont("sans", 12, QFont::Bold), _label(label),
+    _description()
 {
   updateLayout();
 }
@@ -30,6 +31,21 @@ void
 QNetNode::setLabel(const QString &label) {
   _label = label;
   updateLayout();
+}
+
+bool
+QNetNode::hasDescription() const {
+  return ! _description.isEmpty();
+}
+
+const QString &
+QNetNode::description() const {
+  return _description;
+}
+
+void
+QNetNode::setDescription(const QString &text) {
+  _description = text;
 }
 
 const QPoint &
@@ -72,6 +88,7 @@ QNetNode::addSocket(QNetSocket *socket) {
       _rightSockets.append(socket);
       break;
   }
+  socket->setParent(this);
   updateLayout();
 }
 
@@ -115,6 +132,22 @@ QNetNode::selected() const {
 void
 QNetNode::select(bool selected) {
   _selected = selected;
+}
+
+QRect
+QNetNode::boundingRect() const {
+  QPoint pos = position();
+  QSize  size = this->size();
+  pos -= QPoint(_borderPen.width()/2,_borderPen.width()/2);
+  size += QSize(_borderPen.width(),_borderPen.width());
+  QRect rect(pos, size);
+  foreach(QNetSocket *socket, _leftSockets) {
+    rect = rect.united(socket->boundingRect());
+  }
+  foreach(QNetSocket *socket, _rightSockets) {
+    rect = rect.united(socket->boundingRect());
+  }
+  return rect;
 }
 
 void
@@ -262,6 +295,15 @@ QNetSocket::setPosition(int x, int y) {
   setPosition(QPoint(x,y));
 }
 
+QRect
+QNetSocket::boundingRect() const {
+  QPoint pos = position();
+  QSize size = this->size();
+  pos -= QPoint(_borderPen.width()/2, _borderPen.width()/2);
+  size += QSize(_borderPen.width(), _borderPen.width());
+  return QRect(pos, size);
+}
+
 void
 QNetSocket::paint(QPainter &painter) {
   QPen pen(Qt::gray);
@@ -288,7 +330,8 @@ QNetSocket::paint(QPainter &painter) {
 QNetEdge::QNetEdge(QNetSocket *a, QNetSocket *b, QNetView *parent)
   : QObject(parent), _pen(Qt::darkBlue, 3), _altPen(Qt::blue, 3), _a(a), _b(b), _selected(false)
 {
-  // pass...
+  connect(a, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+  connect(b, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
 }
 
 bool
@@ -343,6 +386,12 @@ QNetEdge::dest() const {
   return _b;
 }
 
+QRect
+QNetEdge::boundingRect() const {
+  QPainterPath path = this->path();
+  return path.boundingRect().toRect();
+}
+
 void
 QNetEdge::paint(QPainter &painter) {
   QPainterPath path = this->path();
@@ -387,6 +436,7 @@ void
 QNetView::addNode(QNetNode *node) {
   node->setParent(this);
   _nodes.append(node);
+  connect(node, SIGNAL(destroyed(QObject*)), this, SLOT(itemDestroyed(QObject*)));
   setModified();
   updateLayout();
 }
@@ -395,26 +445,8 @@ void
 QNetView::remNode(QNetNode *node) {
   if (! _nodes.contains(node))
     return;
-  QList<QNetEdge *> edges;
-  foreach (QNetEdge *edge, _edges) {
-    if (edge->isConnectedWith(node)) {
-      edges.append(edge);
-    }
-  }
-  // First, remove all edges connected with node
-  foreach (QNetEdge *edge, edges) {
-    if (_selectedEdge == edge)
-      _selectedEdge=0;
-    _edges.removeAll(edge);
-    edge->deleteLater();
-  }
-  // Then remove node
   _nodes.removeAll(node);
-  if (_selectedNode == node)
-    _selectedNode = 0;
   node->deleteLater();
-  setModified();
-  updateLayout();
 }
 
 void
@@ -450,6 +482,7 @@ void
 QNetView::addEdge(QNetEdge *edge) {
   edge->setParent(this);
   _edges.append(edge);
+  connect(edge, SIGNAL(destroyed(QObject*)), this, SLOT(itemDestroyed(QObject*)));
   setModified();
   updateLayout();
 }
@@ -459,11 +492,7 @@ QNetView::remEdge(QNetEdge *edge) {
   if (! _edges.contains(edge))
     return;
   _edges.removeAll(edge);
-  if (_selectedEdge == edge)
-    _selectedEdge = 0;
   edge->deleteLater();
-  setModified();
-  updateLayout();
 }
 
 QNetView::edgeIterator
@@ -516,6 +545,22 @@ QNetView::isModified() const{
   return _modified;
 }
 
+QRect
+QNetView::boundingRect() const {
+  if (0 == _nodes.size())
+    return QRect();
+
+  QRect rect;
+  foreach(QNetNode *node, _nodes) {
+    rect = rect.united(node->boundingRect());
+  }
+  foreach(QNetEdge *edge, _edges) {
+    rect = rect.united(edge->boundingRect());
+  }
+
+  return rect;
+}
+
 void
 QNetView::setModified(bool mod) {
   bool ismod = _modified ^ mod;
@@ -523,6 +568,24 @@ QNetView::setModified(bool mod) {
   if (ismod)
     emit modified();
 }
+
+void
+QNetView::itemDestroyed(QObject *item) {
+  if (_nodes.contains((QNetNode *) item)) {
+    _nodes.removeAll((QNetNode *) item);
+    if (_selectedNode == (QNetNode *) item)
+      _selectedNode = 0;
+  } else if (_edges.contains((QNetEdge *) item)) {
+    _edges.removeAll((QNetEdge *) item);
+    if (_selectedEdge == (QNetEdge *) item)
+      _selectedEdge = 0;
+  } else {
+    return;
+  }
+  setModified();
+  updateLayout();
+}
+
 
 void
 QNetView::updateLayout() {

@@ -11,5 +11,6 @@
         <file>icons/check_64.png</file>
         <file>icons/output_64.png</file>
         <file>about.html</file>
+        <file>xml/network-1.0.xml</file>
     </qresource>
 </RCC>

@@ -1,6 +1,6 @@
 \section{Artificial example} \label{sec:example}
-Within this section, we show how a rather trivial stochastic model of a reading experiment can be
-implemented using StochBB's Python interface.
+Within this section, I present how a rather trivial stochastic model of a reading experiment can be
+implemented using StochBB's GUI application.
 
 The model describes the fixation duration $R$ as a simple chain of a lexical $L$, semantic $S$ and
 occulomotor $M$ stage. Each stage is represented by a Gamma distributed random variable, that is
@@ -23,51 +23,16 @@ compound distributed random variables.
 
 \begin{figure}[!ht]
  \centering
-  \includegraphics[width=0.7\textwidth]{example_graph.pdf}
-  \caption{Visualization of the example process.} \label{fig:exgraph}
+  \includegraphics[width=0.7\textwidth]{example1.png}
+  \caption{Visualization of the example process within the \pkg{StochBB} GUI application.} \label{fig:exgraph}
 \end{figure}
 
-The following code shows how this simple model of a reading experiment is implemented using the
-Python API of StochBB.
-
-\begin{lstlisting}[language=Python]
-from numpy import *
-import stochbb
-
-# Corpus model:
-#  Log word frequency (per mililon), is uniform distr. on the interval [0,4]
-f = stochbb.uniform(0,4)
-#  Predictability of word is unif. distributed on the interval [0,1]
-p = stochbb.uniform(0,1)
-
-# Experimental model:
-#  "lexical" stage is gamma distributed with k=5*f+5, theta=10
-L = stochbb.gamma(5*f + 5, 10)
-#  "semantic" stage is gamma distributed with k=10*p+5, theta=20
-S = stochbb.gamma(10*p + 5, 20)
-#  "motor" stage is gamma distributed with k=10, theta=30
-M = stochbb.gamma(10, 30)
-#  "response latency" is simply R = L + S + M
-R = L + S + M
-
-# Evaluate marginal densities on interval [0,1200] ms
-Tmin, Tmax, N = 0, 1200, 1000
-t = linspace(Tmin, Tmax, N); dt = float(Tmax-Tmin)/N
-pL = empty(N,); L.density().eval(Tmin, Tmax, pL)
-pS = empty(N,); S.density().eval(Tmin, Tmax, pS)
-pM = empty(N,); M.density().eval(Tmin, Tmax, pM)
-pR = empty(N,); R.density().eval(Tmin, Tmax, pR)
-
-# Sample 10k samples from system
-sam = stochbb.ExactSampler([L,S,M,R])
-X = empty((100000, 4))
-sam.sample(X)
-\end{lstlisting}
-
-Figure \ref{fig:example} shows the results of the script. The histogram of the samples are in a good agreement with the PDFs obtained numerically. 
+Figure \ref{fig:exgraph} shows the visualization of the network within the \pkg{SochBB} GUI application. At the top-left corner an additional node called \emph{Stimulus} is shown. This node represents a simple $\delta$-distributed random variable defining the temporal reference point at $T=0$. The random parameters $f$ and $p$ as well a their affine transformation ($5\,f+5$ and $10\,p+5$) are shown in the bottom left of Fig. \ref{fig:exgraph}. The compound Gamma distributed $L$ and $S$ stage as well as the Gamma distributed $M$ stage are shown near the center. At the very right of Fig. \ref{fig:exgraph}, a plot node is shown that produces the Figure \ref{fig:example}.
 
 \begin{figure}[!ht]
  \centering
- \includegraphics[width=0.6\textwidth]{fig/example.pdf}
+ \includegraphics[width=0.45\textwidth]{example1_plot.pdf}
  \caption{Shows the histogram of the samples (boxes) and the numerically obtained densities (lines).} \label{fig:example}
-\end{figure}
+\end{figure}	
+
+Figure \ref{fig:example} shows the results of the analysis. It shows the densities of the response times for each stage (L, S and M) in comparison. 

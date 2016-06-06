@@ -66,9 +66,9 @@ DeltaDistributionObj::pdf(double Tmin, double Tmax, Eigen::Ref<Eigen::VectorXd> 
                           const Eigen::Ref<const Eigen::VectorXd> params) const
 {
   out.setZero();
-  if ((params[0]<Tmin) || (params[0]>Tmax)) { return; }
+  if ((params[0]<Tmin) || (params[0]>=Tmax)) { return; }
   double dt = (Tmax-Tmin)/out.size();
-  size_t idx = (params[0]-Tmin)/dt;
+  int idx = (params[0]-Tmin)/dt;
   out[idx] = 1./dt;
 }
 

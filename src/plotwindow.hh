@@ -5,8 +5,22 @@
 #include "lib/api.hh"
 #include "qcustomplot.hh"
 
+class PlotWindow: public QMainWindow
+{
+  Q_OBJECT
 
-class MarginalPlotWindow: public QMainWindow
+public:
+  PlotWindow(QWidget *parent=0);
+
+protected slots:
+  void onSave();
+
+protected:
+  QCustomPlot *_plot;
+};
+
+
+class MarginalPlotWindow: public PlotWindow
 {
   Q_OBJECT
 
@@ -22,7 +36,7 @@ protected:
 };
 
 
-class ScatterPlotWindow: public QMainWindow
+class ScatterPlotWindow: public PlotWindow
 {
   Q_OBJECT
 
@@ -49,7 +63,7 @@ protected:
 };
 
 
-class KDEPlotWindow: public QMainWindow
+class KDEPlotWindow: public PlotWindow
 {
   Q_OBJECT
 

@@ -40,6 +40,8 @@ public:
   bool hasLabel() const;
   const QString &label() const;
 
+  QRect boundingRect() const;
+
 public slots:
   void paint(QPainter &painter);
 
@@ -65,6 +67,10 @@ public:
   const QString &label() const;
   void setLabel(const QString &label);
 
+  bool hasDescription() const;
+  const QString &description() const;
+  void setDescription(const QString &text);
+
   const QPoint &position() const;
   const QSize &size() const;
 
@@ -77,6 +83,8 @@ public:
   QNetSocket *socketAt(QNetSocket::Side side, size_t i) const;
 
   bool selected() const;
+
+  QRect boundingRect() const;
 
 public slots:
   void paint(QPainter &painter);
@@ -99,6 +107,8 @@ protected:
   QPoint  _labelPos;
   QFont   _labelFont;
   QString _label;
+
+  QString _description;
 
   int     _leftSocketOffset;
   int     _rightSocketOffset;
@@ -123,6 +133,8 @@ public:
   bool selected() const;
   bool contains(const QPoint &pos) const;
   QPainterPath path() const;
+
+  QRect boundingRect() const;
 
 public slots:
   void paint(QPainter &painter);
@@ -177,12 +189,17 @@ public:
 
   bool isModified() const;
 
+  QRect boundingRect() const;
+
 public slots:
   void setModified(bool modified=true);
   void paint(QPainter &painter);
 
 signals:
   void modified();
+
+protected slots:
+  void itemDestroyed(QObject *item);
 
 protected:
   void updateLayout();

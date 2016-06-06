@@ -14,6 +14,11 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QApplication>
+#include <QVBoxLayout>
+#include <QImage>
+#include <QPainter>
+#include <QSvgGenerator>
+#include <QPrinter>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -22,11 +27,20 @@ MainWindow::MainWindow(QWidget *parent)
   setMinimumSize(640, 480);
 
   _log = new LogWindow(this);
+  _log->setVisible(false);
 
   _netedit = new NetEditWidget();
   connect(_netedit->network(), SIGNAL(modified()), this, SLOT(updateTitle()));
   updateTitle();
-  setCentralWidget(_netedit);
+
+  QWidget *panel = new QWidget();
+  QVBoxLayout *layout = new QVBoxLayout();
+  layout->addWidget(_netedit, 1);
+  layout->addWidget(_log, 0);
+  layout->setMargin(0);
+  layout->setSpacing(0);
+  panel->setLayout(layout);
+  setCentralWidget(panel);
 
   QMenuBar *menu_bar = new QMenuBar();
   QMenu *file_menu = menu_bar->addMenu(tr("File"));
@@ -36,8 +50,10 @@ MainWindow::MainWindow(QWidget *parent)
   open->setShortcut(Qt::CTRL + Qt::Key_O);
   QAction *save = file_menu->addAction(tr("Save"), this, SLOT(onSave()));
   save->setShortcut(Qt::CTRL + Qt::Key_S);
-  QAction *save_as = file_menu->addAction(tr("Save as ..."), this, SLOT(onSave()));
+  QAction *save_as = file_menu->addAction(tr("Save as ..."), this, SLOT(onSaveAs()));
   save_as->setShortcut(Qt::SHIFT + Qt::CTRL + Qt::Key_S);
+  file_menu->addSeparator();
+  file_menu->addAction(tr("Export network ..."), this, SLOT(onImageExport()));
   file_menu->addSeparator();
   QAction *check_action = file_menu->addAction(
         QIcon("://icons/check_64.png"), tr("Verify"), this, SLOT(onCheck()));
@@ -94,7 +110,9 @@ MainWindow::MainWindow(QWidget *parent)
   QAction *zoom_out_action = view_menu->addAction(
         QIcon("://icons/zoom-out_64.png"), tr("Zoom out"), _netedit, SLOT(zoomOut()));
   view_menu->addSeparator();
-  view_menu->addAction(tr("Show Log..."), this, SLOT(onShowLog()));
+  QAction *show_log = view_menu->addAction(tr("Show Log"));
+  show_log->setCheckable(true);
+  connect(show_log, SIGNAL(toggled(bool)), this, SLOT(onShowLog(bool)));
 
   QMenu *help_menu = menu_bar->addMenu(tr("Help"));
   help_menu->addAction(tr("User Manual"), this, SLOT(onHelp()));
@@ -184,11 +202,26 @@ MainWindow::onLoad() {
   }
 
   QString filename = QFileDialog::getOpenFileName(
-        0, tr("Load network from ..."), "", "*.xml");
+        0, tr("Load network from ..."), "", tr("Network files (*.xml)"));
+
   if (filename.isEmpty())
     return;
-  if (_netedit->network()->load(filename))
+  ParserInfo info;
+
+  if (_netedit->network()->load(filename, info)) {
     setWindowTitle(tr("StochBB - %0").arg(_netedit->network()->filename()));
+    if (ParserInfo::OK != info.state()) {
+      QMessageBox::information(0, tr("Notifications while loading network."),
+                               tr("There where some issues while loading network from %0: \n %1")
+                               .arg(filename)
+                               .arg(info.messages().join("\n")));
+    }
+  } else {
+    QMessageBox::critical(0, tr("Error while loading network."),
+                          tr("Cannot load network from %0: \n %1")
+                          .arg(filename)
+                          .arg(info.messages().join("\n")));
+  }
 }
 
 void
@@ -202,11 +235,70 @@ MainWindow::onSave() {
 void
 MainWindow::onSaveAs() {
   QString filename = QFileDialog::getSaveFileName(
-        0, tr("Save network as ..."), "", "*.xml");
+        0, tr("Save network as ..."), "", tr("Network files (*.xml)"));
   if (filename.isEmpty())
     return;
   if (_netedit->network()->save(filename))
     setWindowTitle(tr("StochBB - %0").arg(_netedit->network()->filename()));
+}
+
+void
+MainWindow::onImageExport() {
+  QString filename = QFileDialog::getSaveFileName(
+        0, tr("Export network as ..."), "", tr("Images (*.png *.svg *.pdf)"));
+
+  if (filename.isEmpty())
+    return;
+
+  QFileInfo finfo(filename);
+  if ("svg" == finfo.suffix()) {
+    QRect bb = _netedit->network()->boundingRect();
+    QSvgGenerator img;
+    img.setFileName(filename);
+    img.setSize(bb.size()+QSize(10,10));
+    QPainter painter(&img);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.translate(-bb.topLeft()+QPoint(5,5));
+    _netedit->network()->paint(painter);
+  } else if ("png" == finfo.suffix()){
+    QRect bb = _netedit->network()->boundingRect();
+    QImage img(bb.size()+QSize(10,10), QImage::Format_ARGB32);
+    img.fill(Qt::transparent);
+    QPainter painter(&img);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.translate(-bb.topLeft()+QPoint(5,5));
+    _netedit->network()->paint(painter);
+    if (! img.save(filename)) {
+      QMessageBox::critical(0, tr("Error while exporting network"),
+                            tr("Cannot export network to file %0").arg(filename));
+    }
+  } else if ("pdf" == finfo.suffix()) {
+    QRect bb = _netedit->network()->boundingRect();
+    QPrinter printer(QPrinter::ScreenResolution);
+    printer.setOutputFileName(filename);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setColorMode(QPrinter::Color);
+  #if QT_VERSION < QT_VERSION_CHECK(5, 3, 0)
+    printer.setFullPage(true);
+    printer.setPaperSize(bb.size()+QSize(10,10), QPrinter::DevicePixel);
+  #else
+    QPageLayout pageLayout;
+    pageLayout.setMode(QPageLayout::FullPageMode);
+    pageLayout.setOrientation(QPageLayout::Portrait);
+    pageLayout.setMargins(QMarginsF(0, 0, 0, 0));
+    pageLayout.setPageSize(QPageSize(bb.size()+QSize(10,10), QPageSize::Point,
+                                     QString(), QPageSize::ExactMatch));
+    printer.setPageLayout(pageLayout);
+  #endif
+    QPainter painter(&printer);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.translate(-bb.topLeft()+QPoint(5,5));
+    _netedit->network()->paint(painter);
+  } else {
+    QMessageBox::critical(
+          this, tr("Cannot export network."),
+          tr("Cannot export network as '%0'. Image format not supported.").arg(filename));
+  }
 }
 
 void
@@ -270,8 +362,11 @@ MainWindow::updateTitle() {
 }
 
 void
-MainWindow::onShowLog() {
-  _log->show();
+MainWindow::onShowLog(bool show) {
+  if (show)
+    _log->show();
+  else
+    _log->hide();
 }
 
 void

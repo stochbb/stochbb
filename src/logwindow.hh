@@ -1,7 +1,6 @@
 #ifndef LOGWINDOW_HH
 #define LOGWINDOW_HH
 
-#include <QMainWindow>
 #include <QListWidget>
 
 #include "lib/logger.hh"
@@ -20,7 +19,7 @@ signals:
 };
 
 
-class LogWindow: public QMainWindow
+class LogWindow: public QListWidget
 {
   Q_OBJECT
 
@@ -29,12 +28,6 @@ public:
 
 protected slots:
   void onMessage(QString msg);
-
-protected:
-  void closeEvent(QCloseEvent *);
-
-protected:
-  QListWidget *_messages;
 };
 
 #endif // LOGWINDOW_HH

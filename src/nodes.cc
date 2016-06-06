@@ -11,56 +11,6 @@
 
 
 /* ********************************************************************************************* *
- * Implementation of NodeConfigDialog
- * ********************************************************************************************* */
-NodeConfigDialog::NodeConfigDialog(NodeBase *node)
-  : QDialog(), _node(node)
-{
-  QFormLayout *nodeprops = new QFormLayout();
-  _label = new QLineEdit(_node->label());
-  nodeprops->addRow(tr("Label"), _label);
-
-  QFormLayout *param_layout = 0;
-  if (node->hasParameters())
-    param_layout = new QFormLayout();
-
-  const QHash<QString, double> &params = node->parameters();
-  QHash<QString, double>::const_iterator param = params.begin();
-  for (; param != params.end(); param++) {
-    QLineEdit *p = new QLineEdit(QString::number(param.value()));
-    p->setValidator(new QDoubleValidator());
-    _params.insert(param.key(), p);
-    param_layout->addRow(param.key(), p);
-  }
-
-  QVBoxLayout *layout = new QVBoxLayout();
-  layout->addLayout(nodeprops);
-  layout->addWidget(new QLabel(tr("Parameters:")));
-  if (param_layout)
-    layout->addLayout(param_layout);
-  else
-    layout->addWidget(new QLabel(tr("This node has no parameters.")));
-
-  QDialogButtonBox *bb = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
-  connect(bb, SIGNAL(accepted()), this, SLOT(apply()));
-  connect(bb, SIGNAL(rejected()), this, SLOT(reject()));
-  layout->addWidget(bb);
-
-  setLayout(layout);
-}
-
-void
-NodeConfigDialog::apply() {
-  _node->setLabel(_label->text());
-  QHash<QString, QLineEdit *>::iterator item = _params.begin();
-  for (; item != _params.end(); item++) {
-    _node->setParameter(item.key(), item.value()->text().toDouble());
-  }
-  accept();
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of Socket
  * ********************************************************************************************* */
 Socket::Socket(Side side, const QString &name, const QString &label, QNetNode *node)
@@ -78,34 +28,35 @@ Socket::name() const {
 /* ********************************************************************************************* *
  * Implementation of NodeBase
  * ********************************************************************************************* */
-QHash<QString, NodeBase *(*)(const QDomElement &node)>
+QHash<QString, NodeBase::nodeFactoryFunction>
 NodeBase::_factoryFunctions({
-  {"delay",        (NodeBase *(*)(const QDomElement &node)) DelayNode::fromXml},
-  {"rdelay",       (NodeBase *(*)(const QDomElement &node)) RandomDelayNode::fromXml},
-  {"trigger",      (NodeBase *(*)(const QDomElement &node)) TriggerNode::fromXml},
-  {"gammap",       (NodeBase *(*)(const QDomElement &node)) GammaProcessNode::fromXml},
-  {"cgammap",      (NodeBase *(*)(const QDomElement &node)) CompoundGammaProcessNode::fromXml},
-  {"invgammap",    (NodeBase *(*)(const QDomElement &node)) InvGammaProcessNode::fromXml},
-  {"cinvgammap",   (NodeBase *(*)(const QDomElement &node)) CompoundInvGammaProcessNode::fromXml},
-  {"weibullp",     (NodeBase *(*)(const QDomElement &node)) WeibullProcessNode::fromXml},
-  {"cweibullp",    (NodeBase *(*)(const QDomElement &node)) CompoundWeibullProcessNode::fromXml},
-  {"minimum",      (NodeBase *(*)(const QDomElement &node)) MinimumNode::fromXml},
-  {"maximum",      (NodeBase *(*)(const QDomElement &node)) MaximumNode::fromXml},
-  {"inhibition",   (NodeBase *(*)(const QDomElement &node)) InhibitionNode::fromXml},
-  {"affine",       (NodeBase *(*)(const QDomElement &node)) AffineNode::fromXml},
-  {"const",        (NodeBase *(*)(const QDomElement &node)) ConstantNode::fromXml},
-  {"unifv",        (NodeBase *(*)(const QDomElement &node)) UniformVarNode::fromXml},
-  {"normv",        (NodeBase *(*)(const QDomElement &node)) NormalVarNode::fromXml},
-  {"cnormv",       (NodeBase *(*)(const QDomElement &node)) CompoundNormalVarNode::fromXml},
-  {"gammav",       (NodeBase *(*)(const QDomElement &node)) GammaVarNode::fromXml},
-  {"cgammav",      (NodeBase *(*)(const QDomElement &node)) CompoundGammaVarNode::fromXml},
-  {"invgammav",    (NodeBase *(*)(const QDomElement &node)) InvGammaVarNode::fromXml},
-  {"cinvgammav",   (NodeBase *(*)(const QDomElement &node)) CompoundInvGammaVarNode::fromXml},
-  {"weibullv",     (NodeBase *(*)(const QDomElement &node)) WeibullVarNode::fromXml},
-  {"cweibullv",    (NodeBase *(*)(const QDomElement &node)) CompoundWeibullVarNode::fromXml},
-  {"marginalplot", (NodeBase *(*)(const QDomElement &node)) MarginalPlotNode::fromXml},
-  {"scatterplot",  (NodeBase *(*)(const QDomElement &node)) ScatterPlotNode::fromXml},
-  {"kdeplot",      (NodeBase *(*)(const QDomElement &node)) KDEPlotNode::fromXml}});
+  {"delay",        (NodeBase::nodeFactoryFunction) DelayNode::fromXml},
+  {"rdelay",       (NodeBase::nodeFactoryFunction) RandomDelayNode::fromXml},
+  {"trigger",      (NodeBase::nodeFactoryFunction) TriggerNode::fromXml},
+  {"gammap",       (NodeBase::nodeFactoryFunction) GammaProcessNode::fromXml},
+  {"cgammap",      (NodeBase::nodeFactoryFunction) CompoundGammaProcessNode::fromXml},
+  {"invgammap",    (NodeBase::nodeFactoryFunction) InvGammaProcessNode::fromXml},
+  {"cinvgammap",   (NodeBase::nodeFactoryFunction) CompoundInvGammaProcessNode::fromXml},
+  {"weibullp",     (NodeBase::nodeFactoryFunction) WeibullProcessNode::fromXml},
+  {"cweibullp",    (NodeBase::nodeFactoryFunction) CompoundWeibullProcessNode::fromXml},
+  {"minimum",      (NodeBase::nodeFactoryFunction) MinimumNode::fromXml},
+  {"maximum",      (NodeBase::nodeFactoryFunction) MaximumNode::fromXml},
+  {"inhibition",   (NodeBase::nodeFactoryFunction) InhibitionNode::fromXml},
+  {"join",         (NodeBase::nodeFactoryFunction) JoinNode::fromXml},
+  {"affine",       (NodeBase::nodeFactoryFunction) AffineNode::fromXml},
+  {"const",        (NodeBase::nodeFactoryFunction) ConstantNode::fromXml},
+  {"unifv",        (NodeBase::nodeFactoryFunction) UniformVarNode::fromXml},
+  {"normv",        (NodeBase::nodeFactoryFunction) NormalVarNode::fromXml},
+  {"cnormv",       (NodeBase::nodeFactoryFunction) CompoundNormalVarNode::fromXml},
+  {"gammav",       (NodeBase::nodeFactoryFunction) GammaVarNode::fromXml},
+  {"cgammav",      (NodeBase::nodeFactoryFunction) CompoundGammaVarNode::fromXml},
+  {"invgammav",    (NodeBase::nodeFactoryFunction) InvGammaVarNode::fromXml},
+  {"cinvgammav",   (NodeBase::nodeFactoryFunction) CompoundInvGammaVarNode::fromXml},
+  {"weibullv",     (NodeBase::nodeFactoryFunction) WeibullVarNode::fromXml},
+  {"cweibullv",    (NodeBase::nodeFactoryFunction) CompoundWeibullVarNode::fromXml},
+  {"marginalplot", (NodeBase::nodeFactoryFunction) MarginalPlotNode::fromXml},
+  {"scatterplot",  (NodeBase::nodeFactoryFunction) ScatterPlotNode::fromXml},
+  {"kdeplot",      (NodeBase::nodeFactoryFunction) KDEPlotNode::fromXml}});
 
 
 NodeBase::NodeBase(const QString &label, QNetView *parent)
@@ -113,11 +64,17 @@ NodeBase::NodeBase(const QString &label, QNetView *parent)
 {
   std::stringstream buffer; buffer << this;
   _id = QString(buffer.str().c_str());
+  _type = "<NodeBase::_type attribute unset>";
 }
 
 const QString &
 NodeBase::id() const {
   return _id;
+}
+
+const QString &
+NodeBase::type() const {
+  return _type;
 }
 
 bool
@@ -130,21 +87,28 @@ NodeBase::hasParameter(const QString &name) const {
   return _params.contains(name);
 }
 
-double
+Parameter
 NodeBase::parameter(const QString &name) const {
   return _params[name];
 }
 
-const QHash<QString, double> &
+const QHash<QString, Parameter> &
 NodeBase::parameters() const {
   return _params;
 }
 
+void
+NodeBase::addParameter(const QString &name, const Parameter &param) {
+  _params[name] = param;
+}
+
 bool
-NodeBase::setParameter(const QString &name, double value) {
+NodeBase::setParameter(const QString &name, const Parameter &param) {
   if (! _params.contains(name))
     return false;
-  _params[name] = value;
+  if (_params[name].type() != param.type())
+    return false;
+  _params[name] = param;
   return true;
 }
 
@@ -174,14 +138,18 @@ NodeBase::serialize(QDomDocument &doc) const {
   node.setAttribute("y", position().y());
   node.setAttribute("label", label());
 
-  QHash<QString, double>::const_iterator param = _params.begin();
+  QHash<QString, Parameter>::const_iterator param = _params.begin();
   for (; param != _params.end(); param++) {
-    QDomElement pnode = doc.createElement("parameter");
+    QDomElement pnode = param.value().serialize(doc);
     pnode.setAttribute("name", param.key());
-    pnode.appendChild(doc.createTextNode(QString::number(param.value())));
     node.appendChild(pnode);
   }
 
+  if (hasDescription()) {
+    QDomElement descr = doc.createElement("description");
+    descr.appendChild(doc.createTextNode(description()));
+    node.appendChild(descr);
+  }
   return node;
 }
 
@@ -213,31 +181,65 @@ NodeBase::processable(Assembler &assembler) const {
 
 
 NodeBase *
-NodeBase::fromXml(const QDomElement &node) {
+NodeBase::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   // Check if node has 'type' attribute
-  if (! node.hasAttribute("type"))
+  if (! node.hasAttribute("type")) {
+    QString text; QTextStream msg(&text);
+    msg << "@line " << node.lineNumber() << ": Node " << node.tagName()
+        << " has no 'type' attribute.";
+    info.addError(text);
     return 0;
+  }
+
 
   // Dispatch by type
   NodeBase *obj = 0;
   if (_factoryFunctions.contains(node.attribute("type"))) {
-    obj = _factoryFunctions[node.attribute("type")](node);
+    obj = _factoryFunctions[node.attribute("type")](node, info, nodeTable);
+  } else {
+    QString text; QTextStream msg(&text);
+    msg << "@line " << node.lineNumber() << ": Unknown node type '"
+        << node.attribute("type") << "'.";
+    info.addError(text);
+    return 0;
   }
 
-  if (obj) {
-    QPoint pos(obj->position());
-    if (node.hasAttribute("x"))
-      pos.setX(node.attribute("x").toInt());
-    if (node.hasAttribute("y"))
-      pos.setY(node.attribute("y").toInt());
-    obj->setPosition(pos);
-    if (node.hasAttribute("label"))
-      obj->setLabel(node.attribute("label"));
+  QPoint pos(obj->position());
+  if (node.hasAttribute("x"))
+    pos.setX(node.attribute("x").toInt());
+  else {
+    QString text; QTextStream msg(&text);
+    msg << "@line " << node.lineNumber() << ": Node has no 'x' attribute.";
+    info.addWarning(text);
+  }
+  if (node.hasAttribute("y"))
+    pos.setY(node.attribute("y").toInt());
+  else {
+    QString text; QTextStream msg(&text);
+    msg << "@line " << node.lineNumber() << ": Node has no 'y' attribute.";
+    info.addWarning(text);
+  }
+  obj->setPosition(pos);
+  if (node.hasAttribute("label"))
+    obj->setLabel(node.attribute("label"));
+  QDomElement descr = node.firstChildElement("description");
+  if (descr.isElement())
+    obj->setDescription(descr.text());
 
-    QDomElement param = node.firstChildElement("parameter");
-    for (; ! param.isNull(); param = param.nextSiblingElement("parameter")) {
-      if (param.hasAttribute("name"))
-        obj->setParameter(param.attribute("name"), param.text().toDouble());
+  QDomElement param = node.firstChildElement("parameter");
+  for (; ! param.isNull(); param = param.nextSiblingElement("parameter")) {
+    if (param.hasAttribute("name")) {
+       if(! obj->setParameter(param.attribute("name"), Parameter::fromXml(param, info))) {
+         QString text; QTextStream msg(&text);
+         msg << "@line " << node.lineNumber() << ": Cannot set parameter '"
+             << param.attribute("name") << "' to '"
+             << param.text() << "'.";
+         info.addWarning(text);
+       }
+    } else {
+      QString text; QTextStream msg(&text);
+      msg << "@line " << node.lineNumber() << ": 'parameter' element has no name.";
+      info.addWarning(text);
     }
   }
 
@@ -252,7 +254,8 @@ TriggerNode::TriggerNode(Network *parent)
   : NodeBase("Trigger", parent)
 {
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
-  _params.insert("time", 0);
+  _params.insert("time", Parameter(0.0));
+  _type = "trigger";
 }
 
 QDomElement
@@ -268,11 +271,11 @@ TriggerNode::assemble(Assembler &assembler) const {
   if (! out)
     return false;
   return assembler.addVariable(
-        out, stochbb::delta(parameter("time"), label().toStdString()));
+        out, stochbb::delta(parameter("time").asFloat(), label().toStdString()));
 }
 
 TriggerNode *
-TriggerNode::fromXml(const QDomElement &node) {
+TriggerNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return  new TriggerNode();
 }
 
@@ -287,7 +290,9 @@ DelayNode::DelayNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "in", "", this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
 
-  this->_params.insert("delay", 0);
+  this->_params.insert("delay", Parameter(0.0));
+
+  _type = "fixed delay";
 }
 
 QDomElement
@@ -303,13 +308,13 @@ DelayNode::assemble(Assembler &assembler) const {
   stochbb::Var in = assembler.sourceVar(this, "in");
   if (! out || in.isNull())
     return false;
-  stochbb::Var res = stochbb::delta(parameter("delay"))+in;
+  stochbb::Var res = stochbb::delta(parameter("delay").asFloat())+in;
   res.setName(label().toStdString());
   return assembler.addVariable(out, res);
 }
 
 DelayNode *
-DelayNode::fromXml(const QDomElement &node) {
+DelayNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new DelayNode();
 }
 
@@ -323,6 +328,7 @@ RandomDelayNode::RandomDelayNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "in", "", this));
   this->addSocket(new Socket(QNetSocket::LEFT, "delay", QChar(0x0394), this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
+  _type = "random delay";
 }
 
 QDomElement
@@ -345,7 +351,7 @@ RandomDelayNode::assemble(Assembler &assembler) const {
 }
 
 RandomDelayNode *
-RandomDelayNode::fromXml(const QDomElement &node) {
+RandomDelayNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new RandomDelayNode();
 }
 
@@ -359,8 +365,10 @@ GammaProcessNode::GammaProcessNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "in", "", this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
 
-  this->_params.insert("k", 1);
-  this->_params.insert("theta", 1);
+  this->_params.insert("k", Parameter(1.0));
+  this->_params.insert("theta", Parameter(1.0));
+
+  _type = "gamma process";
 }
 
 QDomElement
@@ -376,13 +384,13 @@ GammaProcessNode::assemble(Assembler &assembler) const {
   stochbb::Var in = assembler.sourceVar(this, "in");
   if (!out || in.isNull())
     return false;
-  stochbb::Var res = stochbb::gamma(parameter("k"), parameter("theta")) + in;
+  stochbb::Var res = stochbb::gamma(parameter("k").asFloat(), parameter("theta").asFloat()) + in;
   res.setName(label().toStdString());
   return assembler.addVariable(out, res);
 }
 
 GammaProcessNode *
-GammaProcessNode::fromXml(const QDomElement &node) {
+GammaProcessNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new GammaProcessNode();
 }
 
@@ -397,6 +405,7 @@ CompoundGammaProcessNode::CompoundGammaProcessNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "k", "k", this));
   this->addSocket(new Socket(QNetSocket::LEFT, "theta", QChar(0x0398), this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
+  _type = "compound gamma process";
 }
 
 QDomElement
@@ -420,7 +429,7 @@ CompoundGammaProcessNode::assemble(Assembler &assembler) const {
 }
 
 CompoundGammaProcessNode *
-CompoundGammaProcessNode::fromXml(const QDomElement &node) {
+CompoundGammaProcessNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new CompoundGammaProcessNode();
 }
 
@@ -434,8 +443,10 @@ InvGammaProcessNode::InvGammaProcessNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "in", "", this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
 
-  this->_params.insert("alpha", 1);
-  this->_params.insert("beta", 1);
+  this->_params.insert("alpha", Parameter(1.0));
+  this->_params.insert("beta", Parameter(1.0));
+
+  _type = "inverse gamma process";
 }
 
 QDomElement
@@ -451,13 +462,13 @@ InvGammaProcessNode::assemble(Assembler &assembler) const {
   stochbb::Var in = assembler.sourceVar(this, "in");
   if (!out || in.isNull())
     return false;
-  stochbb::Var res = stochbb::invgamma(parameter("alpha"), parameter("beta")) + in;
+  stochbb::Var res = stochbb::invgamma(parameter("alpha").asFloat(), parameter("beta").asFloat()) + in;
   res.setName(label().toStdString());
   return assembler.addVariable(out, res);
 }
 
 InvGammaProcessNode *
-InvGammaProcessNode::fromXml(const QDomElement &node) {
+InvGammaProcessNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new InvGammaProcessNode();
 }
 
@@ -472,6 +483,7 @@ CompoundInvGammaProcessNode::CompoundInvGammaProcessNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "alpha", QChar(0x03B1), this));
   this->addSocket(new Socket(QNetSocket::LEFT, "beta", QChar(0x03B2), this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
+  _type = "compound inverse gamma process";
 }
 
 QDomElement
@@ -495,7 +507,7 @@ CompoundInvGammaProcessNode::assemble(Assembler &assembler) const {
 }
 
 CompoundInvGammaProcessNode *
-CompoundInvGammaProcessNode::fromXml(const QDomElement &node) {
+CompoundInvGammaProcessNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new CompoundInvGammaProcessNode();
 }
 
@@ -509,8 +521,10 @@ WeibullProcessNode::WeibullProcessNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "in", "", this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
 
-  this->_params.insert("k", 1);
-  this->_params.insert("lambda", 1);
+  this->_params.insert("k", Parameter(1.0));
+  this->_params.insert("lambda", Parameter(1.0));
+
+  _type = "weibull process";
 }
 
 QDomElement
@@ -526,13 +540,13 @@ WeibullProcessNode::assemble(Assembler &assembler) const {
   stochbb::Var in = assembler.sourceVar(this, "in");
   if (!out || in.isNull())
     return false;
-  stochbb::Var res = stochbb::weibull(parameter("k"), parameter("lambda")) + in;
+  stochbb::Var res = stochbb::weibull(parameter("k").asFloat(), parameter("lambda").asFloat()) + in;
   res.setName(label().toStdString());
   return assembler.addVariable(out, res);
 }
 
 WeibullProcessNode *
-WeibullProcessNode::fromXml(const QDomElement &node) {
+WeibullProcessNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new WeibullProcessNode();
 }
 
@@ -547,6 +561,8 @@ CompoundWeibullProcessNode::CompoundWeibullProcessNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "k", "k", this));
   this->addSocket(new Socket(QNetSocket::LEFT, "lambda", QChar(0x03BB), this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
+
+  _type = "compound weibull process";
 }
 
 QDomElement
@@ -570,7 +586,7 @@ CompoundWeibullProcessNode::assemble(Assembler &assembler) const {
 }
 
 CompoundWeibullProcessNode *
-CompoundWeibullProcessNode::fromXml(const QDomElement &node) {
+CompoundWeibullProcessNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new CompoundWeibullProcessNode();
 }
 
@@ -584,6 +600,8 @@ MinimumNode::MinimumNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "X", tr("X"), this));
   this->addSocket(new Socket(QNetSocket::LEFT, "Y", tr("Y"), this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
+
+  _type = "minimum";
 }
 
 QDomElement
@@ -606,7 +624,7 @@ MinimumNode::assemble(Assembler &assembler) const {
 }
 
 MinimumNode *
-MinimumNode::fromXml(const QDomElement &node) {
+MinimumNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new MinimumNode();
 }
 
@@ -620,6 +638,7 @@ MaximumNode::MaximumNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::LEFT, "X", tr("X"), this));
   this->addSocket(new Socket(QNetSocket::LEFT, "Y", tr("Y"), this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
+  _type = "maximum";
 }
 
 QDomElement
@@ -642,7 +661,7 @@ MaximumNode::assemble(Assembler &assembler) const {
 }
 
 MaximumNode *
-MaximumNode::fromXml(const QDomElement &node) {
+MaximumNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new MaximumNode();
 }
 
@@ -653,13 +672,11 @@ MaximumNode::fromXml(const QDomElement &node) {
 InhibitionNode::InhibitionNode(Network *parent)
   : NodeBase("Inh", parent)
 {
-  this->addSocket(new Socket(QNetSocket::LEFT,  "Ain", tr(">A"), this));
-  this->addSocket(new Socket(QNetSocket::LEFT,  "inX", tr("X"), this));
-  this->addSocket(new Socket(QNetSocket::LEFT,  "inY", tr("Y"), this));
-  this->addSocket(new Socket(QNetSocket::LEFT,  "Bin", tr(">B"), this));
-  this->addSocket(new Socket(QNetSocket::RIGHT, "Aout", tr("A>"), this));
-  this->addSocket(new Socket(QNetSocket::RIGHT, "out", tr("out"), this));
-  this->addSocket(new Socket(QNetSocket::RIGHT, "Bout", tr("B>"), this));
+  this->addSocket(new Socket(QNetSocket::LEFT,  "X", tr("X"), this));
+  this->addSocket(new Socket(QNetSocket::LEFT,  "Y", tr("Y"), this));
+  this->addSocket(new Socket(QNetSocket::RIGHT,  "Xout", tr("X"), this));
+  this->addSocket(new Socket(QNetSocket::RIGHT,  "Yout", tr("Y"), this));
+  _type = "inhibition";
 }
 
 QDomElement
@@ -670,28 +687,53 @@ InhibitionNode::serialize(QDomDocument &doc) const {
 }
 
 bool
-InhibitionNode::needsPreprocessing(Assembler &assembler) const {
-  return (! assembler.hasVariable(assembler.socket(this, "Aout"))) ||
-      (! assembler.hasVariable(assembler.socket(this, "Bout")));
-}
-
-bool
-InhibitionNode::preprocess(Assembler &assembler) const {
-  if ((! assembler.socket(this, "Aout")) || (! assembler.socket(this, "Bout")))
+InhibitionNode::assemble(Assembler &assembler) const {
+  stochbb::Var X = assembler.sourceVar(this, "X");
+  stochbb::Var Y = assembler.sourceVar(this, "Y");
+  Socket *Xout = assembler.socket(this, "Xout");
+  Socket *Yout = assembler.socket(this, "Yout");
+  if ((!Xout) || (!Yout) || X.isNull() || Y.isNull())
     return false;
-  if (! assembler.hasVariable(socket("Aout")))
-    assembler.addVariable(socket("Aout"), stochbb::delta(0));
-  if (! assembler.hasVariable(socket("Bout")))
-    assembler.addVariable(socket("Bout"), stochbb::delta(0));
+  assembler.addVariable(Xout, stochbb::delta(0));
+  assembler.addVariable(Yout, stochbb::delta(0));
   return true;
 }
 
+InhibitionNode *
+InhibitionNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
+  return new InhibitionNode();
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of JoinNode
+ * ********************************************************************************************* */
+JoinNode::JoinNode(InhibitionNode *sibling, Network *parent)
+  : NodeBase("Join", parent), _sibling(sibling)
+{
+  this->addSocket(new Socket(QNetSocket::LEFT,  "X", tr("X"), this));
+  this->addSocket(new Socket(QNetSocket::LEFT,  "Y", tr("Y"), this));
+  this->addSocket(new Socket(QNetSocket::RIGHT, "out", tr("out"), this));
+  _type = "join";
+
+  connect(_sibling, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
+  connect(this, SIGNAL(destroyed(QObject*)), _sibling, SLOT(deleteLater()));
+}
+
+QDomElement
+JoinNode::serialize(QDomDocument &doc) const {
+  QDomElement node = NodeBase::serialize(doc);
+  node.setAttribute("type","join");
+  node.setAttribute("sibling", _sibling->id());
+  return node;
+}
+
 bool
-InhibitionNode::assemble(Assembler &assembler) const {
-  stochbb::Var X = assembler.sourceVar(this, "inX");
-  stochbb::Var Y = assembler.sourceVar(this, "inY");
-  stochbb::Var A = assembler.sourceVar(this, "Ain");
-  stochbb::Var B = assembler.sourceVar(this, "Bin");
+JoinNode::assemble(Assembler &assembler) const {
+  stochbb::Var X = assembler.sourceVar(_sibling, "X");
+  stochbb::Var Y = assembler.sourceVar(_sibling, "Y");
+  stochbb::Var A = assembler.sourceVar(this, "X");
+  stochbb::Var B = assembler.sourceVar(this, "Y");
   Socket *out = assembler.socket(this, "out");
   if ((!out) || X.isNull() || Y.isNull() || A.isNull() || B.isNull())
     return false;
@@ -700,9 +742,16 @@ InhibitionNode::assemble(Assembler &assembler) const {
   return assembler.addVariable(out, res);
 }
 
-InhibitionNode *
-InhibitionNode::fromXml(const QDomElement &node) {
-  return new InhibitionNode();
+JoinNode *
+JoinNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
+  if (! node.hasAttribute("sibling"))
+    return 0;
+  if (! nodeTable.contains(node.attribute("sibling")))
+    return 0;
+  InhibitionNode *inh = dynamic_cast<InhibitionNode *>(nodeTable[node.attribute("sibling")]);
+  if (! inh)
+    return 0;
+  return new JoinNode(inh);
 }
 
 
@@ -714,8 +763,9 @@ AffineNode::AffineNode(Network *parent)
 {
   this->addSocket(new Socket(QNetSocket::LEFT, "in", "", this));
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
-  this->_params.insert("scale", 1);
-  this->_params.insert("shift", 0);
+  this->_params.insert("scale", Parameter(1.0));
+  this->_params.insert("shift", Parameter(1.0));
+  _type = "affine transform";
 }
 
 QDomElement
@@ -731,13 +781,13 @@ AffineNode::assemble(Assembler &assembler) const {
   Socket *out = assembler.socket(this, "out");
   if (! out || in.isNull())
     return false;
-  stochbb::Var res = parameter("scale") * in + parameter("shift");
+  stochbb::Var res = parameter("scale").asFloat() * in + parameter("shift").asFloat();
   res.setName(label().toStdString());
   return assembler.addVariable(out, res);
 }
 
 AffineNode *
-AffineNode::fromXml(const QDomElement &node) {
+AffineNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new AffineNode();
 }
 
@@ -749,7 +799,8 @@ ConstantNode::ConstantNode(Network *parent)
   : NodeBase("C", parent)
 {
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
-  this->_params.insert("value", 0);
+  this->_params.insert("value", Parameter(1.0));
+  _type = "constant";
 }
 
 QDomElement
@@ -764,11 +815,11 @@ ConstantNode::assemble(Assembler &assembler) const {
   Socket *out = assembler.socket(this, "out");
   if (! out)
     return false;
-  return assembler.addVariable(out, stochbb::delta(parameter("value"), label().toStdString()));
+  return assembler.addVariable(out, stochbb::delta(parameter("value").asFloat(), label().toStdString()));
 }
 
 ConstantNode *
-ConstantNode::fromXml(const QDomElement &node) {
+ConstantNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new ConstantNode();
 }
 
@@ -780,8 +831,10 @@ GammaVarNode::GammaVarNode(Network *parent)
   : NodeBase(QChar(0x0393), parent)
 {
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
-  this->_params.insert("k", 1);
-  this->_params.insert("theta", 1);
+  this->_params.insert("k", Parameter(1.0));
+  this->_params.insert("theta", Parameter(1.0));
+
+  _type = "gamma variable";
 }
 
 QDomElement
@@ -797,11 +850,11 @@ GammaVarNode::assemble(Assembler &assembler) const {
   if (! out)
     return false;
   return assembler.addVariable(
-        out, stochbb::gamma(parameter("k"), parameter("theta"), label().toStdString()));
+        out, stochbb::gamma(parameter("k").asFloat(), parameter("theta").asFloat(), label().toStdString()));
 }
 
 GammaVarNode *
-GammaVarNode::fromXml(const QDomElement &node) {
+GammaVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new GammaVarNode();
 }
 
@@ -815,6 +868,7 @@ CompoundGammaVarNode::CompoundGammaVarNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
   this->addSocket(new Socket(QNetSocket::LEFT, "k", tr("k"), this));
   this->addSocket(new Socket(QNetSocket::LEFT, "theta", QChar(0x0398), this));
+  _type = "compound gamma variable";
 }
 
 QDomElement
@@ -835,7 +889,7 @@ CompoundGammaVarNode::assemble(Assembler &assembler) const {
 }
 
 CompoundGammaVarNode *
-CompoundGammaVarNode::fromXml(const QDomElement &node) {
+CompoundGammaVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new CompoundGammaVarNode();
 }
 
@@ -847,8 +901,9 @@ InvGammaVarNode::InvGammaVarNode(Network *parent)
   : NodeBase(QString("1/")+QChar(0x0393), parent)
 {
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
-  this->_params.insert("alpha", 1);
-  this->_params.insert("beta", 1);
+  this->_params.insert("alpha", Parameter(1.0));
+  this->_params.insert("beta", Parameter(1.0));
+  _type = "inverse gamma variable";
 }
 
 QDomElement
@@ -864,11 +919,11 @@ InvGammaVarNode::assemble(Assembler &assembler) const {
   if (! out)
     return false;
   return assembler.addVariable(
-        out, stochbb::invgamma(parameter("alpha"), parameter("beta"), label().toStdString()));
+        out, stochbb::invgamma(parameter("alpha").asFloat(), parameter("beta").asFloat(), label().toStdString()));
 }
 
 InvGammaVarNode *
-InvGammaVarNode::fromXml(const QDomElement &node) {
+InvGammaVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new InvGammaVarNode();
 }
 
@@ -882,6 +937,7 @@ CompoundInvGammaVarNode::CompoundInvGammaVarNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
   this->addSocket(new Socket(QNetSocket::LEFT, "alpha", QChar(0x03B1), this));
   this->addSocket(new Socket(QNetSocket::LEFT, "beta", QChar(0x03B2), this));
+  _type = "compound inverse gamma variable";
 }
 
 QDomElement
@@ -902,7 +958,7 @@ CompoundInvGammaVarNode::assemble(Assembler &assembler) const {
 }
 
 CompoundInvGammaVarNode *
-CompoundInvGammaVarNode::fromXml(const QDomElement &node) {
+CompoundInvGammaVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new CompoundInvGammaVarNode();
 }
 
@@ -914,8 +970,9 @@ WeibullVarNode::WeibullVarNode(Network *parent)
   : NodeBase("Weibull", parent)
 {
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
-  this->_params.insert("k", 1);
-  this->_params.insert("lambda", 1);
+  this->_params.insert("k", Parameter(1.0));
+  this->_params.insert("lambda", Parameter(1.0));
+  _type = "weibull variable";
 }
 
 QDomElement
@@ -931,11 +988,11 @@ WeibullVarNode::assemble(Assembler &assembler) const {
   if (! out)
     return false;
   return assembler.addVariable(
-        out, stochbb::weibull(parameter("k"), parameter("lambda"), label().toStdString()));
+        out, stochbb::weibull(parameter("k").asFloat(), parameter("lambda").asFloat(), label().toStdString()));
 }
 
 WeibullVarNode *
-WeibullVarNode::fromXml(const QDomElement &node) {
+WeibullVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new WeibullVarNode();
 }
 
@@ -949,6 +1006,7 @@ CompoundWeibullVarNode::CompoundWeibullVarNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
   this->addSocket(new Socket(QNetSocket::LEFT, "k", "k", this));
   this->addSocket(new Socket(QNetSocket::LEFT, "lambda", QChar(0x03BB), this));
+  _type = "compound weibull variable";
 }
 
 QDomElement
@@ -969,7 +1027,7 @@ CompoundWeibullVarNode::assemble(Assembler &assembler) const {
 }
 
 CompoundWeibullVarNode *
-CompoundWeibullVarNode::fromXml(const QDomElement &node) {
+CompoundWeibullVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new CompoundWeibullVarNode();
 }
 
@@ -981,8 +1039,9 @@ UniformVarNode::UniformVarNode(Network *parent)
   : NodeBase("U", parent)
 {
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
-  this->_params.insert("min", 0);
-  this->_params.insert("max", 1);
+  this->_params.insert("min", Parameter(0.0));
+  this->_params.insert("max", Parameter(1.0));
+  _type = "uniform variable";
 }
 
 QDomElement
@@ -998,11 +1057,11 @@ UniformVarNode::assemble(Assembler &assembler) const {
   if (! out)
     return false;
   return assembler.addVariable(
-        out, stochbb::uniform(parameter("min"), parameter("max"), label().toStdString()));
+        out, stochbb::uniform(parameter("min").asFloat(), parameter("max").asFloat(), label().toStdString()));
 }
 
 UniformVarNode *
-UniformVarNode::fromXml(const QDomElement &node) {
+UniformVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new UniformVarNode();
 }
 
@@ -1014,8 +1073,9 @@ NormalVarNode::NormalVarNode(Network *parent)
   : NodeBase("N", parent)
 {
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
-  this->_params.insert("mu", 0);
-  this->_params.insert("sigma", 1);
+  this->_params.insert("mu", Parameter(0.0));
+  this->_params.insert("sigma", Parameter(1.0));
+  _type = "normal variable";
 }
 
 QDomElement
@@ -1031,11 +1091,11 @@ NormalVarNode::assemble(Assembler &assembler) const {
   if (! out)
     return false;
   return assembler.addVariable(
-        out, stochbb::normal(parameter("mu"), parameter("sigma"), label().toStdString()));
+        out, stochbb::normal(parameter("mu").asFloat(), parameter("sigma").asFloat(), label().toStdString()));
 }
 
 NormalVarNode *
-NormalVarNode::fromXml(const QDomElement &node) {
+NormalVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new NormalVarNode();
 }
 
@@ -1049,6 +1109,7 @@ CompoundNormalVarNode::CompoundNormalVarNode(Network *parent)
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
   this->addSocket(new Socket(QNetSocket::LEFT, "mu", QChar(0x03BC), this));
   this->addSocket(new Socket(QNetSocket::LEFT, "sigma", QChar(0x03C3), this));
+  _type = "weibull variable";
 }
 
 QDomElement
@@ -1069,7 +1130,7 @@ CompoundNormalVarNode::assemble(Assembler &assembler) const {
 }
 
 CompoundNormalVarNode *
-CompoundNormalVarNode::fromXml(const QDomElement &node) {
+CompoundNormalVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new CompoundNormalVarNode();
 }
 
@@ -1095,24 +1156,25 @@ OutputNode::assemble(Assembler &assembler) const {
 MarginalPlotNode::MarginalPlotNode(Network *parent)
   : OutputNode("Marginal Plot", parent)
 {
-  _params.insert("graphs", 0);
-  _params.insert("min", 0);
-  _params.insert("max", 1);
-  _params.insert("steps", 100);
+  _params.insert("graphs", Parameter(int(0)));
+  _params.insert("min", Parameter(0.0));
+  _params.insert("max", Parameter(1.0));
+  _params.insert("steps", Parameter(100));
+  _type = "marginal plot";
 }
 
 bool
-MarginalPlotNode::setParameter(const QString &name, double value) {
+MarginalPlotNode::setParameter(const QString &name, const Parameter &param) {
   if ("graphs" == name) {
-    if (value < numSockets(QNetSocket::LEFT))
+    if (param.asInt() < numSockets(QNetSocket::LEFT))
       return false;
     size_t n = numSockets(QNetSocket::LEFT)+1;
-    while (value > numSockets(QNetSocket::LEFT)) {
+    while (param.asInt() > numSockets(QNetSocket::LEFT)) {
       addSocket(new Socket(QNetSocket::LEFT, QString::number(n), QString::number(n), this));
       n++;
     }
   }
-  return NodeBase::setParameter(name, value);
+  return NodeBase::setParameter(name, param);
 }
 
 void
@@ -1127,8 +1189,8 @@ MarginalPlotNode::execute(const QHash<Socket *, stochbb::Var> &vartable) {
     vars.push_back(X);
   }
 
-  size_t nstep = parameter("steps") > 0 ? parameter("steps") : 100;
-  double tmin = parameter("min"), tmax = parameter("max");
+  size_t nstep = parameter("steps").asInt() > 0 ? parameter("steps").asInt() : 100;
+  double tmin = parameter("min").asFloat(), tmax = parameter("max").asFloat();
 
   MarginalPlotWindow *plot = new MarginalPlotWindow(tmin, tmax, nstep, vars);
   plot->resize(480, 320);
@@ -1144,7 +1206,7 @@ MarginalPlotNode::serialize(QDomDocument &doc) const {
 }
 
 MarginalPlotNode *
-MarginalPlotNode::fromXml(const QDomElement &node) {
+MarginalPlotNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new MarginalPlotNode();
 }
 
@@ -1157,7 +1219,8 @@ ScatterPlotNode::ScatterPlotNode(Network *parent)
 {
   addSocket(new Socket(QNetSocket::LEFT, "X", "X", this));
   addSocket(new Socket(QNetSocket::LEFT, "Y", "Y", this));
-  _params.insert("samples", 1000);
+  _params.insert("samples", Parameter(1000));
+  _type = "scatter plot";
 }
 
 void
@@ -1165,7 +1228,7 @@ ScatterPlotNode::execute(const QHash<Socket *, stochbb::Var> &vartable) {
   stochbb::Var X = vartable[socket("X")];
   stochbb::Var Y = vartable[socket("Y")];
 
-  size_t samples = parameter("samples") > 0 ? parameter("samples") : 1000;
+  size_t samples = parameter("samples").asInt() > 0 ? parameter("samples").asInt() : 1000;
 
   ScatterPlotWindow *plot = new ScatterPlotWindow(samples, X, Y);
   plot->resize(480, 320);
@@ -1181,7 +1244,7 @@ ScatterPlotNode::serialize(QDomDocument &doc) const {
 }
 
 ScatterPlotNode *
-ScatterPlotNode::fromXml(const QDomElement &node) {
+ScatterPlotNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new ScatterPlotNode();
 }
 
@@ -1192,22 +1255,24 @@ ScatterPlotNode::fromXml(const QDomElement &node) {
 KDEPlotNode::KDEPlotNode(Network *parent)
   : OutputNode("KDE Plot", parent)
 {
-  _params.insert("graphs", 0);
-  _params.insert("samples", 100);
+  _params.insert("graphs", Parameter(0));
+  _params.insert("samples", Parameter(1000));
+
+  _type = "KDE plot";
 }
 
 bool
-KDEPlotNode::setParameter(const QString &name, double value) {
+KDEPlotNode::setParameter(const QString &name, const Parameter &param) {
   if ("graphs" == name) {
-    if (value < numSockets(QNetSocket::LEFT))
+    if (param.asInt() < numSockets(QNetSocket::LEFT))
       return false;
     size_t n = numSockets(QNetSocket::LEFT)+1;
-    while (value > numSockets(QNetSocket::LEFT)) {
+    while (param.asInt() > numSockets(QNetSocket::LEFT)) {
       addSocket(new Socket(QNetSocket::LEFT, QString::number(n), QString::number(n), this));
       n++;
     }
   }
-  return NodeBase::setParameter(name, value);
+  return NodeBase::setParameter(name, param);
 }
 
 void
@@ -1222,7 +1287,7 @@ KDEPlotNode::execute(const QHash<Socket *, stochbb::Var> &vartable) {
     vars.push_back(X);
   }
 
-  size_t nsample = parameter("samples") > 0 ? parameter("samples") : 100;
+  size_t nsample = parameter("samples").asInt() > 0 ? parameter("samples").asInt() : 1000;
 
   KDEPlotWindow *plot = new KDEPlotWindow(nsample, vars);
   plot->resize(480, 320);
@@ -1238,7 +1303,7 @@ KDEPlotNode::serialize(QDomDocument &doc) const {
 }
 
 KDEPlotNode *
-KDEPlotNode::fromXml(const QDomElement &node) {
+KDEPlotNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new KDEPlotNode();
 }
 

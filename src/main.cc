@@ -14,7 +14,7 @@ using namespace stochbb;
 
 int main(int argc, char *argv[]) {
 
-  stochbb::Logger::addHandler(stochbb::IOLogHandler());
+  //stochbb::Logger::addHandler(stochbb::IOLogHandler());
 
   QApplication app(argc, argv);
 

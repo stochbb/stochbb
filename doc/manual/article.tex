@@ -1,0 +1,76 @@
+\documentclass[article]{jss}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% almost as usual
+\author{Hannes Matuschek\\University of Potsdam, Germany}
+\title{\pkg{StochBB}: A Software Framework and Application for Analyzing Networks of Random Variables}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Hannes Matuschek} %% comma-separated
+\Plaintitle{StochBB: A Software Framework and Application for Analyzing Networks of Random Variables} %% without formatting
+\Shorttitle{\pkg{StochBB}: Analyzing Networks of Random Variables} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{
+  \input{abstract}
+}
+\Keywords{random variables, computer algebra system, stochastic simulation, \proglang{C++}, \proglang{Python}, \proglang{R}}
+\Plainkeywords{random variables, computer algebra system, stochastic simulation, C++, Python, R} %% without formatting
+%% at least one keyword must be supplied
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{50}
+%% \Issue{9}
+%% \Month{June}
+%% \Year{2012}
+%% \Submitdate{2012-06-04}
+%% \Acceptdate{2012-06-04}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+  Hannes Matuschek\\
+  Department of Mathematics\\
+  Focus area \emph{Dynamics of Complex Systems}\\
+  University of Potsdam\\
+  Karl-Liebknecht-Strasse 24-25\\
+  D-14476 Potsdam, Germany\\
+  E-mail: \email{hannes.matuschek@uni-potsdam.de}\\
+}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/512/507-7103
+%% Fax: +43/512/507-2851
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% need no \usepackage{Sweave.sty}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{listings}
+\usepackage{amsmath}
+%\usepackage{geometry}
+\usepackage{color}
+%\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{editorial}
+%\usepackage{codedoc}
+
+\begin{document}
+
+%% include your article here, just as usual
+%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+
+\input{introduction}
+\input{arch}
+\input{api}
+\input{pod}	
+
+\bibliography{references}
+
+\end{document}

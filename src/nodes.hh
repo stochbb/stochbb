@@ -5,6 +5,7 @@
 #include <QHash>
 #include <QDomElement>
 #include <QDialog>
+#include "parameter.hh"
 #include "lib/api.hh"
 
 
@@ -35,12 +36,14 @@ public:
   explicit NodeBase(const QString &label, QNetView *parent=0);
 
   const QString &id() const;
+  const QString &type() const;
 
   bool hasParameters() const;
   bool hasParameter(const QString &name) const;
-  double parameter(const QString &name) const;
-  const QHash<QString, double> &parameters() const;
-  virtual bool setParameter(const QString &name, double value);
+  Parameter parameter(const QString &name) const;
+  const QHash<QString, Parameter> &parameters() const;
+  void addParameter(const QString &name, const Parameter &param);
+  virtual bool setParameter(const QString &name, const Parameter &param);
 
   bool hasSocket(const QString &name) const;
   Socket *socket(const QString &name) const;
@@ -53,14 +56,16 @@ public:
   virtual bool assemble(Assembler &assembler) const = 0;
 
 public:
-  static NodeBase *fromXml(const QDomElement &node);
+  static NodeBase *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 
 protected:
   QString _id;
+  QString _type;
   QHash<QString, Socket *> _sockets;
-  QHash<QString, double> _params;
+  QHash<QString, Parameter> _params;
 
-  static QHash<QString, NodeBase *(*)(const QDomElement &node)> _factoryFunctions;
+  typedef NodeBase *(*nodeFactoryFunction)(const QDomElement &, ParserInfo &, QHash<QString, NodeBase *> &);
+  static QHash<QString, nodeFactoryFunction> _factoryFunctions;
 };
 
 
@@ -75,7 +80,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static TriggerNode *fromXml(const QDomElement &node);
+  static TriggerNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -90,7 +95,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static DelayNode *fromXml(const QDomElement &node);
+  static DelayNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -105,7 +110,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static RandomDelayNode *fromXml(const QDomElement &node);
+  static RandomDelayNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -120,7 +125,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static GammaProcessNode *fromXml(const QDomElement &node);
+  static GammaProcessNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -135,7 +140,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static CompoundGammaProcessNode *fromXml(const QDomElement &node);
+  static CompoundGammaProcessNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -150,7 +155,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static InvGammaProcessNode *fromXml(const QDomElement &node);
+  static InvGammaProcessNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -165,7 +170,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static CompoundInvGammaProcessNode *fromXml(const QDomElement &node);
+  static CompoundInvGammaProcessNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -180,7 +185,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static WeibullProcessNode *fromXml(const QDomElement &node);
+  static WeibullProcessNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -195,7 +200,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static CompoundWeibullProcessNode *fromXml(const QDomElement &node);
+  static CompoundWeibullProcessNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -210,7 +215,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static MinimumNode *fromXml(const QDomElement &node);
+  static MinimumNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -225,7 +230,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static MaximumNode *fromXml(const QDomElement &node);
+  static MaximumNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -237,13 +242,29 @@ public:
   InhibitionNode(Network *parent=0);
 
   QDomElement serialize(QDomDocument &doc) const;
-
-  bool needsPreprocessing(Assembler &assembler) const;
-  bool preprocess(Assembler &assembler) const;
   bool assemble(Assembler &assembler) const;
 
 public:
-  static InhibitionNode *fromXml(const QDomElement &node);
+  static InhibitionNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
+};
+
+
+class JoinNode: public NodeBase
+{
+  Q_OBJECT
+
+public:
+  JoinNode(InhibitionNode *sibling, Network *parent=0);
+
+  QDomElement serialize(QDomDocument &doc) const;
+
+  bool assemble(Assembler &assembler) const;
+
+public:
+  static JoinNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
+
+protected:
+  InhibitionNode *_sibling;
 };
 
 
@@ -258,7 +279,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static AffineNode *fromXml(const QDomElement &node);
+  static AffineNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -273,7 +294,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static ConstantNode *fromXml(const QDomElement &node);
+  static ConstantNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -288,7 +309,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static GammaVarNode *fromXml(const QDomElement &node);
+  static GammaVarNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -303,7 +324,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static CompoundGammaVarNode *fromXml(const QDomElement &node);
+  static CompoundGammaVarNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -318,7 +339,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static InvGammaVarNode *fromXml(const QDomElement &node);
+  static InvGammaVarNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -333,7 +354,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static CompoundInvGammaVarNode *fromXml(const QDomElement &node);
+  static CompoundInvGammaVarNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -348,7 +369,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static WeibullVarNode *fromXml(const QDomElement &node);
+  static WeibullVarNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -363,7 +384,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static CompoundWeibullVarNode *fromXml(const QDomElement &node);
+  static CompoundWeibullVarNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -378,7 +399,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static UniformVarNode *fromXml(const QDomElement &node);
+  static UniformVarNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -393,7 +414,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static NormalVarNode *fromXml(const QDomElement &node);
+  static NormalVarNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -408,7 +429,7 @@ public:
   virtual bool assemble(Assembler &assembler) const;
 
 public:
-  static CompoundNormalVarNode *fromXml(const QDomElement &node);
+  static CompoundNormalVarNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -432,13 +453,13 @@ class MarginalPlotNode: public OutputNode
 public:
   MarginalPlotNode(Network *parent=0);
 
-  bool setParameter(const QString &name, double value);
+  bool setParameter(const QString &name, const Parameter &param);
   QDomElement serialize(QDomDocument &doc) const;
 
   void execute(const QHash<Socket *, stochbb::Var> &vartable);
 
 public:
-  static MarginalPlotNode *fromXml(const QDomElement &node);
+  static MarginalPlotNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -454,7 +475,7 @@ public:
   void execute(const QHash<Socket *, stochbb::Var> &vartable);
 
 public:
-  static ScatterPlotNode *fromXml(const QDomElement &node);
+  static ScatterPlotNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
 
@@ -465,30 +486,14 @@ class KDEPlotNode: public OutputNode
 public:
   KDEPlotNode(Network *parent=0);
 
-  bool setParameter(const QString &name, double value);
+  bool setParameter(const QString &name, const Parameter &param);
   QDomElement serialize(QDomDocument &doc) const;
 
   void execute(const QHash<Socket *, stochbb::Var> &vartable);
 
 public:
-  static KDEPlotNode *fromXml(const QDomElement &node);
+  static KDEPlotNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
 };
 
-
-class NodeConfigDialog: public QDialog
-{
-  Q_OBJECT
-
-public:
-  NodeConfigDialog(NodeBase *node);
-
-protected slots:
-  void apply();
-
-protected:
-  NodeBase *_node;
-  QLineEdit *_label;
-  QHash<QString, QLineEdit *> _params;
-};
 
 #endif // NODES_HH

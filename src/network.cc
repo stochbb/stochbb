@@ -6,8 +6,40 @@
 #include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
+#include <QTextStream>
+#include <QXmlSchema>
+#include <QXmlSchemaValidator>
+#include <QDebug>
 
 
+/* ******************************************************************************************** *
+ * Implementation of SchemaMessageHandler
+ * ******************************************************************************************** */
+SchemaMessageHandler::SchemaMessageHandler(ParserInfo &info, QObject *parent)
+  : QAbstractMessageHandler(parent), _info(info)
+{
+  // pass...
+}
+
+void
+SchemaMessageHandler::handleMessage(QtMsgType type, const QString &description,
+                                    const QUrl &identifier, const QSourceLocation &sourceLocation)
+{
+  ParserInfo::State state = ParserInfo::ERROR;
+  if (QtWarningMsg == type)
+    state = ParserInfo::WARNING;
+  else if (QtFatalMsg == type)
+    state = ParserInfo::ERROR;
+  QString text; QTextStream msg(&text);
+  QString desc = description; desc.remove(QRegExp("<[^>]*>"));
+  msg << "@ line " << sourceLocation.line() << ": " << desc;
+  _info.addMessage(state, text);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of Network
+ * ******************************************************************************************** */
 Network::Network(QWidget *parent)
   : QNetView(parent)
 {
@@ -71,16 +103,16 @@ Network::clear() {
 }
 
 bool
-Network::load(const QString &file) {
+Network::load(const QString &file, ParserInfo &info) {
   QFile fd(file);
   if (! fd.open(QIODevice::ReadOnly))
     return false;
 
   QDomDocument doc;
-  if (! doc.setContent(& fd))
+  if (! doc.setContent(&fd, true))
     return false;
 
-  bool success = this->load(doc);
+  bool success = this->load(doc, info);
 
   if (success)
     _filepath = file;
@@ -114,16 +146,46 @@ Network::save(const QString &file) {
 
 
 bool
-Network::load(const QDomDocument &doc) {
+Network::load(const QDomDocument &doc, ParserInfo &info) {
   clear();
 
   QDomElement root = doc.documentElement();
+
+  // Get schema URL
+  QUrl schemaURL = QUrl("https://hmatuschek.github.io/stochbb/schema/network-1.0");
+  // First, check if Schema is known
+  QFile schemaFile("://xml/network-1.0.xml");
+  if (! schemaFile.open(QIODevice::ReadOnly)) {
+    QString text; QTextStream msg(&text);
+    msg << "Cannot open XML Schema file " << schemaFile.fileName() << ".";
+    info.addError(text); return false;
+  }
+
+  // Get schema
+  QXmlSchema schema;
+  schema.load(&schemaFile, schemaURL);
+  if (! schema.isValid()) {
+    QString text; QTextStream msg(&text);
+    msg << "Invalaid XML Schema " << schemaFile.fileName() << ".";
+    info.addError(text); return false;
+  }
+
+  // Validate document
+  QXmlSchemaValidator validator(schema);
+  SchemaMessageHandler msgHandler(info);
+  validator.setMessageHandler(&msgHandler);
+  if (! validator.validate(doc.toByteArray())) {
+    QString text; QTextStream msg(&text);
+    msg << "Validation failed.";
+    info.addError(text); return false;
+  }
+
   QHash<QString, NodeBase *> node_table;
 
   // Iterate over all "node" children
   QDomElement node = root.firstChildElement("node");
   for (; ! node.isNull(); node = node.nextSiblingElement("node")) {
-    NodeBase *obj = NodeBase::fromXml(node);
+    NodeBase *obj = NodeBase::fromXml(node, info, node_table);
     if (! obj)
       return false;
     node_table.insert(node.attribute("id"), obj);
@@ -133,7 +195,7 @@ Network::load(const QDomDocument &doc) {
   // Iterate over all "edge" children
   QDomElement edge = root.firstChildElement("edge");
   for (; ! edge.isNull(); edge = edge.nextSiblingElement("edge")) {
-    Edge *obj = Edge::fromXml(edge, node_table);
+    Edge *obj = Edge::fromXml(edge, node_table, info);
     if (! obj)
       return false;
     this->addEdge(obj);
