@@ -1,0 +1,53 @@
+<net>
+ <node id="0x7f9e70e82820" x="6" label="Stimulus" type="trigger" y="22">
+  <parameter name="time" type="float">0</parameter>
+ </node>
+ <node id="0x7f9e7338f3e0" x="204" label="L" type="cgammap" y="26">
+  <description>Lexical stage</description>
+ </node>
+ <node id="0x7f9e7372fa40" x="84" label="5 f + 5" type="affine" y="56">
+  <parameter name="scale" type="float">5</parameter>
+  <parameter name="shift" type="float">5</parameter>
+ </node>
+ <node id="0x7f9e73727e40" x="16" label="f" type="unifv" y="56">
+  <parameter name="min" type="float">0</parameter>
+  <parameter name="max" type="float">4</parameter>
+ </node>
+ <node id="0x7f9e7336b1a0" x="116" label="10" type="const" y="91">
+  <parameter name="value" type="float">10</parameter>
+ </node>
+ <node id="0x7f9e7371a250" x="91" label="p" type="unifv" y="128">
+  <parameter name="min" type="float">0</parameter>
+  <parameter name="max" type="float">1</parameter>
+ </node>
+ <node id="0x7f9e7370dbd0" x="161" label="10 p + 5" type="affine" y="128">
+  <parameter name="scale" type="float">10</parameter>
+  <parameter name="shift" type="float">5</parameter>
+ </node>
+ <node id="0x7f9e733bb8a0" x="297" label="S" type="cgammap" y="57"/>
+ <node id="0x7f9e735db4a0" x="205" label="20" type="const" y="161">
+  <parameter name="value" type="float">20</parameter>
+ </node>
+ <node id="0x7f9e7358d2c0" x="387" label="M" type="gammap" y="80">
+  <parameter name="k" type="float">10</parameter>
+  <parameter name="theta" type="float">30</parameter>
+ </node>
+ <node id="0x7f9e7371a0d0" x="464" label="Fig. 2" type="marginalplot" y="36">
+  <parameter name="graphs" type="int">3</parameter>
+  <parameter name="min" type="float">0</parameter>
+  <parameter name="max" type="float">1200</parameter>
+  <parameter name="steps" type="int">1000</parameter>
+ </node>
+ <edge destNode="0x7f9e7372fa40" destSocket="in" srcNode="0x7f9e73727e40" srcSocket="out"/>
+ <edge destNode="0x7f9e7338f3e0" destSocket="k" srcNode="0x7f9e7372fa40" srcSocket="out"/>
+ <edge destNode="0x7f9e7338f3e0" destSocket="theta" srcNode="0x7f9e7336b1a0" srcSocket="out"/>
+ <edge destNode="0x7f9e7338f3e0" destSocket="in" srcNode="0x7f9e70e82820" srcSocket="out"/>
+ <edge destNode="0x7f9e7370dbd0" destSocket="in" srcNode="0x7f9e7371a250" srcSocket="out"/>
+ <edge destNode="0x7f9e733bb8a0" destSocket="k" srcNode="0x7f9e7370dbd0" srcSocket="out"/>
+ <edge destNode="0x7f9e733bb8a0" destSocket="theta" srcNode="0x7f9e735db4a0" srcSocket="out"/>
+ <edge destNode="0x7f9e733bb8a0" destSocket="in" srcNode="0x7f9e7338f3e0" srcSocket="out"/>
+ <edge destNode="0x7f9e7358d2c0" destSocket="in" srcNode="0x7f9e733bb8a0" srcSocket="out"/>
+ <edge destNode="0x7f9e7371a0d0" destSocket="3" srcNode="0x7f9e7358d2c0" srcSocket="out"/>
+ <edge destNode="0x7f9e7371a0d0" destSocket="2" srcNode="0x7f9e733bb8a0" srcSocket="out"/>
+ <edge destNode="0x7f9e7371a0d0" destSocket="1" srcNode="0x7f9e7338f3e0" srcSocket="out"/>
+</net>

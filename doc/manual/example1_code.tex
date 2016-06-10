@@ -1,0 +1,37 @@
+The following code shows how this simple model of a reading experiment is implemented using the
+Python API of StochBB.
+
+\begin{lstlisting}[language=Python]
+from numpy import *
+import stochbb
+
+# Corpus model:
+#  Log word frequency (per mililon), is uniform distr. on the interval [0,4]
+f = stochbb.uniform(0,4)
+#  Predictability of word is unif. distributed on the interval [0,1]
+p = stochbb.uniform(0,1)
+
+# Experimental model:
+#  "lexical" stage is gamma distributed with k=5*f+5, theta=10
+L = stochbb.gamma(5*f + 5, 10)
+#  "semantic" stage is gamma distributed with k=10*p+5, theta=20
+S = stochbb.gamma(10*p + 5, 20)
+#  "motor" stage is gamma distributed with k=10, theta=30
+M = stochbb.gamma(10, 30)
+#  "response latency" is simply R = L + S + M
+R = L + S + M
+
+# Evaluate marginal densities on interval [0,1200] ms
+Tmin, Tmax, N = 0, 1200, 1000
+t = linspace(Tmin, Tmax, N); dt = float(Tmax-Tmin)/N
+pL = empty(N,); L.density().eval(Tmin, Tmax, pL)
+pS = empty(N,); S.density().eval(Tmin, Tmax, pS)
+pM = empty(N,); M.density().eval(Tmin, Tmax, pM)
+pR = empty(N,); R.density().eval(Tmin, Tmax, pR)
+
+# Sample 10k samples from system
+sam = stochbb.ExactSampler([L,S,M,R])
+X = empty((100000, 4))
+sam.sample(X)
+\end{lstlisting}
+

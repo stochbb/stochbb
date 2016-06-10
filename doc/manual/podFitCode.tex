@@ -1,0 +1,28 @@
+\begin{lstlisting}[language=R, basicstyle=\footnotesize]
+library(stochbb)
+
+# The "stages"
+d  <- 500
+V  <- gamma(5,30)
+S1 <- gamma(10,50)
+S2 <- gamma(1,120)
+M  <- gamma(1,150) 
+
+# Response under "experimental condition"
+Re <- V %+% minimum(S1, affine(S2, 1, d)) %+% M
+
+# Sample Re
+Nsam <- 30000;
+sam <- new(ExactSampler, c(Re))
+res <- array(0, c(Nsam,1))
+sam$sample(res)
+
+costFunc <- function(theta) {
+  S2 <- gamma(1,theta[1]);
+  R <- V %+% minimum(S1, affine(S2, 1, d)) %+% M
+  return( -logLikelihood(R, 10000, res[,1]) )
+}
+
+# Find estimate
+opt <- optim(c(100), costFunc, method="L-BFGS-B")
+\end{lstlisting}

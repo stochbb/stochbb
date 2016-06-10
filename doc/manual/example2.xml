@@ -1,0 +1,58 @@
+<net>
+ <node id="0x7fa9254f6ca0" type="trigger" x="28" y="84" label="Stimulus">
+  <parameter type="float" name="time">0</parameter>
+ </node>
+ <node id="0x7fa925408640" type="gammap" x="152" y="84" label="V">
+  <parameter type="float" name="k">5</parameter>
+  <parameter type="float" name="theta">30</parameter>
+ </node>
+ <node id="0x7fa9254ba610" type="gammap" x="265" y="84" label="S1">
+  <parameter type="float" name="k">10</parameter>
+  <parameter type="float" name="theta">50</parameter>
+ </node>
+ <node id="0x7fa9254c6740" type="trigger" x="28" y="169" label="Stimulus">
+  <parameter type="float" name="time">0</parameter>
+ </node>
+ <node id="0x7fa9254cb3c0" type="gammap" x="151" y="169" label="V">
+  <parameter type="float" name="k">5</parameter>
+  <parameter type="float" name="theta">30</parameter>
+ </node>
+ <node id="0x7fa925449060" type="gammap" x="266" y="149" label="S1">
+  <parameter type="float" name="k">10</parameter>
+  <parameter type="float" name="theta">50</parameter>
+ </node>
+ <node id="0x7fa92546dbd0" type="delay" x="236" y="199" label="δ">
+  <parameter type="float" name="delay">500</parameter>
+ </node>
+ <node id="0x7fa9254064a0" type="gammap" x="311" y="199" label="S2">
+  <parameter type="float" name="k">1</parameter>
+  <parameter type="float" name="theta">200</parameter>
+ </node>
+ <node id="0x7fa925467610" type="gammap" x="496" y="86" label="M (ctrl)">
+  <parameter type="float" name="k">1</parameter>
+  <parameter type="float" name="theta">150</parameter>
+ </node>
+ <node id="0x7fa922c68960" type="gammap" x="495" y="165" label="M (exp)">
+  <parameter type="float" name="k">1</parameter>
+  <parameter type="float" name="theta">150</parameter>
+ </node>
+ <node id="0x7fa9254ce260" type="minimum" x="399" y="164" label="Min"/>
+ <node id="0x7fa925482b50" type="marginalplot" x="612" y="123" label="Fig. 3">
+  <parameter type="int" name="graphs">2</parameter>
+  <parameter type="int" name="steps">300</parameter>
+  <parameter type="float" name="min">0</parameter>
+  <parameter type="float" name="max">1700</parameter>
+ </node>
+ <edge srcNode="0x7fa9254f6ca0" srcSocket="out" destSocket="in" destNode="0x7fa925408640"/>
+ <edge srcNode="0x7fa925408640" srcSocket="out" destSocket="in" destNode="0x7fa9254ba610"/>
+ <edge srcNode="0x7fa9254ba610" srcSocket="out" destSocket="in" destNode="0x7fa925467610"/>
+ <edge srcNode="0x7fa925467610" srcSocket="out" destSocket="1" destNode="0x7fa925482b50"/>
+ <edge srcNode="0x7fa9254c6740" srcSocket="out" destSocket="in" destNode="0x7fa9254cb3c0"/>
+ <edge srcNode="0x7fa9254cb3c0" srcSocket="out" destSocket="in" destNode="0x7fa925449060"/>
+ <edge srcNode="0x7fa9254cb3c0" srcSocket="out" destSocket="in" destNode="0x7fa92546dbd0"/>
+ <edge srcNode="0x7fa92546dbd0" srcSocket="out" destSocket="in" destNode="0x7fa9254064a0"/>
+ <edge srcNode="0x7fa925449060" srcSocket="out" destSocket="X" destNode="0x7fa9254ce260"/>
+ <edge srcNode="0x7fa9254064a0" srcSocket="out" destSocket="Y" destNode="0x7fa9254ce260"/>
+ <edge srcNode="0x7fa9254ce260" srcSocket="out" destSocket="in" destNode="0x7fa922c68960"/>
+ <edge srcNode="0x7fa922c68960" srcSocket="out" destSocket="2" destNode="0x7fa925482b50"/>
+</net>

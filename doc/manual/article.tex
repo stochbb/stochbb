@@ -1,4 +1,4 @@
-\documentclass[article]{jss}
+\documentclass[article, nojss]{jss}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17,6 +17,7 @@
 \Abstract{
   \input{abstract}
 }
+
 \Keywords{random variables, computer algebra system, stochastic simulation, \proglang{C++}, \proglang{Python}, \proglang{R}}
 \Plainkeywords{random variables, computer algebra system, stochastic simulation, C++, Python, R} %% without formatting
 %% at least one keyword must be supplied
@@ -53,23 +54,20 @@
 
 \usepackage{listings}
 \usepackage{amsmath}
-%\usepackage{geometry}
 \usepackage{color}
-%\usepackage{natbib}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{editorial}
-%\usepackage{codedoc}
 
 \begin{document}
 
-%% include your article here, just as usual
-%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
-
 \input{introduction}
 \input{arch}
+\input{gui}
 \input{api}
-\input{pod}	
+\input{pod}
+\input{data}	
+\input{summary}
 
 \bibliography{references}
 
