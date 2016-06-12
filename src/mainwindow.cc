@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent), _netedit(0)
 {
   setMinimumSize(640, 480);
+  setWindowIcon(QIcon("://icons/icon.png"));
 
   _log = new LogWindow(this);
   _log->setVisible(false);

@@ -1,7 +1,7 @@
 \section{Dealing with data}
-Given that \pkg{StochBB} is able to provide a good approximation of the PDF of some (response) random variable, it is also able to fit a system of dependent random variables to data. For this, the \pkg{StochBB} API provides two function. One is the \code{kolmogorov} function which returns the Kolmogorov-Smirnov statistic \cite[e.g.,][]{Marsaglia2003}, the other function is the \code{logLikelihood} function. Both take the random variable, the   number of bins and some data vector as arguments. Both function then uses an approximation of the PDF (for the log likelihood) or CDF (KS) evaluated on a regular grid spanning the data range for computing the corresponding value.
+Given that \pkg{StochBB} is able to provide good approximations of the marginal PDFs of some (response) random variable, it is also able to fit a system of dependent random variables to data. For this, the \pkg{StochBB} API provides two functions. One is the \code{kolmogorov} function which returns the Kolmogorov-Smirnov statistic \cite[e.g.,][]{Marsaglia2003}, the other function is the \code{logLikelihood} function. Both take the random variable, the number of bins and some data vector as arguments. These functions then uses an approximation of the PDF (for the log likelihood) or CDF (KS) evaluated on a regular grid spanning at least the data range for computing the corresponding value.
 
-These functions can then be used to fit a network of random variables to some given observations. For example, consider the network of random variables introduced above, describing the cognitive process under the \emph{experimental condition}. One may try to re-estimate the $\theta=120$ parameter of the stage S2. First, a relatively large sample is drawn ($N=10,000$). Then one may implement a cost function of that parameter, that is the negative of the log likelihood given the samples and finally fit that mode the the data by minimizing the cost function using a numerical optimization algorithm.
+They can then be used to fit a network of random variables to some given observations. For example, consider the network of random variables introduced above, describing the cognitive process under the \emph{experimental condition}. One may try to re-estimate the $\theta=120$ parameter of the stage S2. First, a relatively large sample is drawn ($N=30,000$). Then one may implement a cost function of that parameter. Here, the negative of the log likelihood, given the samples is used. Finally the model is fitted to the the data by minimizing the cost function using a numerical optimization algorithm.
 
 An example R code could be
 \input{podFitCode}
@@ -11,7 +11,7 @@ This code is then able to find the $\theta$ parameter for the S2 stage by means 
 \begin{figure}[!ht]
  \centering
  \includegraphics[width=0.49\textwidth]{fig/pod_likelihoodProf.pdf}
- \caption{An example of a likelihood profile for some $\theta$ estimate using 10,000 samples.} \label{fig:llprof}
+ \caption{An example of a likelihood profile for some $\theta$ estimate (vertival dashed line) using 30,000 samples drawn from a network of random variables, with $\theta=120$ (vertical solid line) for the $S1$ stage.} \label{fig:llprof}
 \end{figure}
 
 Moreover, the \code{logLikelihood} can then also be used to profile the likelihood (see Figure \ref{fig:llprof}) given the data to obtain confidence intervals for the parameter estimate. There the true value of $\theta=120$ is shown as a solid vertical line and the estimate as the dashed vertical line. 

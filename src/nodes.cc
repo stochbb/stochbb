@@ -737,7 +737,7 @@ JoinNode::assemble(Assembler &assembler) const {
   Socket *out = assembler.socket(this, "out");
   if ((!out) || X.isNull() || Y.isNull() || A.isNull() || B.isNull())
     return false;
-  stochbb::Var res = stochbb::condchain(X, Y, A, B);
+  stochbb::Var res = stochbb::condsum(X, Y, A, B);
   res.setName(label().toStdString());
   return assembler.addVariable(out, res);
 }

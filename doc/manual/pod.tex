@@ -3,10 +3,13 @@ This example shows a simple \emph{toy model} for some cognitive process that is 
 so called \emph{divergence point} \cite[e.g.,][]{Reingold2012}. A divergence point of two response-latency
 distributions is the earliest time point at which the two distributions differ. Obviously, 
 there exists no divergence point, if the two distributions are analytic 
-(e.g., the convolution of Gamma distributions, \cite{Gelooven1999}). This example, however,
-not only shows how a non-analytic response-latency distribution may arise using very common
-processing stages models (i.e., these stage models are also used in EZ-Reader, \cite{Reichle2003}) 
-that allows for a divergence point, but actually has a divergence point%
+(e.g., the convolution of Gamma distributions, \cite{Gelooven1999}) and there is some controversy
+whether a cognitive model exists that is formed by simple \emph{processing stages} which has a
+divergence point \cite[e.g.,][]{Gomez2016}.
+
+Within this example I not only show how a non-analytic response-latency distribution may arise
+using very common processing-stage models (i.e., these stages are also used in EZ-Reader model,
+\cite{Reichle2003}) that allows for a divergence point, but actually has a divergence point%
 \footnote{At least one distribution being non-analytic is a necessary but not a sufficient
 condition for the existence of a divergence point.}. 
 
@@ -34,7 +37,7 @@ under experimental condition is $R_e = V + \min(S_1,S_2+500) + M$.
 \begin{figure} [!ht]
  \begin{subfigure}[t]{0.45\textwidth}
    \includegraphics[width=.95\textwidth]{fig/example2_plot.pdf}
-   \subcaption{PDFs of the response latencies under  control condition (blue lines) and experimental condition (green lines).  
+   \subcaption{PDFs of the response latencies under control condition (blue lines) and experimental condition (red lines).  
    The \emph{true} divergence point of the two response-latency distributions is $500 ms$, however, the distributions appear 
    to diverge much later (about $600 ms$). \label{fig:pod}}
   \end{subfigure} \hfill
@@ -51,7 +54,9 @@ of the response latency under control condition. Being a convolution of 3 Gamma 
 is an analytic function on the interval $(0,\infty)$ \citep{Gelooven1999}. The red lines show the 
 PDF of the response latency under control condition. As the distribution of $S_2$ is not analytic on 
 the complete interval $(0,\infty)$ (discontinuity at $T=500$ ms), a divergence point may exist at 
-$T=500$. Due to the \emph{minimum} stage and the fact that $P(S_2<500)=0$ (delayed by 
+$T=500$. 
+
+Due to the \emph{minimum} stage and the fact that $P(S_2<500)=0$ (delayed by 
 $500 ms$), it is ensured that the two response latencies are identical on the interval $[0,500) ms$.
 Hence, this simple model is able to produce a divergence point as both response-latency distributions are identical
 on the interval $[0,500)$ and diverge thereafter.
@@ -59,4 +64,7 @@ on the interval $[0,500)$ and diverge thereafter.
 However, Fig. \ref{fig:podzoom} shows that this existing divergence point cannot be estimated reliably as the two 
 response latency distributions diverge very slowly. Consequently, an estimate for this point \cite[e.g. by means of 
 estimators proposed in][]{Reingold2012} based on a finite sample will always be heavily biased towards larger
-values.
+values. Moreover, if the experimental manipulation also affects the parameters of the $V, S1$ or 
+$M$ stage, the two response distributions will be different everywhere on the interval $(0,\infty)$ and consequently 
+no divergence point exists. For a finite data set, however, an estimator \cite[like][]{Reingold2012} will report a finite 
+estimate as it is impossible to test for the existence on a finite data set. 

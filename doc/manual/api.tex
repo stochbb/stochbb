@@ -1,5 +1,5 @@
 \section{Application programming interface} \label{sec:api}
-The application programming interface (API, see also \cite{stochbbapi}) 
+The application programming interface \cite[API, see also][]{stochbbapi} 
 allows to assemble complex systems of random variables programmatically in C++.
 All API classes are derived from the \code{Container} class which is an essential part of the
 memory management system used by \pkg{StochBB}. Usually a C++ programmer needs to keep track of all
@@ -130,7 +130,7 @@ function \code{stochbb::cond} as following.
 
 \subsubsection{Conditional sums of random variables}
 Likewise the simple conditional random variable, conditional sums of random variables can be constructed 
-using the \code{stochbb::condchain} function as 
+using the \code{stochbb::condsum} function as 
 \begin{lstlisting}[language=C++]
  #include <stochbb/api.hh>
  using namespace stochbb;
@@ -141,7 +141,7 @@ using the \code{stochbb::condchain} function as
  Var X2 = gamma(20, 50);
  Var Y1 = normal(0, 1)
  Var Y2 = normal(0, 2);
- Var Z = condchain(X1,X2, Y1,Y2);
+ Var Z = condsum(X1,X2, Y1,Y2);
 \end{lstlisting}
 
 \subsubsection{Mixtures of random variables}
@@ -246,4 +246,16 @@ In this example, a \code{MarginalSampler} is constructed for the random variable
 approximation of its CDF on the interval $[0,500)$ using $1000$ steps. Then, the
 \code{MarginalSampler::sample} method is used to obtain $1000$ independent samples.
 
+\subsection{Handling data}
+Being able to evaluate the CDFs and PDFs of random variables efficiently, \pkg{StochBB} can be used to fit a system of random variables to observations by either maximizing the (log) likelihood or minimizing the Kolmogorov-Smirnov statistic \cite[KS; e.g.,][]{Marsaglia2003}. For these tasks, \pkg{StochBB} provides two functions. One called \code{kolmogorov}, evaluating the KS statistic and the other is called \code{logLikelihood} evaluating the log likelihood of some given data for a specific random variable. Both functions share the same interface (continuing the example above)
 
+\begin{lstlisting}[language=C++]
+// [...]
+
+// evaluate the KS statistic of the data samples for RV Y
+kolmogorov(Y, 0, 500, 1000, samples);
+// or evaluate the log likelihood
+logLikelihood(Y, 0, 500, 1000, samples);
+\end{lstlisting}
+
+The first argument specifies the random variable, here \code{Y}. the next two arguments specify the range on which the CDF or PDF is evaluated, here $[0,500)$. The fourth argument specifies the number of bins to use for the evaluation (here $1000$) and finally the fifth argument specifies the data vector. Please note that both functions may log a warning message if some given samples lay outside of the specified interval. Both functions will then simply ignore these values.

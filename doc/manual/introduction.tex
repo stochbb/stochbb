@@ -25,7 +25,7 @@ From these basic building blocks, a more complex system can be assembled by
 combining them. Using the example above, one may define a new processing stage that is a chain of
 the stages $X_1,\dots,X_3$. This simple chain then describes the successive
 processing of information entering the first stage described by $X_1$.
-Once the first processing stage finished, its result gets forwarded to the second stage described
+Once the first processing stage finishes, its result gets forwarded to the second stage described
 by $X_2$ and finally to the last stage described by $X_3$. The waiting time of the
 complete chain is again a random variable that is the sum of all random variables,
 or expressed mathematically
@@ -79,16 +79,14 @@ PDFs of the summed variables. That is
 
 The direct numerical convolution of the underlying distributions can be computationally expensive if the
 number of PDFs is large. Assuming that all distributions are well supported on a common interval, however, 
-allows for a fast numerical convolution by means of FFT convolution \cite[e.g., ][]{Press2007}. For the FFT convolution, all 
-densities $f_i(x)$ are evaluated on a common regular gird and the evaluation of the convolution on that gird
-can then be computed easily. This, however, requires that the grid is chosen such that all densities being
+allows for a fast numerical convolution by means of FFT convolution \cite[e.g., ][]{Press2007}. 
+This, however, requires that the grid is chosen such that all densities being
 convoluted as well as the result are well supported on the chosen interval. Moreover, the grid must be fine 
 enough to capture the details of all distributions. 
 
-The numerical convolution, like any numerical approach, is only an approximation. Hence \pkg{SochBB} tries to perform
-the convolutions analytically before resorting to the numerical approach. 
-
-First all sums of random variables are flattened. That is, 
+Like any numerical approach, the FFT convolution is only an approximation. Hence \pkg{SochBB}
+tries to perform the convolutions analytically before resorting to the numerical approach. First
+all sums of random variables are flattened. That is, 
 \begin{equation}
  \begin{array}{l}
   Y_1 = X_1 + X_2\\
@@ -119,11 +117,11 @@ $\Gamma(\cdot; k, \theta)$ the gamma distribution with shape $k$ and scale $\the
 \subsection{Minimum and maximum of random variables}
 The minimum or maximum of some given random variables, e.g. $Y=\min\{X_1,X_2\}$ or 
 $Y=\max\{X_1,X_2\}$ are themselves random variables. These derived random variables can be used to
-express the waiting time of a processing stage that consists of several independent processes being
-performed in parallel (in contrast to sequential processes described by sums of random variables). 
-If the complete process finishes once the first of the parallel processes finishes, the 
-resulting waiting time can be expressed by the minimum of the underlying random variables. If the process
-finishes once all underlying processes are finished, the resulting waiting time can be described
+express the waiting time of a processing stage that consists of several independent processing stages being
+performed in parallel (in contrast to sequential processing described by sums of random variables). 
+If the complete system finishes once the first of the parallel processing stages finishes, the 
+resulting waiting time can be expressed by the minimum of the underlying random variables. If the system
+finishes once all underlying processing stages are finished, the resulting waiting time can be described
 by the maximum.	 
 
 If the two independent random variables $X_1$ and $X_2$ are distributed according to the (cumulative) distribution
@@ -135,9 +133,7 @@ $F_Y(y)=1-(1-F_1(y))\cdot(1-F_2(y))$ and therefore $f_Y(y) = f_1(y)(1-F_2(y)) + 
 
 For applying these equations to derive the CDF and PDFs of the minimum and maximum random variables, the 
 underlying random variables must be independent. To achieve independence where possible, the following 
-reductions are performed on maximum as well as minimum random variables.
-
-Again, first maximum and minimum structures were flattened, for example
+reductions are performed first. Again, first maximum and minimum structures were flattened, for example
 \begin{equation}
  \begin{array}{l}
   Y_1 = \max\{X_1,X_2\}\\

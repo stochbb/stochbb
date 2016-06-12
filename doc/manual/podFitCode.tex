@@ -9,7 +9,7 @@ S2 <- gamma(1,120)
 M  <- gamma(1,150) 
 
 # Response under "experimental condition"
-Re <- V %+% minimum(S1, affine(S2, 1, d)) %+% M
+Re <- V %+% minimum(S1, S2 %+% d) %+% M
 
 # Sample Re
 Nsam <- 30000;
