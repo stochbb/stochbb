@@ -7,8 +7,8 @@ process reaches a certain state. In the field of cognitive psychology, random pr
 describe each processing stage in a chain of stages that leads to a response. The state of
 each random process itself is usually not measurable but the total response time of all processing 
 stages involved. Although each processing stage is modeled as a random process, the waiting-time
-of a single stage is just a random variable and the complete system is then a system of dependent random 
-variables \cite[e.g.,][]{Reichle2003}.
+of a single stage is just a random variable and the complete system is therefore a system of dependent random 
+variables \cite[e.g., the EZ-Reader model,][]{Reichle2003}.
 
 \pkg{StochBB} is able to describe and analyze complex systems of dependent random variables
 by combining simple ones (representing single stages with a known waiting-time distribution) to
@@ -37,7 +37,7 @@ or expressed mathematically
 (CDF) of the waiting-time distribution of the process $Y$ analytically (as far as
 possible) or resorts to a numeric method if the analytic approach fails 
 \cite[see][for examples of numerical approximations outperforming the stochastic simulation approach]{Thomas2012, Thomas2013}.
-More over it provides an efficient and correct sampler for the system of random variables.
+Moreover it provides an efficient and correct sampler for the system of random variables.
 
 \subsection{Representation and reductions of random variables}
 Continuing the example above, please note that the sum of random variables commutes. Hence the
@@ -80,9 +80,9 @@ PDFs of the summed variables. That is
 The direct numerical convolution of the underlying distributions can be computationally expensive if the
 number of PDFs is large. Assuming that all distributions are well supported on a common interval, however, 
 allows for a fast numerical convolution by means of FFT convolution \cite[e.g., ][]{Press2007}. 
-This, however, requires that the grid is chosen such that all densities being
-convoluted as well as the result are well supported on the chosen interval. Moreover, the grid must be fine 
-enough to capture the details of all distributions. 
+This requires that the grid is chosen such that all densities being convoluted as well as the
+result are well supported on the chosen interval and the grid must be fine enough to
+capture the details of all distributions. 
 
 Like any numerical approach, the FFT convolution is only an approximation. Hence \pkg{SochBB}
 tries to perform the convolutions analytically before resorting to the numerical approach. First
@@ -131,9 +131,9 @@ is $f_Y(y)=f_1(y)\cdot F_2(y) + f_2(y)\cdot F_1(y)$, where $f_1(\cdot)$ and $f_2
 of the random variables $X_1$ and $X_2$. Likewise, the CDF and PDF of the minimum can be expressed as
 $F_Y(y)=1-(1-F_1(y))\cdot(1-F_2(y))$ and therefore $f_Y(y) = f_1(y)(1-F_2(y)) + f_2(y)(1-F_1(y))$.
 
-For applying these equations to derive the CDF and PDFs of the minimum and maximum random variables, the 
+For applying these equations to derive the CDFs and PDFs of the minimum and maximum random variables, the 
 underlying random variables must be independent. To achieve independence where possible, the following 
-reductions are performed first. Again, first maximum and minimum structures were flattened, for example
+reductions are performed first. In a first step, the maximum and minimum structures were flattened, for example
 \begin{equation}
  \begin{array}{l}
   Y_1 = \max\{X_1,X_2\}\\
@@ -212,7 +212,7 @@ where $X_1, X_2, Y_1$ and $X_1, X_2, Y_2$ are mutually independent. $Y_1$ and $Y
 dependent random variables. Although being similar to the conditional random variable, there is an 
 important difference: Both possible outcomes ($X_1+Y_1$ and $X_2+Y_2$) 
 are not independent from the condition (i.e. $X_1+Y_1$ depends trivially on $X_1$).
-Therefore, the simple conditional random variable cannot be used here. However, likewise the
+Therefore, the simple conditional random variable cannot be used here. However, like with the
 conditional random variable, common terms are removed first. That is
 \begin{equation}
  Z = \begin{cases}

@@ -1,9 +1,7 @@
 \section{Summary}
-\begin{itemize}
- \item \pkg{StochBB} allows to analyze systems of dependent random variables efficiently without resorting to stochastic simulation.
- \item It uses analytic solutions for the marginal distributions if possible and resorts to numerical approximations if necessary.
- \item To this end, it reveals a surprising good precision. One that would require a large amount of samples to achieve same precision using stochastic simulation.
- \item With this high precision, it is possible to fit networks of random variables to data by means of maximum likelihood or minimizing the KS-statistic.
- \item The GUI eases assembling of complex networks that are mend to describe random models like those typical for cognitive psychology by providing an abstract semantics related to \emph{stochastic processing stages} rather than \emph{random variables}.
- \item The software (including the core library, interfaces to \proglang{Python} and \proglang{R} as well as the graphical user interface) is available under the General Public License version 3 at \texttt{https://github.com/stochbb}. 
-\end{itemize}
+With this article I introduced \pkg{StochBB}, a framework that allows to analyze systems of dependent random variables efficiently without resorting to stochastic simulation. It uses analytic solutions for the marginal distributions where possible and resorts to numerical approximations if necessary. It provides a surprising good precision, one that would require a large amount of samples using stochastic simulation to achieve same precision.
+To this end, it is possible to fit networks of random variables to data by means of maximum likelihood or minimizing the KS-statistic.
+
+Additionally, \pkg{StochBB} provides a GUI, which eases assembling of complex networks that are mend to describe random models like those typical for cognitive psychology by providing an abstract semantics related to \emph{stochastic processing stages} rather than \emph{random variables}. The abstract network representation of the GUI application eases the analyses of complex networks such that undergraduate students in fields like cognitive sciences are able to analyze and simulate such networks without the need to \emph{translate} them to the \emph{random variable} representation. To this end, the \pkg{SochBB} is a suitable tool to complement undergraduate lectures.
+
+The software (including the core library, interfaces to \proglang{Python} and \proglang{R} as well as the GUI application) is available under the General Public License version 3 at \href{https://github.com/stochbb}{https://github.com/stochbb}.
