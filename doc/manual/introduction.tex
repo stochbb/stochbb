@@ -6,9 +6,14 @@ interest, but a derived quantity. For example, the distribution of waiting times
 process reaches a certain state. In the field of cognitive psychology, random processes are frequently used to
 describe each processing stage in a chain of stages that leads to a response. The state of
 each random process itself is usually not measurable but the total response time of all processing 
-stages involved. Although each processing stage is modeled as a random process, the waiting-time
-of a single stage is just a random variable and the complete system is therefore a system of dependent random 
-variables \cite[e.g., the EZ-Reader model,][]{Reichle2003}.
+stages involved. Although each processing stage may be modeled as a random process, the waiting-time
+of a single stage is just a sample of a random variable%
+\footnote{This requires that the random process is \emph{reset} for each sample. This is usually 
+the case if the waiting time of the processing stage is determined by the time a random process
+starting at a specified state reaches a certain end state. Then, the waiting times of the processing
+stage are independent samples from a simple random variable with some distribution.}%
+and the complete system is therefore a 
+system of dependent random variables \cite[e.g., the EZ-Reader model,][]{Reichle2003}.
 
 \pkg{StochBB} is able to describe and analyze complex systems of dependent random variables
 by combining simple ones (representing single stages with a known waiting-time distribution) to
@@ -39,7 +44,9 @@ possible) or resorts to a numeric method if the analytic approach fails
 \cite[see][for examples of numerical approximations outperforming the stochastic simulation approach]{Thomas2012, Thomas2013}.
 Moreover it provides an efficient and correct sampler for the system of random variables.
 
-\subsection{Representation and reductions of random variables}
+\marked{TODO: Briefly outline the paper here.}
+
+\section{Representation and reductions of random variables}
 Continuing the example above, please note that the sum of random variables commutes. Hence the
 random variable $Y$ remains the same if defined as $Y = X_1 + X_3 + X_2$ instead of 
 $Y = X_1 + X_2 + X_3$. Moreover, the 
