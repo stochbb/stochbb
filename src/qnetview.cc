@@ -742,3 +742,14 @@ QNetView::mouseReleaseEvent(QMouseEvent *evt) {
     update();
   }
 }
+
+void
+QNetView::mouseDoubleClickEvent(QMouseEvent *event) {
+  QWidget::mouseDoubleClickEvent(event);
+
+  if (_selectedNode) {
+    emit nodeDoubleClick(_selectedNode);
+    _selectedNode->select(false);
+    _selectedNode = 0;
+  }
+}

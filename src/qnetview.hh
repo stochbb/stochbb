@@ -197,6 +197,7 @@ public slots:
 
 signals:
   void modified();
+  void nodeDoubleClick(QNetNode *node);
 
 protected slots:
   void itemDestroyed(QObject *item);
@@ -208,6 +209,7 @@ protected:
   void mousePressEvent(QMouseEvent *evt);
   void mouseMoveEvent(QMouseEvent *evt);
   void mouseReleaseEvent(QMouseEvent *evt);
+  void mouseDoubleClickEvent(QMouseEvent *event);
 
 protected:
   double _scale;

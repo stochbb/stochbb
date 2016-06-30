@@ -2,7 +2,10 @@
 #define MAINWINDOW_HH
 
 #include <QMainWindow>
+#include <QSettings>
 #include "logwindow.hh"
+#include <QTranslator>
+
 
 class NetEditWidget;
 
@@ -20,6 +23,7 @@ protected slots:
   void onSaveAs();
   void onImageExport();
   void onLoad();
+  void onLoad(QAction *action);
   void onCheck();
   void onRun();
   void onHelp();
@@ -29,8 +33,15 @@ protected slots:
   void onQuit();
 
 protected:
+  void addToRecent(const QString &path);
+  void populateRecent();
+
+protected:
   NetEditWidget *_netedit;
   LogWindow *_log;
+  QMenu *_recent;
+  QSettings _settings;
+  QTranslator _translator;
 };
 
 #endif // MAINWINDOW_HH

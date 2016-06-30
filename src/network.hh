@@ -40,9 +40,6 @@ public:
 
   virtual void clear();
 
-signals:
-  void editNodeConfig(NodeBase *node);
-
 public slots:
   bool load(const QString &file, ParserInfo &info);
   bool load(const QDomDocument &doc, ParserInfo &info);
@@ -52,7 +49,6 @@ public slots:
 
 protected:
   QString _filepath;
-  void mouseDoubleClickEvent(QMouseEvent *evt);
 };
 
 #endif // NETWORK_HH

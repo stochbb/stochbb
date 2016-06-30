@@ -14,4 +14,7 @@
         <file>xml/network-1.0.xml</file>
         <file>icons/icon.png</file>
     </qresource>
+    <qresource prefix="/i18n" lang="de_DE">
+        <file alias="stochbb.qm">i18n/stochbb_de_DE.qm</file>
+    </qresource>
 </RCC>
