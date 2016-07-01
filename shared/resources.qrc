@@ -1,20 +1,24 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/join_64.png</file>
-        <file>icons/proc_64.png</file>
-        <file>icons/trafo_64.png</file>
-        <file>icons/var_64.png</file>
-        <file>icons/trash_64.png</file>
-        <file>icons/zoom-in_64.png</file>
-        <file>icons/zoom-out_64.png</file>
-        <file>icons/play_64.png</file>
-        <file>icons/check_64.png</file>
-        <file>icons/output_64.png</file>
         <file>about.html</file>
-        <file>xml/network-1.0.xml</file>
-        <file>icons/icon.png</file>
     </qresource>
-    <qresource prefix="/i18n" lang="de_DE">
+    <qresource lang="de_DE" prefix="/i18n">
         <file alias="stochbb.qm">i18n/stochbb_de_DE.qm</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="check_64.png">icons/check_64.png</file>
+        <file alias="icon.png">icons/icon.png</file>
+        <file alias="join_64.png">icons/join_64.png</file>
+        <file alias="output_64.png">icons/output_64.png</file>
+        <file alias="play_64.png">icons/play_64.png</file>
+        <file alias="proc_64.png">icons/proc_64.png</file>
+        <file alias="trafo_64.png">icons/trafo_64.png</file>
+        <file alias="trash_64.png">icons/trash_64.png</file>
+        <file alias="var_64.png">icons/var_64.png</file>
+        <file alias="zoom-in_64.png">icons/zoom-in_64.png</file>
+        <file alias="zoom-out_64.png">icons/zoom-out_64.png</file>
+    </qresource>
+    <qresource prefix="/xml">
+        <file alias="network-1.0.xml">xml/network-1.0.xml</file>
     </qresource>
 </RCC>

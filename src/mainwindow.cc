@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QApplication>
 
+
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent), _netedit(0), _settings("io.github.stochbb", "stochbb"),
     _translator()

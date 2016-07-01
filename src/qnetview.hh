@@ -167,9 +167,6 @@ public:
   double scale() const;
   void setScale(double scale);
 
-  virtual void addNode(QNetNode *node);
-  virtual void remNode(QNetNode *node);
-  virtual void clear();
   nodeIterator nodesBegin();
   nodeIterator nodesEnd();
 
@@ -192,6 +189,9 @@ public:
   QRect boundingRect() const;
 
 public slots:
+  virtual void addNode(QNetNode *node);
+  virtual void remNode(QNetNode *node);
+  virtual void clear();
   void setModified(bool modified=true);
   void paint(QPainter &painter);
 
