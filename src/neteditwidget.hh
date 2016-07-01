@@ -44,6 +44,7 @@ public slots:
   void addMarginalPlot();
   void addScatterPlot();
   void addKDEPlot();
+  void addSampleDumpNode();
   void removeSelected();
   void zoomIn();
   void zoomOut();

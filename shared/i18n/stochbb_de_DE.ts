@@ -4,7 +4,7 @@
 <context>
     <name>CompoundGammaVarNode</name>
     <message>
-        <location filename="../../src/nodes.cc" line="869"/>
+        <location filename="../../src/nodes.cc" line="870"/>
         <source>k</source>
         <translation>k</translation>
     </message>
@@ -12,14 +12,14 @@
 <context>
     <name>InhibitionNode</name>
     <message>
-        <location filename="../../src/nodes.cc" line="675"/>
-        <location filename="../../src/nodes.cc" line="677"/>
+        <location filename="../../src/nodes.cc" line="676"/>
+        <location filename="../../src/nodes.cc" line="678"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../../src/nodes.cc" line="676"/>
-        <location filename="../../src/nodes.cc" line="678"/>
+        <location filename="../../src/nodes.cc" line="677"/>
+        <location filename="../../src/nodes.cc" line="679"/>
         <source>Y</source>
         <translation>Y</translation>
     </message>
@@ -27,17 +27,17 @@
 <context>
     <name>JoinNode</name>
     <message>
-        <location filename="../../src/nodes.cc" line="714"/>
+        <location filename="../../src/nodes.cc" line="715"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../../src/nodes.cc" line="715"/>
+        <location filename="../../src/nodes.cc" line="716"/>
         <source>Y</source>
         <translation>Y</translation>
     </message>
     <message>
-        <location filename="../../src/nodes.cc" line="716"/>
+        <location filename="../../src/nodes.cc" line="717"/>
         <source>out</source>
         <translation>aus</translation>
     </message>
@@ -256,6 +256,11 @@
         <translation>KDS Plot</translation>
     </message>
     <message>
+        <location filename="../../src/mainwindow.cc" line="111"/>
+        <source>Sample dump node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../src/mainwindow.cc" line="114"/>
         <source>Delete selected</source>
         <translation>Auswahl löschen</translation>
@@ -453,12 +458,12 @@
 <context>
     <name>MarginalPlotNode</name>
     <message>
-        <location filename="../../src/nodes.cc" line="1199"/>
+        <location filename="../../src/nodes.cc" line="1200"/>
         <source>Cannot derive density.</source>
         <translation>Kann dichte nicht bestimmen.</translation>
     </message>
     <message>
-        <location filename="../../src/nodes.cc" line="1200"/>
+        <location filename="../../src/nodes.cc" line="1201"/>
         <source>Cannot derive density for marginal %0 (slot %1): %2</source>
         <translation>Kann Marginaldichte für %0 (Slot %1) nicht bestimmen: %2</translation>
     </message>
@@ -466,12 +471,12 @@
 <context>
     <name>MaximumNode</name>
     <message>
-        <location filename="../../src/nodes.cc" line="638"/>
+        <location filename="../../src/nodes.cc" line="639"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../../src/nodes.cc" line="639"/>
+        <location filename="../../src/nodes.cc" line="640"/>
         <source>Y</source>
         <translation>Y</translation>
     </message>
@@ -479,12 +484,12 @@
 <context>
     <name>MinimumNode</name>
     <message>
-        <location filename="../../src/nodes.cc" line="600"/>
+        <location filename="../../src/nodes.cc" line="601"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../../src/nodes.cc" line="601"/>
+        <location filename="../../src/nodes.cc" line="602"/>
         <source>Y</source>
         <translation>Y</translation>
     </message>
@@ -528,6 +533,39 @@
         <location filename="../../src/plotwindow.cc" line="32"/>
         <source>Image Format (*.png *.pdf)</source>
         <translation>Bild format (*.png *.pdf)</translation>
+    </message>
+</context>
+<context>
+    <name>SampleDumpWindow</name>
+    <message>
+        <location filename="../../src/plotwindow.cc" line="230"/>
+        <source>Cannot save samples to file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/plotwindow.cc" line="231"/>
+        <source>Cannot save samples: No file specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/plotwindow.cc" line="240"/>
+        <source>Cannot save samples.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/plotwindow.cc" line="241"/>
+        <source>Cannot save samples to %1: Cannot open file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/plotwindow.cc" line="258"/>
+        <source>Save samples as ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/plotwindow.cc" line="259"/>
+        <source>Comma separated values (*.csv *.txt)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

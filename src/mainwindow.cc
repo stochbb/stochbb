@@ -108,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent)
   out_menu->addAction(tr("Marginal plot"), _netedit, SLOT(addMarginalPlot()));
   out_menu->addAction(tr("Scatter plot"), _netedit, SLOT(addScatterPlot()));
   out_menu->addAction(tr("KDE plot"), _netedit, SLOT(addKDEPlot()));
-
+  out_menu->addAction(tr("Sample dump node"), _netedit, SLOT(addSampleDumpNode()));
   edit_menu->addSeparator();
   QAction *rm_action = edit_menu->addAction(
         QIcon("://icons/trash_64.png"), tr("Delete selected"), _netedit, SLOT(removeSelected()));

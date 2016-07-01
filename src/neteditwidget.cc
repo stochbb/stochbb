@@ -165,6 +165,11 @@ NetEditWidget::addKDEPlot() {
 }
 
 void
+NetEditWidget::addSampleDumpNode() {
+  _netview->addNode(new SampleDumpNode(_netview));
+}
+
+void
 NetEditWidget::removeSelected() {
   // stop if no item is selected
   if (! _netview->selected())

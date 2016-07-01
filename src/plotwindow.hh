@@ -79,4 +79,24 @@ protected:
   QVector<KDE *> _densities;
 };
 
+
+class SampleDumpWindow: public QMainWindow
+{
+  Q_OBJECT
+
+public:
+  SampleDumpWindow(size_t nsamples, const QVector<stochbb::Var> &vars, QWidget *parent=0);
+  virtual ~SampleDumpWindow();
+
+protected slots:
+  void onSave();
+  void onSelectFile();
+
+protected:
+  size_t _nsamples;
+  size_t _nbins;
+  QVector<stochbb::Var> _vars;
+  QLineEdit *_filename;
+};
+
 #endif // PLOTWINDOW_HH

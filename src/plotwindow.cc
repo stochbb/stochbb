@@ -194,3 +194,70 @@ double
 KDE::max() const {
   return _max;
 }
+
+
+/* ******************************************************************************************** *
+ * Implementation of SampleDumpWindow
+ * ******************************************************************************************** */
+SampleDumpWindow::SampleDumpWindow(size_t nsamples, const QVector<stochbb::Var> &vars, QWidget *parent)
+  : QMainWindow(parent), _nsamples(nsamples),  _vars(vars)
+{
+  _filename = new QLineEdit();
+  QPushButton *sel = new QPushButton("...");
+  QPushButton *save = new QPushButton("Sample & Save");
+  QHBoxLayout *layout = new QHBoxLayout();
+  layout->addWidget(_filename, 1);
+  layout->addWidget(sel, 0);
+  layout->addWidget(save, 0);
+  QWidget *panel = new QWidget();
+  panel->setLayout(layout);
+  setCentralWidget(panel);
+
+  connect(sel, SIGNAL(clicked(bool)), this, SLOT(onSelectFile()));
+  connect(save, SIGNAL(clicked(bool)), this, SLOT(onSave()));
+}
+
+SampleDumpWindow::~SampleDumpWindow() {
+  // pass...
+}
+
+void
+SampleDumpWindow::onSave() {
+  if (0 == _vars.size())
+    return;
+
+  if (_filename->text().simplified().isEmpty()) {
+    QMessageBox::critical(0, tr("Cannot save samples to file."),
+                          tr("Cannot save samples: No file specified"));
+  }
+
+  Eigen::MatrixXd samples(_nsamples, _vars.size());
+  stochbb::ExactSampler sampler(_vars.toStdVector());
+  sampler.sample(samples);
+
+  QFile file(_filename->text());
+  if (! file.open(QIODevice::WriteOnly)) {
+    QMessageBox::critical(0, tr("Cannot save samples."),
+                          tr("Cannot save samples to %1: Cannot open file.").arg(file.fileName()));
+    return;
+  }
+
+  for (int i=0; i<samples.rows(); i++) {
+    file.write(QString::number(samples(i, 0)).toUtf8());
+    for (int j=1; j<samples.cols(); j++) {
+      file.write("\t"); file.write(QString::number(samples(i, j)).toUtf8());
+    }
+    file.write("\n");
+  }
+  file.close();
+}
+
+void
+SampleDumpWindow::onSelectFile() {
+  QString filename = QFileDialog::getSaveFileName(
+        0, tr("Save samples as ..."),
+        "", tr("Comma separated values (*.csv *.txt)"));
+  if (filename.isEmpty())
+    return;
+  _filename->setText(filename);
+}
