@@ -451,6 +451,19 @@
     </message>
 </context>
 <context>
+    <name>MarginalPlotNode</name>
+    <message>
+        <location filename="../../src/nodes.cc" line="1199"/>
+        <source>Cannot derive density.</source>
+        <translation>Kann dichte nicht bestimmen.</translation>
+    </message>
+    <message>
+        <location filename="../../src/nodes.cc" line="1200"/>
+        <source>Cannot derive density for marginal %0 (slot %1): %2</source>
+        <translation>Kann Marginaldichte für %0 (Slot %1) nicht bestimmen: %2</translation>
+    </message>
+</context>
+<context>
     <name>MaximumNode</name>
     <message>
         <location filename="../../src/nodes.cc" line="638"/>

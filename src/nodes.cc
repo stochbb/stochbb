@@ -1181,6 +1181,7 @@ void
 MarginalPlotNode::execute(const QHash<Socket *, stochbb::Var> &vartable) {
   if (0 == numSockets(QNetSocket::LEFT))
     return;
+
   QVector<stochbb::Var> vars;
   for (size_t i=0; i<numSockets(QNetSocket::LEFT); i++) {
     stochbb::Var X = vartable[socket(QString::number(i+1))];
@@ -1189,6 +1190,18 @@ MarginalPlotNode::execute(const QHash<Socket *, stochbb::Var> &vartable) {
     vars.push_back(X);
   }
 
+  // check if the density for each marginal can be derived
+  for (size_t i=0; i<vars.size(); i++) {
+    try {
+      vars[i].density();
+    } catch (stochbb::Error &err) {
+      QMessageBox::critical(
+            0, tr("Cannot derive density."),
+            tr("Cannot derive density for marginal %0 (slot %1): %2")
+            .arg(vars[i].name().c_str()).arg(i+1).arg(err.what()));
+      return;
+    }
+  }
   size_t nstep = parameter("steps").asInt() > 0 ? parameter("steps").asInt() : 100;
   double tmin = parameter("min").asFloat(), tmax = parameter("max").asFloat();
 

@@ -166,8 +166,10 @@ NetEditWidget::addKDEPlot() {
 
 void
 NetEditWidget::removeSelected() {
+  // stop if no item is selected
   if (! _netview->selected())
     return;
+  // Get selected node or edge
   if (QNetNode *node = _netview->selectedNode()) {
     _netview->remNode(node);
   } else if (QNetEdge *edge = _netview->selectedEdge()) {
