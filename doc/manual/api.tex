@@ -114,7 +114,7 @@ created using the overloaded standard library function \code{std::min} and \code
 
 \subsubsection{Conditional random variables}
 Conditional random variables as described above, can be created using the 
-function \code{stochbb::cond} as following. 
+function \code{stochbb::\allowbreak cond} as following. 
 \begin{lstlisting}[language=C++]
  #include <stochbb/api.hh>
  using namespace stochbb;
@@ -130,7 +130,7 @@ function \code{stochbb::cond} as following.
 
 \subsubsection{Conditional sums of random variables}
 Likewise the simple conditional random variable, conditional sums of random variables can be constructed 
-using the \code{stochbb::condsum} function as 
+using the \code{stochbb::\allowbreak condsum} function as 
 \begin{lstlisting}[language=C++]
  #include <stochbb/api.hh>
  using namespace stochbb;
@@ -242,9 +242,9 @@ to draw samples.
  sampler.sample(samples);
 \end{lstlisting}
 
-In this example, a \code{MarginalSampler} is constructed for the random variable \code{Y}. Using an
+In this example, a \code{Marginal\-Sampler} is constructed for the random variable \code{Y}. Using an
 approximation of its CDF on the interval $[0,500)$ using $1000$ steps. Then, the
-\code{MarginalSampler::sample} method is used to obtain $1000$ independent samples.
+\code{Marginal\-Sampler::\allowbreak sample} method is used to obtain $1000$ independent samples.
 
 \subsection{Handling data}
 Being able to evaluate the CDFs and PDFs of random variables efficiently, \pkg{StochBB} can be

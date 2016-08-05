@@ -61,10 +61,11 @@
 \usepackage{subcaption}
 \usepackage{editorial}
 
-%\newcommand{\marked}[1]{{\color{red}#1}}
-
 
 \begin{document}
+
+% Otherwise the code examples are too big.
+\lstset{basicstyle=\footnotesize}
 
 \input{introduction}
 \input{arch}
@@ -75,6 +76,7 @@
 
 \bibliography{references}
 
+\newpage
 \appendix
 \input{api}
 
