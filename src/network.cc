@@ -77,14 +77,6 @@ Network::findSource(Socket *dest) {
   return dynamic_cast<Socket *>(srcs.front());
 }
 
-void
-Network::mouseDoubleClickEvent(QMouseEvent *evt) {
-  QNetView::mouseDoubleClickEvent(evt);
-
-  if (_selectedNode && dynamic_cast<NodeBase *>(_selectedNode))
-    emit editNodeConfig(dynamic_cast<NodeBase *>(_selectedNode));
-}
-
 bool
 Network::hasFilename() const {
   return ! _filepath.isEmpty();

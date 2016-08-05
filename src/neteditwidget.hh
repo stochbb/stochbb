@@ -5,6 +5,7 @@
 
 class Network;
 class NodeBase;
+class QNetNode;
 
 
 class NetEditWidget : public QWidget
@@ -43,12 +44,13 @@ public slots:
   void addMarginalPlot();
   void addScatterPlot();
   void addKDEPlot();
+  void addSampleDumpNode();
   void removeSelected();
   void zoomIn();
   void zoomOut();
 
 protected slots:
-  void onEditNodeConfig(NodeBase *node);
+  void onEditNodeConfig(QNetNode *node);
 
 protected:
   Network *_netview;

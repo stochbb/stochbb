@@ -19,11 +19,11 @@ library. Finally a set of numerical algorithms (e.g., numerical convolution and 
 implemented for obtaining numerical approximations of densities which cannot
 be derived analytically. 
 
-Using the core library directly would rather be complicated as C++ does not provide automatic
-memory management. For easing the usage of the core library an application programming interface
+Using the core library directly would rather be complicated as C++ does not provide any means of automatic
+memory management. For a convenient usage of the core library an application programming interface
 (API) is provided for the core library that encapsulates all objects of the core library into
 container classes. These container classes then implement an automatic memory management by
-means of a \emph{mark-and-sweep} garbage collector \cite[e.g.,][]{Aho2007}. This API (described
-in Appendix \ref{sec:api} below) is then used to provide interfaces to the Python and R programming
+means of a \emph{mark-and-sweep} garbage collector \cite[e.g.,][]{Aho2007}. This API (outlined
+in Appendix \ref{sec:api}) is then used to provide interfaces to the Python and R programming
 language as well as implementing a graphical user interface (GUI) application described in Section 
 \ref{sec:gui} below.

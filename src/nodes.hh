@@ -496,4 +496,21 @@ public:
 };
 
 
+class SampleDumpNode: public OutputNode
+{
+  Q_OBJECT
+
+public:
+  SampleDumpNode(Network *parent=0);
+
+  bool setParameter(const QString &name, const Parameter &param);
+  QDomElement serialize(QDomDocument &doc) const;
+
+  void execute(const QHash<Socket *, stochbb::Var> &vartable);
+
+public:
+  static SampleDumpNode *fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable);
+};
+
+
 #endif // NODES_HH

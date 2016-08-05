@@ -447,6 +447,8 @@ QNetView::remNode(QNetNode *node) {
     return;
   _nodes.removeAll(node);
   node->deleteLater();
+  setModified();
+  updateLayout();
 }
 
 void
@@ -493,6 +495,8 @@ QNetView::remEdge(QNetEdge *edge) {
     return;
   _edges.removeAll(edge);
   edge->deleteLater();
+  setModified();
+  updateLayout();
 }
 
 QNetView::edgeIterator
@@ -740,5 +744,16 @@ QNetView::mouseReleaseEvent(QMouseEvent *evt) {
     }
     _connecting = 0;
     update();
+  }
+}
+
+void
+QNetView::mouseDoubleClickEvent(QMouseEvent *event) {
+  QWidget::mouseDoubleClickEvent(event);
+
+  if (_selectedNode) {
+    emit nodeDoubleClick(_selectedNode);
+    _selectedNode->select(false);
+    _selectedNode = 0;
   }
 }

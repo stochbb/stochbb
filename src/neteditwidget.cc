@@ -11,7 +11,8 @@ NetEditWidget::NetEditWidget(QWidget *parent)
   : QWidget(parent), _netview(0)
 {
   _netview = new Network();
-  connect(_netview, SIGNAL(editNodeConfig(NodeBase*)), this, SLOT(onEditNodeConfig(NodeBase *)));
+  connect(_netview, SIGNAL(nodeDoubleClick(QNetNode*)),
+          this, SLOT(onEditNodeConfig(QNetNode*)));
 
   QScrollArea *scroll = new QScrollArea();
   scroll->setWidget(_netview);
@@ -164,9 +165,16 @@ NetEditWidget::addKDEPlot() {
 }
 
 void
+NetEditWidget::addSampleDumpNode() {
+  _netview->addNode(new SampleDumpNode(_netview));
+}
+
+void
 NetEditWidget::removeSelected() {
+  // stop if no item is selected
   if (! _netview->selected())
     return;
+  // Get selected node or edge
   if (QNetNode *node = _netview->selectedNode()) {
     _netview->remNode(node);
   } else if (QNetEdge *edge = _netview->selectedEdge()) {
@@ -186,7 +194,8 @@ NetEditWidget::zoomOut() {
 }
 
 void
-NetEditWidget::onEditNodeConfig(NodeBase *node) {
-  if (QDialog::Accepted == NodeConfigDialog(node).exec())
+NetEditWidget::onEditNodeConfig(QNetNode *node) {
+  NodeBase *n = dynamic_cast<NodeBase *>(node);
+  if (n && (QDialog::Accepted == NodeConfigDialog(n).exec()))
     _netview->setModified(true);
 }

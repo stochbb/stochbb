@@ -167,9 +167,6 @@ public:
   double scale() const;
   void setScale(double scale);
 
-  virtual void addNode(QNetNode *node);
-  virtual void remNode(QNetNode *node);
-  virtual void clear();
   nodeIterator nodesBegin();
   nodeIterator nodesEnd();
 
@@ -192,11 +189,15 @@ public:
   QRect boundingRect() const;
 
 public slots:
+  virtual void addNode(QNetNode *node);
+  virtual void remNode(QNetNode *node);
+  virtual void clear();
   void setModified(bool modified=true);
   void paint(QPainter &painter);
 
 signals:
   void modified();
+  void nodeDoubleClick(QNetNode *node);
 
 protected slots:
   void itemDestroyed(QObject *item);
@@ -208,6 +209,7 @@ protected:
   void mousePressEvent(QMouseEvent *evt);
   void mouseMoveEvent(QMouseEvent *evt);
   void mouseReleaseEvent(QMouseEvent *evt);
+  void mouseDoubleClickEvent(QMouseEvent *event);
 
 protected:
   double _scale;

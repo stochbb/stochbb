@@ -1,25 +1,25 @@
 \section{Graphical user interface application} \label{sec:gui}
-Within this section, I briefly overview the graphical user interface (GUI) application that allows to assemble and analyze complex networks of random variables graphically, without the need to specify such networks declarative using the R, Python or even the C++ API. 
+Within this section, I briefly overview the graphical user interface (GUI) application that allows to assemble and analyze complex networks of random variables graphically, without the need to specify such networks \marked{declaratively} using the R, Python or even the C++ API. 
 
-While the semantic of the \pkg{StochBB} API is closely related to the internal representation in terms of random variables, the GUI tries to abstract that representation. For example, models of cognitive processes are usually expressed in terms of a network of interacting \emph{processing stages}, each associated with a waiting time distribution. For the sake of simplicity when analyzing such networks, the semantic of the network representation within the GUI is more related to \emph{processing stages} rather than random variables. 
+While the semantic of the \pkg{StochBB} API is closely related to the internal representation in terms of random variables, the GUI uses a more abstract representation. For example, models of cognitive processes are usually expressed in terms of a network of interacting \emph{processing stages}, each associated with a waiting time distribution. For the sake of simplicity, when analyzing such networks, the semantic of the network representation within the GUI is more related to \emph{processing stages} rather than random variables. 
 
-All these \emph{processing stages} share the same form. They have at least one input socket that is the trigger of the stage and one output socket, that is the response. By chaining these stages, that is, connecting the output socket of one stage with the trigger socket of another stage, an equivalent of a sum of the waiting-time random variables of stages is created. Although this representation is quiet uncommon in the field of statistics, it is very common in applied fields dealing with networks of random variables, like modeling of cognitive processes.
+All these \emph{processing stages} share the same form. They have at least one input socket that is the trigger of the stage and one output socket, that is the response. By chaining these stages, that is, connecting the output socket of one stage with the trigger socket of another stage, an equivalent of a sum of the waiting-time random variables of the chained stages is created. Although this representation is quiet uncommon in the field of statistics, it is very common in applied fields dealing with networks of random variables, like modeling of cognitive processes.
 
 \begin{figure}[!ht]
  \centering
  \includegraphics[width=.75\textwidth]{fig/GUI2.png}
- \caption{Overview of the GUI of \pkg{StochBB}, the toolbar at the top of the main window (background), main network edit field in the middle of the main window, the log view at the bottom of the main window (can be hidden) and a separate plot window at the foreground.} \label{fig:gui}
+ \caption{Overview of the GUI of \pkg{StochBB}, the toolbar at the top of the main window (background), network edit field in the middle of the main window, the log view at the bottom of the main window (can be hidden) and a separate plot window at the foreground.} \label{fig:gui}
 \end{figure}
 
 \subsection{General overview}
-The main window of the GUI (see Figure \ref{fig:gui}) consists of two main parts:
+The main window of the GUI (see Figure \ref{fig:gui}) consists of two parts:
 \begin{enumerate}
  \item The tool bar at the top of the main window. Here, frequently used actions are collected like verifying the network, performing the analysis,
  adding or removing items. All these actions are also available at the main menu (not shown in Fig. \ref{fig:gui}).
- \item The main network view at the center of the main window. Here the network of \emph{stages} can be viewed and edited. This view is described in more detail below.
+ \item The network view at the center of the main window. Here the network of \emph{stages} can be viewed and edited. This view is described in more detail below.
 \end{enumerate}
 
-Additionally, there  is a log window at the bottom. By default, this view is hidden and can be enabled at the main menu under \emph{View} $\rightarrow$ \emph{Show log}. It displays various messages from the core library emitted during the verification and analysis of the network. 
+Additionally, there  is a log window at the bottom. By default, this view is hidden and can be enabled at the menu under \emph{View} $\rightarrow$ \emph{Show log}. It displays various messages from the core library emitted during the verification and analysis of the network. 
 
 
 \subsection{Editing a network}

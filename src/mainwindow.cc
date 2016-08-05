@@ -19,13 +19,19 @@
 #include <QPainter>
 #include <QSvgGenerator>
 #include <QPrinter>
+#include <QDebug>
+#include <QApplication>
 
 
 MainWindow::MainWindow(QWidget *parent)
-  : QMainWindow(parent), _netedit(0)
+  : QMainWindow(parent), _netedit(0), _settings("io.github.stochbb", "stochbb"),
+    _translator()
 {
   setMinimumSize(640, 480);
   setWindowIcon(QIcon("://icons/icon.png"));
+
+  _translator.load("://i18n/stochbb.qm");
+  QApplication::instance()->installTranslator(&_translator);
 
   _log = new LogWindow(this);
   _log->setVisible(false);
@@ -49,6 +55,9 @@ MainWindow::MainWindow(QWidget *parent)
   newnet->setShortcut(Qt::CTRL + Qt::Key_N);
   QAction *open = file_menu->addAction(tr("Open ..."), this, SLOT(onLoad()));
   open->setShortcut(Qt::CTRL + Qt::Key_O);
+  _recent = file_menu->addMenu(tr("Open recent"));
+  connect(_recent, SIGNAL(triggered(QAction*)), this, SLOT(onLoad(QAction*)));
+  populateRecent();
   QAction *save = file_menu->addAction(tr("Save"), this, SLOT(onSave()));
   save->setShortcut(Qt::CTRL + Qt::Key_S);
   QAction *save_as = file_menu->addAction(tr("Save as ..."), this, SLOT(onSaveAs()));
@@ -99,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent)
   out_menu->addAction(tr("Marginal plot"), _netedit, SLOT(addMarginalPlot()));
   out_menu->addAction(tr("Scatter plot"), _netedit, SLOT(addScatterPlot()));
   out_menu->addAction(tr("KDE plot"), _netedit, SLOT(addKDEPlot()));
-
+  out_menu->addAction(tr("Sample dump node"), _netedit, SLOT(addSampleDumpNode()));
   edit_menu->addSeparator();
   QAction *rm_action = edit_menu->addAction(
         QIcon("://icons/trash_64.png"), tr("Delete selected"), _netedit, SLOT(removeSelected()));
@@ -207,6 +216,39 @@ MainWindow::onLoad() {
 
   if (filename.isEmpty())
     return;
+  ParserInfo info;
+
+  if (_netedit->network()->load(filename, info)) {
+    setWindowTitle(tr("StochBB - %0").arg(_netedit->network()->filename()));
+    if (ParserInfo::OK != info.state()) {
+      QMessageBox::information(0, tr("Notifications while loading network."),
+                               tr("There where some issues while loading network from %0: \n %1")
+                               .arg(filename)
+                               .arg(info.messages().join("\n")));
+    }
+    addToRecent(filename);
+  } else {
+    QMessageBox::critical(0, tr("Error while loading network."),
+                          tr("Cannot load network from %0: \n %1")
+                          .arg(filename)
+                          .arg(info.messages().join("\n")));
+  }
+}
+
+void
+MainWindow::onLoad(QAction *action) {
+  if (_netedit->network()->isModified()) {
+    int res = QMessageBox::question(this, tr("Discard changes?"),
+                                    tr("The network as been modified. Do you want to discard the changes?"),
+                                    QMessageBox::Abort | QMessageBox::Save | QMessageBox::Discard,
+                                    QMessageBox::Abort);
+    if (QMessageBox::Abort == res)
+      return;
+    if (QMessageBox::Save == res)
+      onSave();
+  }
+
+  QString filename = action->data().toString();
   ParserInfo info;
 
   if (_netedit->network()->load(filename, info)) {
@@ -381,4 +423,44 @@ MainWindow::onAbout() {
 void
 MainWindow::onHelp() {
   QDesktopServices::openUrl(QUrl("https://hmatuschek.github.io/stochbb"));
+}
+
+void
+MainWindow::addToRecent(const QString &path) {
+  QStringList paths;
+  paths.append(path);
+  int N = _settings.beginReadArray("recent");
+  for (int i=0; i<N; i++) {
+    _settings.setArrayIndex(i);
+    QString path = _settings.value("path").toString();
+    QFileInfo finfo(path);
+    if (finfo.exists() && finfo.isReadable()) {
+      paths.append(path);
+    }
+  }
+  _settings.endArray();
+  _settings.beginWriteArray("recent");
+  for (int i=0; i<paths.size(); i++) {
+    _settings.setArrayIndex(i);
+    _settings.setValue("path", paths.at(i));
+  }
+  _settings.endArray();
+  populateRecent();
+}
+
+void
+MainWindow::populateRecent() {
+  _recent->clear();
+  int N = _settings.beginReadArray("recent");
+  for (int i=0; i<N; i++) {
+    _settings.setArrayIndex(i);
+    QString path = _settings.value("path").toString();
+    QFileInfo finfo(path);
+    if (finfo.exists() && finfo.isReadable()) {
+      QAction *action = _recent->addAction(finfo.fileName());
+      action->setToolTip(path);
+      action->setData(path); action->setVisible(true);
+    }
+  }
+  _settings.endArray();
 }

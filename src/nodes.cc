@@ -56,7 +56,8 @@ NodeBase::_factoryFunctions({
   {"cweibullv",    (NodeBase::nodeFactoryFunction) CompoundWeibullVarNode::fromXml},
   {"marginalplot", (NodeBase::nodeFactoryFunction) MarginalPlotNode::fromXml},
   {"scatterplot",  (NodeBase::nodeFactoryFunction) ScatterPlotNode::fromXml},
-  {"kdeplot",      (NodeBase::nodeFactoryFunction) KDEPlotNode::fromXml}});
+  {"kdeplot",      (NodeBase::nodeFactoryFunction) KDEPlotNode::fromXml},
+  {"sampledump",   (NodeBase::nodeFactoryFunction) SampleDumpNode::fromXml}});
 
 
 NodeBase::NodeBase(const QString &label, QNetView *parent)
@@ -1181,6 +1182,7 @@ void
 MarginalPlotNode::execute(const QHash<Socket *, stochbb::Var> &vartable) {
   if (0 == numSockets(QNetSocket::LEFT))
     return;
+
   QVector<stochbb::Var> vars;
   for (size_t i=0; i<numSockets(QNetSocket::LEFT); i++) {
     stochbb::Var X = vartable[socket(QString::number(i+1))];
@@ -1189,6 +1191,18 @@ MarginalPlotNode::execute(const QHash<Socket *, stochbb::Var> &vartable) {
     vars.push_back(X);
   }
 
+  // check if the density for each marginal can be derived
+  for (size_t i=0; i<vars.size(); i++) {
+    try {
+      vars[i].density();
+    } catch (stochbb::Error &err) {
+      QMessageBox::critical(
+            0, tr("Cannot derive density."),
+            tr("Cannot derive density for marginal %0 (slot %1): %2")
+            .arg(vars[i].name().c_str()).arg(i+1).arg(err.what()));
+      return;
+    }
+  }
   size_t nstep = parameter("steps").asInt() > 0 ? parameter("steps").asInt() : 100;
   double tmin = parameter("min").asFloat(), tmax = parameter("max").asFloat();
 
@@ -1306,5 +1320,63 @@ KDEPlotNode *
 KDEPlotNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
   return new KDEPlotNode();
 }
+
+
+/* ********************************************************************************************* *
+ * Implementation of SampleDumpNode
+ * ********************************************************************************************* */
+SampleDumpNode::SampleDumpNode(Network *parent)
+  : OutputNode("Sample Dump", parent)
+{
+  _params.insert("variables", Parameter(0));
+  _params.insert("samples", Parameter(1000));
+
+  _type = "Sample Dump";
+}
+
+bool
+SampleDumpNode::setParameter(const QString &name, const Parameter &param) {
+  if ("variables" == name) {
+    if (param.asInt() < numSockets(QNetSocket::LEFT))
+      return false;
+    size_t n = numSockets(QNetSocket::LEFT)+1;
+    while (param.asInt() > numSockets(QNetSocket::LEFT)) {
+      addSocket(new Socket(QNetSocket::LEFT, QString::number(n), QString::number(n), this));
+      n++;
+    }
+  }
+  return NodeBase::setParameter(name, param);
+}
+
+void
+SampleDumpNode::execute(const QHash<Socket *, stochbb::Var> &vartable) {
+  if (0 == numSockets(QNetSocket::LEFT))
+    return;
+  QVector<stochbb::Var> vars;
+  for (size_t i=0; i<numSockets(QNetSocket::LEFT); i++) {
+    stochbb::Var X = vartable[socket(QString::number(i+1))];
+    if (X.isNull())
+      continue;
+    vars.push_back(X);
+  }
+
+  size_t nsample = parameter("samples").asInt() > 0 ? parameter("samples").asInt() : 1000;
+  SampleDumpWindow *win = new SampleDumpWindow(nsample, vars);
+  win->setWindowTitle(this->label());
+  win->show();
+}
+
+QDomElement
+SampleDumpNode::serialize(QDomDocument &doc) const {
+  QDomElement node = NodeBase::serialize(doc);
+  node.setAttribute("type", "kdeplot");
+  return node;
+}
+
+SampleDumpNode *
+SampleDumpNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString, NodeBase *> &nodeTable) {
+  return new SampleDumpNode();
+}
+
 
 
