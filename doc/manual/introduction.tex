@@ -1,4 +1,4 @@
- \section{Introduction} \label{sec:intro}
+\section{Introduction} \label{sec:intro}
 Frequently, complex systems are described in terms of stochastic processes, as the
 underlying deterministic process is too complex to be modeled exactly or as the
 process is indeed random. It is not always the random process itself that is of 
@@ -53,7 +53,7 @@ $Y = X_1 + X_2 + X_3$. Moreover, the
 distribution of the sum of $X_1$ and $X_3$ can be determined analytically as 
 $X' = (X_1+X_3)\sim\Gamma(11,100)$. Hence the random variable $Y$ can now be expressed as 
 $Y = X_2 + X'$, and only a single numeric convolution is necessary to obtain the PDF of the
-random variable $Y$. \pkg{SochBB} implements several of such reductions, exploiting mathematical
+random variable $Y$. \pkg{SochBB} implements several reductions, exploiting mathematical
 identities of random variables and their distributions. To this end, it allows to obtain their PDFs and 
 CDFs efficiently. In this section, all basic building blocks that are currently implemented and their 
 reductions are presented and discussed in some detail.
