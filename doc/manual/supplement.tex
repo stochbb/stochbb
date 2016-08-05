@@ -1,0 +1,50 @@
+\documentclass[a4paper, 10pt]{article}
+\usepackage{geometry}
+\usepackage{hyperref}
+
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1.5em}
+
+
+
+\title{Supplement: Source code structure}
+\author{Hannes Matuschek}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+In total, the C++ source code has about 40,000 lines of code. This is certainly too much to be reviewed. The majority of this source code, however, is only related to the GUI application (about 30,000 lines) particularly  the plotting code. The core library consists of about 10,000 lines of code of which again the majority accounts to so called boiler-plate code concerning the memory management and utilities like logging, unit tests etc.. This supplementary document is intended to be a guide for the reviewers through the source code of the StochBB framework.
+\end{abstract}
+
+\section{General structure}
+The code is organized in four independent repositories. The code library is available at \href{https://github.com/stochbb/libstochbb}{https://github.com/stochbb/libstochbb}, the GUI application at \href{https://github.com/stochbb/stochbb}{https://github.com/stochbb/stochbb}, the R package at \href{https://github.com/stochbb/r-stochbb}{https://github.com/stochbb/r-stochbb} and the Python interface at \href{https://github.com/stochbb/python-stochbb}{https://github.com/stochbb/python-stochbb}. The most important part of the code is the core library. The structure of this source code repository is described below.
+
+\section{Core library}
+The core library is available at \href{https://github.com/stochbb/libstochbb}{https://github.com/stochbb/libstochbb}. The documentation of this library (all classes and functions) is available at \href{https://stochbb.github.io/libstochbb}{https://stochbb.github.io/libstochbb}.
+
+The repository contains four directories. \emph{cmake} contains auxiliary file for the cmake build system, the \emph{doc} contains the doxygen related files, \emph{test} contains some unit tests for the library and \emph{src} the source code of the library. 
+
+Although the entirety of the code consist of about 10,000 lines, the actual core functionality of the library is implemented in about 2,000 lines of C++ code (see Table \ref{tab:lines}). Hence the review of about 2,000 lines of core functionality is certainly possible.
+
+\begin{table}
+ \begin{tabular}{p{0.05\textwidth}|p{0.60\textwidth}|p{0.3\textwidth}}
+  Lines & Files & Purpose  \\  \hline
+  4,000 & \texttt{*.hh} & Headers \\
+  1,000 & \texttt{cputime.cc}, \texttt{logger.cc}, \texttt{option\_parser.cc},  \texttt{unittest.cc} & Utilities \\
+  1,600 & \texttt{api.cc}, \texttt{exception.cc}, \texttt{object.cc}, \texttt{operators.cc} & Memory management, error handling, API containers \\
+  1,000 & \texttt{distribution.cc}, \texttt{math.cc} & Special functions and distributions \\
+  300 & \texttt{randomvariable.cc}, \texttt{density.cc} & Interfaces. \\
+  200 & \texttt{exactsampler.cc}, \texttt{marginalsampler.cc} & RV sampler. \\ \hline
+  1,600 & \texttt{affinetrafo.cc}, \texttt{chain.cc}, \texttt{compound.cc}, \texttt{conditional.cc},  \texttt{minmax.cc}, \texttt{mixture.cc} & Core RV representation and numeric density approximation.\\
+  300 (900) & \texttt{reduction.cc}, (\texttt{operators.cc}) & Analytic density reductions (partially impl. in \texttt{operators.cc}). \\
+\end{tabular}
+\caption{Number of lines of code of each "component" of the core library.} \label{tab:lines}
+\end{table}
+
+
+
+
+
+\end{document}
