@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
   panel->setLayout(layout);
   setCentralWidget(panel);
 
-  QMenuBar *menu_bar = new QMenuBar();
+  QMenuBar *menu_bar = this->menuBar();
   QMenu *file_menu = menu_bar->addMenu(tr("File"));
   QAction *newnet = file_menu->addAction(tr("New"), this, SLOT(onNewNetwork()));
   newnet->setShortcut(Qt::CTRL + Qt::Key_N);
@@ -129,46 +129,47 @@ MainWindow::MainWindow(QWidget *parent)
   help_menu->addAction(tr("About StochBB"), this, SLOT(onAbout()));
 
   QToolBar *toolbar = new QToolBar();
+  toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
   toolbar->addAction(check_action);
   toolbar->addAction(run_action);
 
   toolbar->addSeparator();
   QToolButton* add_rand = new QToolButton();
-  add_rand->setText(tr("Add Variable"));
+  add_rand->setToolTip(tr("Add Variable"));
   add_rand->setIcon(QIcon("://icons/var_64.png"));
-  add_rand->setToolButtonStyle(Qt::ToolButtonFollowStyle);
+  add_rand->setToolButtonStyle(Qt::ToolButtonIconOnly);
   add_rand->setPopupMode(QToolButton::InstantPopup);
   add_rand->setMenu(rand_menu);
   toolbar->addWidget(add_rand);
 
   QToolButton* add_proc = new QToolButton();
-  add_proc->setText(tr("Add Process"));
+  add_proc->setToolTip(tr("Add Process"));
   add_proc->setIcon(QIcon("://icons/proc_64.png"));
-  add_proc->setToolButtonStyle(Qt::ToolButtonFollowStyle);
+  add_proc->setToolButtonStyle(Qt::ToolButtonIconOnly);
   add_proc->setPopupMode(QToolButton::InstantPopup);
   add_proc->setMenu(proc_menu);
   toolbar->addWidget(add_proc);
 
   QToolButton* add_comb = new QToolButton();
-  add_comb->setText(tr("Add Combine"));
+  add_comb->setToolTip(tr("Add Combine"));
   add_comb->setIcon(QIcon("://icons/join_64.png"));
-  add_comb->setToolButtonStyle(Qt::ToolButtonFollowStyle);
+  add_comb->setToolButtonStyle(Qt::ToolButtonIconOnly);
   add_comb->setPopupMode(QToolButton::InstantPopup);
   add_comb->setMenu(comb_menu);
   toolbar->addWidget(add_comb);
 
   QToolButton* add_traf = new QToolButton();
-  add_traf->setText(tr("Add Transform"));
+  add_traf->setToolTip(tr("Add Transform"));
   add_traf->setIcon(QIcon("://icons/trafo_64.png"));
-  add_traf->setToolButtonStyle(Qt::ToolButtonFollowStyle);
+  add_traf->setToolButtonStyle(Qt::ToolButtonIconOnly);
   add_traf->setPopupMode(QToolButton::InstantPopup);
   add_traf->setMenu(traf_menu);
   toolbar->addWidget(add_traf);
 
   QToolButton* add_out = new QToolButton();
-  add_out->setText(tr("Add Output"));
+  add_out->setToolTip(tr("Add Output"));
   add_out->setIcon(QIcon("://icons/output_64.png"));
-  add_out->setToolButtonStyle(Qt::ToolButtonFollowStyle);
+  add_out->setToolButtonStyle(Qt::ToolButtonIconOnly);
   add_out->setPopupMode(QToolButton::InstantPopup);
   add_out->setMenu(out_menu);
   toolbar->addWidget(add_out);
@@ -422,7 +423,7 @@ MainWindow::onAbout() {
 
 void
 MainWindow::onHelp() {
-  QDesktopServices::openUrl(QUrl("https://hmatuschek.github.io/stochbb"));
+  QDesktopServices::openUrl(QUrl("https://stochbb.github.io/doc/manual.pdf"));
 }
 
 void

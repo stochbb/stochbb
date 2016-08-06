@@ -297,160 +297,160 @@
     </message>
     <message>
         <location filename="../../src/mainwindow.cc" line="129"/>
-        <location filename="../../src/mainwindow.cc" line="419"/>
+        <location filename="../../src/mainwindow.cc" line="420"/>
         <source>About StochBB</source>
         <translation>Über StochBB</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="137"/>
+        <location filename="../../src/mainwindow.cc" line="138"/>
         <source>Add Variable</source>
         <translation>Variable hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="145"/>
+        <location filename="../../src/mainwindow.cc" line="146"/>
         <source>Add Process</source>
         <translation>Prozess hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="153"/>
+        <location filename="../../src/mainwindow.cc" line="154"/>
         <source>Add Combine</source>
         <translation>Vereinigung hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="161"/>
+        <location filename="../../src/mainwindow.cc" line="162"/>
         <source>Add Transform</source>
         <translation>Transformation hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="169"/>
+        <location filename="../../src/mainwindow.cc" line="170"/>
         <source>Add Output</source>
         <translation>Ausgabe hinzufügen</translation>
-    </message>
-    <message>
-        <location filename="../../src/mainwindow.cc" line="189"/>
-        <location filename="../../src/mainwindow.cc" line="204"/>
-        <location filename="../../src/mainwindow.cc" line="241"/>
-        <location filename="../../src/mainwindow.cc" line="384"/>
-        <source>Discard changes?</source>
-        <translation>Änderungen verwerfen?</translation>
     </message>
     <message>
         <location filename="../../src/mainwindow.cc" line="190"/>
         <location filename="../../src/mainwindow.cc" line="205"/>
         <location filename="../../src/mainwindow.cc" line="242"/>
         <location filename="../../src/mainwindow.cc" line="385"/>
+        <source>Discard changes?</source>
+        <translation>Änderungen verwerfen?</translation>
+    </message>
+    <message>
+        <location filename="../../src/mainwindow.cc" line="191"/>
+        <location filename="../../src/mainwindow.cc" line="206"/>
+        <location filename="../../src/mainwindow.cc" line="243"/>
+        <location filename="../../src/mainwindow.cc" line="386"/>
         <source>The network as been modified. Do you want to discard the changes?</source>
         <translation>Das Netzwerk wurde verändert. Wollen sie die Änderungen verwerfen?</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="215"/>
+        <location filename="../../src/mainwindow.cc" line="216"/>
         <source>Load network from ...</source>
         <translation>Netzwerk laden ...</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="215"/>
-        <location filename="../../src/mainwindow.cc" line="281"/>
+        <location filename="../../src/mainwindow.cc" line="216"/>
+        <location filename="../../src/mainwindow.cc" line="282"/>
         <source>Network files (*.xml)</source>
         <translation>Netwerke (*.xml)</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="222"/>
-        <location filename="../../src/mainwindow.cc" line="255"/>
-        <location filename="../../src/mainwindow.cc" line="285"/>
-        <location filename="../../src/mainwindow.cc" line="404"/>
+        <location filename="../../src/mainwindow.cc" line="223"/>
+        <location filename="../../src/mainwindow.cc" line="256"/>
+        <location filename="../../src/mainwindow.cc" line="286"/>
+        <location filename="../../src/mainwindow.cc" line="405"/>
         <source>StochBB - %0</source>
         <translation>StochBB - %0</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="224"/>
-        <location filename="../../src/mainwindow.cc" line="257"/>
+        <location filename="../../src/mainwindow.cc" line="225"/>
+        <location filename="../../src/mainwindow.cc" line="258"/>
         <source>Notifications while loading network.</source>
         <translation>Meldungen die wärend des Ladens auftraten.</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="225"/>
-        <location filename="../../src/mainwindow.cc" line="258"/>
+        <location filename="../../src/mainwindow.cc" line="226"/>
+        <location filename="../../src/mainwindow.cc" line="259"/>
         <source>There where some issues while loading network from %0: 
  %1</source>
         <translation>Es gab Meldungen wärend des ladens von %0: 
  %1</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="231"/>
-        <location filename="../../src/mainwindow.cc" line="263"/>
+        <location filename="../../src/mainwindow.cc" line="232"/>
+        <location filename="../../src/mainwindow.cc" line="264"/>
         <source>Error while loading network.</source>
         <translation>Ladefehler.</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="232"/>
-        <location filename="../../src/mainwindow.cc" line="264"/>
+        <location filename="../../src/mainwindow.cc" line="233"/>
+        <location filename="../../src/mainwindow.cc" line="265"/>
         <source>Cannot load network from %0: 
  %1</source>
         <translation>Kann Netzwerk nich von %0 laden: 
  %1</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="281"/>
+        <location filename="../../src/mainwindow.cc" line="282"/>
         <source>Save network as ...</source>
         <translation>Netzwerk speichern unter ...</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="291"/>
+        <location filename="../../src/mainwindow.cc" line="292"/>
         <source>Export network as ...</source>
         <translation>Netwerk exportieren ...</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="291"/>
+        <location filename="../../src/mainwindow.cc" line="292"/>
         <source>Images (*.png *.svg *.pdf)</source>
         <translation>Bilddateien (*.png *.svg *.pdf)</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="315"/>
+        <location filename="../../src/mainwindow.cc" line="316"/>
         <source>Error while exporting network</source>
         <translation>Fehler wärend des Netzwerkexports</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="316"/>
+        <location filename="../../src/mainwindow.cc" line="317"/>
         <source>Cannot export network to file %0</source>
         <translation>Kann Netzwerk nicht in Datei %0 exportieren</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="342"/>
+        <location filename="../../src/mainwindow.cc" line="343"/>
         <source>Cannot export network.</source>
         <translation>Kann Netzwerk nicht exportieren.</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="343"/>
+        <location filename="../../src/mainwindow.cc" line="344"/>
         <source>Cannot export network as &apos;%0&apos;. Image format not supported.</source>
         <translation>Kann Netzwerk nicht zu &apos;%0&apos; exportieren. Dateiformat nicht unterstützt.</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="356"/>
+        <location filename="../../src/mainwindow.cc" line="357"/>
         <source>Results</source>
         <translation>Ergebnisse</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="358"/>
+        <location filename="../../src/mainwindow.cc" line="359"/>
         <source>Success</source>
         <translation>Verifikation erfolgreich</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="358"/>
+        <location filename="../../src/mainwindow.cc" line="359"/>
         <source>The network is consistent.</source>
         <translation>Das Netzwerk ist konsistent.</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="367"/>
+        <location filename="../../src/mainwindow.cc" line="368"/>
         <source>Can not run network.</source>
         <translation>Kann das Netzwerk nicht analysieren.</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="368"/>
+        <location filename="../../src/mainwindow.cc" line="369"/>
         <source>There was an error during the analysis step: Run &apos;Check Network&apos;.</source>
         <translation>Es gab Fehler im Analyseschritt. Bitte führen sie &apos;Netzwerk prüfen&apos; aus.</translation>
     </message>
     <message>
-        <location filename="../../src/mainwindow.cc" line="398"/>
+        <location filename="../../src/mainwindow.cc" line="399"/>
         <source>New network</source>
         <translation>Neues Netzwerk</translation>
     </message>

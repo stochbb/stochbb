@@ -115,11 +115,11 @@ QNetNode::socketAt(const QPoint &pos) const {
 QNetSocket *
 QNetNode::socketAt(QNetSocket::Side side, size_t i) const {
   if (QNetSocket::LEFT == side) {
-    if (i >= _leftSockets.size())
+    if (i >= (size_t) _leftSockets.size())
       return 0;
     return _leftSockets.at(i);
   }
-  if (i >= _rightSockets.size())
+  if (i >= (size_t) _rightSockets.size())
     return 0;
   return _rightSockets.at(i);
 }
@@ -665,8 +665,8 @@ QNetView::mousePressEvent(QMouseEvent *evt) {
   }
 
   if (Qt::LeftButton == evt->button()) {
-    QList<QNetNode *>::reverse_iterator node = _nodes.rbegin();
-    for (; node != _nodes.rend(); node++) {
+    QList<QNetNode *>::iterator node = _nodes.begin();
+    for (; node != _nodes.end(); node++) {
       QRect bb((*node)->position(), (*node)->size());
       if (bb.contains(evt->pos()/_scale)) {
         _dragging = _selectedNode = *node;
