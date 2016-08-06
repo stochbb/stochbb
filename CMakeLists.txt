@@ -59,7 +59,7 @@ SET(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
 
 SET(libsbb_VERSION_MAJOR "1")
 SET(libsbb_VERSION_MINOR "0")
-SET(libsbb_VERSION_PATCH "0")
+SET(libsbb_VERSION_PATCH "1")
 
 add_subdirectory(src)
 
@@ -75,6 +75,6 @@ SET(CPACK_SOURCE_GENERATOR "TGZ")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME
     "stochbb-${libsbb_VERSION_MAJOR}.${libsbb_VERSION_MINOR}.${libsbb_VERSION_PATCH}")
 set(CPACK_SOURCE_IGNORE_FILES
-    "/build/;/doc/;/dist/;/lib/;/.git/;${CPACK_SOURCE_IGNORE_FILES}")
+    "/build/;/doc/;/dist/;/lib/;/.git/;CMakeLists.txt.user;${CPACK_SOURCE_IGNORE_FILES}")
 include(CPack)
 
