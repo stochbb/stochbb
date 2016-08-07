@@ -59,7 +59,7 @@ SET(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
 
 SET(libsbb_VERSION_MAJOR "1")
 SET(libsbb_VERSION_MINOR "0")
-SET(libsbb_VERSION_PATCH "1")
+SET(libsbb_VERSION_PATCH "2")
 
 add_subdirectory(src)
 

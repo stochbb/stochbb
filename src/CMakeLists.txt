@@ -25,3 +25,8 @@ add_executable(stochbb ${stochbb_SOURCES} ${stochbb_MOC_SOURCES} ${stochbb_RCC_S
 target_link_libraries(stochbb ${LIBS})
 
 install(TARGETS stochbb DESTINATION "bin/")
+
+if (UNIX AND NOT APPLE)
+ install(FILES ../shared/stochbb.desktop DESTINATION share/applications)
+ install(FILES ../shared/stochbb-icon.png DESTINATION share/icons)
+endif (UNIX AND NOT APPLE)

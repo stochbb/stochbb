@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=StochBB
+Comment=Analyse networks of dependent random variables.
+Exec=stochbb
+StartupNotify=true
+Terminal=false
+Type=Application
+Icon=stochbb-icon
