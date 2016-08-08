@@ -1,4 +1,4 @@
-\documentclass[a4paper, 10pt]{paper}
+\documentclass[a4paper, 11pt]{paper}
 
 \usepackage{listings}
 \usepackage{amsmath}
@@ -31,6 +31,9 @@
   stringstyle=\color[rgb]{0.58,0,0.82}   % string literal style
 }
 
+\newcommand{\pkg}[1]{\textbf{#1}}
+\newcommand{\proglang}[1]{\textit{#1}}
+
 %
 % Content
 %
@@ -38,20 +41,23 @@
 \begin{document}
 
 \maketitle
- 
-\input{introduction}
-\input{api}
-\input{example}
-\input{pod}	
-%\input{ezreader}
+\begin{abstract}
+ \input{abstract}
+\end{abstract}
 
-\bibliographystyle{plain}
+\input{introduction}
+\input{arch}
+\newpage
+\input{gui}
+\input{pod}
+\input{data}	
+\input{summary}
+
+\bibliographystyle{apalike}
 \bibliography{references}
 
-%\clearpage
-%\appendix
-%\input{cli}
-%\input{apidoc}
-%\input{build}
+\newpage
+\appendix
+\input{api}
 
 \end{document}
