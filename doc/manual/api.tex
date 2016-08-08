@@ -13,12 +13,12 @@ although they represent references to objects allocated on the heap.
 There are also Python and R packages (called \code{stochbb} too) that provide access to
 the classes and functions of the C++ API. This allows for a convenient construction of systems
 of random variables while maintaining the speed of the C++ implementation. These APIs are 
-almost identical to the C++ one that R and \code{numpy} array are used instead of Eigen matrices
+almost identical to the C++ one, except that R and \code{numpy} arrays are used instead of Eigen matrices
 and vectors.
 
 The central class of \pkg{StochBB} is \code{Var}, representing a random variable. This could be a
 simple random variable having a specified distribution (\code{AtomicVar}) or a random
-variable that is derived from others like \code{Chain}, \code{Minimum}, \code{Maximum} or
+variable that is derived from others like \code{Sum}, \code{Minimum}, \code{Maximum} or
 \code{Mixture}. All random variables (atomic and derived) have probability density functions
 attached. They can be accessed using the \code{Var::density} method which returns a 
 \code{Density} object.
@@ -52,17 +52,17 @@ The result of the evaluation is stored into the vector \code{pdf}. There are onl
 or atomic random-variable types defined in \pkg{StochBB}:
 
 \begin{tabular}{l|lp{8.4cm}l}
- Constructor & Parameters & Process description \\ \hline
- \code{stochbb::delta} & \code{delay} & A constant delay or a process with a fixed waiting time. \\
- \code{stochbb::unif} & \code{a}, \code{b} & A process with a uniform-distributed waiting time. \\
- \code{stochbb::norm} & \code{mu}, \code{sigma} & A process with a normal-distributed \emph{waiting time}. \\
- \code{stochbb::gamma} & \code{k}, \code{theta} & A process with a gamma-distributed waiting time. \\
- \code{stochbb::invgamma} & \code{alpha}, \code{beta} & A process with an inverse gamma-distributed waiting time. \\
- \code{stochbb::weibull} & \code{k}, \code{lambda} & A process with a Weibull-distributed waiting time. \\
- \code{stochbb::studt} & \code{nu} & A process with a Student's t-distributed \emph{waiting time}. \\
+ Constructor & Parameters & Processing stage description \\ \hline
+ \code{stochbb::delta} & \code{delay} & A constant delay or a stage with a fixed waiting time. \\
+ \code{stochbb::unif} & \code{a}, \code{b} & A stage with a uniform-distributed waiting time. \\
+ \code{stochbb::norm} & \code{mu}, \code{sigma} & A stage with a normal-distributed \emph{waiting time}. \\
+ \code{stochbb::gamma} & \code{k}, \code{theta} & A stage with a gamma-distributed waiting time. \\
+ \code{stochbb::invgamma} & \code{alpha}, \code{beta} & A stage with an inverse gamma-distributed waiting time. \\
+ \code{stochbb::weibull} & \code{k}, \code{lambda} & A stage with a Weibull-distributed waiting time. \\
+ \code{stochbb::studt} & \code{nu} & A stage with a Student's t-distributed \emph{waiting time}. \\
 \end{tabular}
 
-More complex processes can be derived by combining these atomic random variables or as special cases of them. 
+More complex processing stages can be derived by combining these atomic random variables or as special cases of them. 
 For example, the exponential distribution $\text{Exp}(\lambda)$ is equivalent to a Gamma distribution with $k=1$ 
 and $\theta = \lambda^{-1}$.
 
@@ -82,9 +82,9 @@ real values. An affine transformation can be obtained using the overloaded * and
 constructs a random variable \code{Y} being an affine transformed of the random variable \code{X}.
 
 \subsubsection{Sums of random variables}
-Beside the affine transfrom of random variables, the most basic derived random variable is a \code{Chain}.
-This type represents the \emph{chaining} of random processes. Such a chain can be constructed using 
-the overloaded \code{+} operator or the \code{stochbb::chain} function. For example
+Beside the affine transform of random variables, the most basic derived random variable is a \code{Sum}.
+This type represents the \emph{chaining} of processing stages. Such a chain can be constructed using 
+the overloaded \code{+} operator or the \code{stochbb::sum} function. For example
 \begin{lstlisting}[language=C++]
  #include <stochbb/api.hh>
  using namespace stochbb;
@@ -166,7 +166,7 @@ a probability of $\frac{1}{3}$ and the outcome of $X_2$ with probability
 $\frac{2}{3}$.
 
 \subsubsection{Compound random variables}
-An important class of derived random processes are compound processes. There the parameters of the
+An important class of derived random processes are compound processes. There, the parameters of the
 distribution of a random variable are themselves random variables. That is
 \begin{equation}
  X \sim f(x|A)\,,\quad A \sim g(a|\theta)\,, \nonumber
@@ -247,7 +247,7 @@ approximation of its CDF on the interval $[0,500)$ using $1000$ steps. Then, the
 \code{Marginal\-Sampler::\allowbreak sample} method is used to obtain $1000$ independent samples.
 
 \subsection{Handling data}
-Being able to evaluate the CDFs and PDFs of random variables efficiently, \pkg{StochBB} can be
+Being able to evaluate the CDFs and PDFs of random variables accurately, \pkg{StochBB} can be
 used to fit a system of random variables to observations by either maximizing the (log) likelihood
 or minimizing the Kolmogorov-Smirnov statistic \cite[KS; e.g.,][]{Marsaglia2003}. For these tasks,
 \pkg{StochBB} provides two functions. One called \code{kolmogorov}, evaluating the KS statistic

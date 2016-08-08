@@ -3,11 +3,13 @@ Frequently, complex systems are described in terms of stochastic processes, as t
 underlying deterministic process is too complex to be modeled exactly or as the
 process is indeed random. It is not always the random process itself that is of 
 interest, but a derived quantity. For example, the distribution of waiting times until the
-process reaches a certain state. In the field of cognitive psychology, random processes are frequently used to
+process reaches a certain state. 
+
+In the field of cognitive psychology, random processes are frequently used to
 describe each processing stage in a chain of stages that leads to a response. The state of
 each random process itself is usually not measurable but the total response time of all processing 
 stages involved. Although each processing stage may be modeled as a random process, the waiting-time
-of a single stage is just a sample of a random variable%
+of a single stage is just a random variable%
 \footnote{This requires that the random process is \emph{reset} for each sample. This is usually 
 the case if the waiting time of the processing stage is determined by the time a random process
 starting at a specified state reaches a certain end state. Then, the waiting times of the processing
@@ -21,13 +23,13 @@ a complex system. For example, consider the following independent random variabl
 \begin{equation}
   X_1 \sim \Gamma(10, 100)\,, X_2 \sim \Gamma(20, 50)\text{ and } X_3 \sim \text{Exp}(0.01)\,,\nonumber
 \end{equation}
-which are described completely by their distribution. This means that the time, the
+which are described completely by their distribution. In terms of \emph{processing stages}, this means that the time, the
 processing stage $X_1$ needs to complete is gamma-distributed with shape $k=10$ and scale
 $\theta=100$. Analogously, the stages $X_2$ and $X_3$ are defined by their own waiting-time 
 distribution.
 
 From these basic building blocks, a more complex system can be assembled by
-combining them. Using the example above, one may define a new processing stage that is a chain of
+combining them. Using the example above, one may assume sequential processing. That is, a chain of
 the stages $X_1,\dots,X_3$. This simple chain then describes the successive
 processing of information entering the first stage described by $X_1$.
 Once the first processing stage finishes, its result gets forwarded to the second stage described
@@ -39,16 +41,20 @@ or expressed mathematically
 \end{equation}
 
 \pkg{SochBB} determines the probability density function (PDF) or cumulative probability function
-(CDF) of the waiting-time distribution of the process $Y$ analytically (as far as
+(CDF) of the waiting-time distribution of $Y$ analytically (as far as
 possible) or resorts to a numeric method if the analytic approach fails 
-\cite[see][for examples of numerical approximations outperforming the stochastic simulation approach]{Thomas2012, Thomas2013}.
-Moreover it provides an efficient and correct sampler for the system of random variables.
+\cite[see][for examples of numerical approximations outperforming the
+stochastic simulation approach]{Thomas2012, Thomas2013}. Moreover it provides an
+efficient and correct sampler for the system of random variables.
 
-In the following section, I outline the representation of random variables and the reductions performed on a network. 
-In section \ref{sec:arch}, I describe the architecture of the framework followed by a in-detail description of the graphical
-user interface (GUI) application that allows to assemble and analyze networks of dependent random variables easily. In section
-\ref{sec:pod} I showcase the usage of the GUI application for an analysis of a simple response latency model. Finally, in section
-\ref{sec:data} I describe how parameters of the distributions of random variables can be estimated from data.
+In the following section, I outline the representation of random variables and the
+reductions performed on a network. In section \ref{sec:arch}, I describe the
+architecture of the framework followed by a in-detail description of the
+graphical user interface (GUI) application that allows to assemble and analyze
+networks of dependent random variables easily. In section \ref{sec:pod}, I
+showcase the usage of the GUI application for an analysis of a simple response
+latency model. Finally, in section \ref{sec:data}, I describe how parameters of
+the distributions of random variables can be estimated from data.
 
 
 \section{Representation and reductions of random variables}
@@ -97,8 +103,9 @@ result are well supported on the chosen interval and the grid must be fine enoug
 capture the details of all distributions. 
 
 Like any numerical approach, the FFT convolution is only an approximation. Hence \pkg{SochBB}
-tries to perform the convolutions analytically before resorting to the numerical approach. First
-all sums of random variables are flattened. That is, 
+tries to perform convolutions analytically before resorting to the numerical approach. 
+
+First, all sums of random variables are flattened. That is, 
 \begin{equation}
  \begin{array}{l}
   Y_1 = X_1 + X_2\\
@@ -128,13 +135,12 @@ $\Gamma(\cdot; k, \theta)$ the gamma distribution with shape $k$ and scale $\the
 
 \subsection{Minimum and maximum of random variables}
 The minimum or maximum of some given random variables, e.g. $Y=\min\{X_1,X_2\}$ or 
-$Y=\max\{X_1,X_2\}$ are themselves random variables. These derived random variables can be used to
+$Y=\max\{X_1,X_2\}$ are themselves random variables. These derived random variables may
 express the waiting time of a processing stage that consists of several independent processing stages being
 performed in parallel (in contrast to sequential processing described by sums of random variables). 
 If the complete system finishes once the first of the parallel processing stages finishes, the 
-resulting waiting time can be expressed by the minimum of the underlying random variables. If the system
-finishes once all underlying processing stages are finished, the resulting waiting time can be described
-by the maximum.	 
+resulting waiting time is the minimum of the underlying random variables. If the system
+finishes once all underlying processing stages are finished, the resulting waiting time is the maximum.	 
 
 If the two independent random variables $X_1$ and $X_2$ are distributed according to the (cumulative) distribution
 functions $F_1(x)$ and $F_2(x)$, the maximum of these two random variables $Y=\max\{X_1,X_2\}$
@@ -163,7 +169,7 @@ then, possible common terms are collected like
 
 The latter transformation does not \emph{ensure} independence of random variables, but 
 decreases the complexity of setting-up a complex system of random variables by 
-resolving simple-structured dependencies between random variables.
+resolving simple-structured dependencies between random variables analytically.
 
 \subsection{Mixture of random variables}
 A mixture is the weighted sum of random variables
@@ -212,7 +218,7 @@ is given by the probability of $X_1<X_2$. Hence the density of the result variab
 \end{align}
 
 \subsection{Conditional sum of random variables}
-One of the few non-textbook examples of a derived random variable is the conditional sum of random variables. 
+The only non-textbook example of a derived random variable, is the conditional sum of random variables. 
 It can be defined as
 \begin{equation}
  Z = \begin{cases}
@@ -223,24 +229,24 @@ It can be defined as
 where $X_1, X_2, Y_1$ and $X_1, X_2, Y_2$ are mutually independent. $Y_1$ and $Y_2$ may be 
 dependent random variables. Although being similar to the conditional random variable, there is an 
 important difference: Both possible outcomes ($X_1+Y_1$ and $X_2+Y_2$) 
-are not independent from the condition (i.e. $X_1+Y_1$ depends trivially on $X_1$).
+are not independent from the condition ($X_1+Y_1$ depends trivially on $X_1$).
 Therefore, the simple conditional random variable cannot be used here. However, like with the
 conditional random variable, common terms are removed first. That is
 \begin{equation}
  Z = \begin{cases}
    X_1 + Y_1 + C& \mbox{if } X_1 + C < X_2 + C\\
-   X_2 + Y_2 + C& \mbox{else\,,} 
+   X_2 + Y_2 + C& \mbox{else} 
  \end{cases} \longrightarrow 
  Z = C + \begin{cases}
    X_1 + Y_1 & \mbox{if } X_1 < X_2\\
-   X_2 + Y_2 & \mbox{else\,,} 
+   X_2 + Y_2 & \mbox{else\,.} 
  \end{cases} \nonumber
 \end{equation}
 
 
 The conditional sum of random variables can be used to describe two independent parallel processing
 stages where the fastest stage will trigger another stage. For example, if $X_1$ \emph{wins}, it triggers $Y_1$
-and if $X_2$ \emph{wins} it triggers $Y_2$. In contrast to the conditional sum, the 
+and if $X_2$ \emph{wins}, it triggers $Y_2$. In contrast to the conditional sum, the 
 simple conditional random variable does not trigger a third stage but \emph{selects} the value of a third stage. 
 Therefore, the actual waiting time of the \emph{winning} stage does not have an influence on the 
 selected one and may lead to non-causal waiting times if $X_1$ and $X_2$ are larger than $Y_1$ and
@@ -283,7 +289,7 @@ and it can be evaluated using the same \emph{trick} used for chains of random va
 
 \subsection{Compound random variables}
 The most complex derived random-variable type is the compound random variable. That is a random variable
-$X$ distributed according to a parametric distribution $X\sim f_{X|A}(x;A)$ with parameter $A$. $A$, however, 
+$X$, distributed according to a parametric distribution $X\sim f_{X|A}(x;A)$ with parameter $A$. $A$, however, 
 is itself a random variable with its own distribution $A\sim g(a)$. The distribution of the compound 
 random variable $X$ is then obtained by marginalizing the parameter of the PDF $f_{X|A}(\cdot;a)$ as 
 \begin{equation}

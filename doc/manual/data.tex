@@ -20,7 +20,8 @@ a numerical optimization algorithm.
 An example R code could be
 \input{podFitCode}
 
-This code is then able to find the $\theta$ parameter for the S2 stage by means of maximum likelihood (see Figure
+This code is then able to find an estimate of the $\theta$ parameter for the S2 stage by means of
+maximum likelihood (see Figure
 \ref{fig:llprof}). 
 
 \begin{figure}[!ht]
@@ -32,6 +33,6 @@ This code is then able to find the $\theta$ parameter for the S2 stage by means 
 \end{figure}
 
 Moreover, the \code{logLikelihood} can then also be used to profile the likelihood (compare Figure
-\ref{fig:llprof}) given the data to obtain confidence intervals for the parameter estimate. There
+\ref{fig:llprof}) given the data, to obtain confidence intervals for the parameter estimate. There
 the true value of $\theta=120$ is shown as a solid vertical line and the estimate as the dashed
 vertical line. 
