@@ -47,7 +47,7 @@ NodeBase::_factoryFunctions({
   {"const",        (NodeBase::nodeFactoryFunction) ConstantNode::fromXml},
   {"unifv",        (NodeBase::nodeFactoryFunction) UniformVarNode::fromXml},
   {"normv",        (NodeBase::nodeFactoryFunction) NormalVarNode::fromXml},
-  {"cnormv",       (NodeBase::nodeFactoryFunction) CompoundNormalVarNode::fromXml},
+  {"cnormalv",     (NodeBase::nodeFactoryFunction) CompoundNormalVarNode::fromXml},
   {"gammav",       (NodeBase::nodeFactoryFunction) GammaVarNode::fromXml},
   {"cgammav",      (NodeBase::nodeFactoryFunction) CompoundGammaVarNode::fromXml},
   {"invgammav",    (NodeBase::nodeFactoryFunction) InvGammaVarNode::fromXml},
@@ -1105,12 +1105,12 @@ NormalVarNode::fromXml(const QDomElement &node, ParserInfo &info, QHash<QString,
  * Implementation of CompoundNormalVarNode
  * ********************************************************************************************* */
 CompoundNormalVarNode::CompoundNormalVarNode(Network *parent)
-  : NodeBase("Weibull", parent)
+  : NodeBase("N", parent)
 {
   this->addSocket(new Socket(QNetSocket::RIGHT, "out", "", this));
   this->addSocket(new Socket(QNetSocket::LEFT, "mu", QChar(0x03BC), this));
   this->addSocket(new Socket(QNetSocket::LEFT, "sigma", QChar(0x03C3), this));
-  _type = "weibull variable";
+  _type = "normal variable";
 }
 
 QDomElement

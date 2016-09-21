@@ -1,0 +1,29 @@
+<net>
+ <node x="181" label="Γ" type="gammav" id="0x7f9c3b635e80" y="111">
+  <parameter type="float" name="k">1</parameter>
+  <parameter type="float" name="theta">1</parameter>
+ </node>
+ <node x="180" label="Γ" type="gammav" id="0x7f9c3daec710" y="160">
+  <parameter type="float" name="k">1</parameter>
+  <parameter type="float" name="theta">1</parameter>
+ </node>
+ <node x="262" label="Min" type="minimum" id="0x7f9c3de81cc0" y="154"/>
+ <node x="371" label="Max" type="maximum" id="0x7f9c3dec1650" y="115"/>
+ <node x="495" label="Scatter Plot" type="scatterplot" id="0x7f9c3db38820" y="119">
+  <parameter type="int" name="samples">1000</parameter>
+ </node>
+ <node x="484" label="Marginal Plot" type="marginalplot" id="0x7f9c3dd20580" y="171">
+  <parameter type="int" name="graphs">2</parameter>
+  <parameter type="float" name="min">0</parameter>
+  <parameter type="float" name="max">1</parameter>
+  <parameter type="int" name="steps">100</parameter>
+ </node>
+ <edge srcSocket="out" destNode="0x7f9c3de81cc0" srcNode="0x7f9c3b635e80" destSocket="X"/>
+ <edge srcSocket="out" destNode="0x7f9c3de81cc0" srcNode="0x7f9c3daec710" destSocket="Y"/>
+ <edge srcSocket="out" destNode="0x7f9c3dec1650" srcNode="0x7f9c3de81cc0" destSocket="Y"/>
+ <edge srcSocket="out" destNode="0x7f9c3dec1650" srcNode="0x7f9c3b635e80" destSocket="X"/>
+ <edge srcSocket="out" destNode="0x7f9c3db38820" srcNode="0x7f9c3dec1650" destSocket="X"/>
+ <edge srcSocket="out" destNode="0x7f9c3db38820" srcNode="0x7f9c3de81cc0" destSocket="Y"/>
+ <edge srcSocket="out" destNode="0x7f9c3dd20580" srcNode="0x7f9c3dec1650" destSocket="1"/>
+ <edge srcSocket="out" destNode="0x7f9c3dd20580" srcNode="0x7f9c3de81cc0" destSocket="2"/>
+</net>
