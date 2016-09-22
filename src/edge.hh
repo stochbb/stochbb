@@ -9,6 +9,7 @@ class Network;
 class NodeBase;
 class ParserInfo;
 
+
 class Edge : public QNetEdge
 {
   Q_OBJECT

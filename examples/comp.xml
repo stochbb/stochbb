@@ -1,29 +1,29 @@
 <net>
- <node x="205" y="170" type="cnormalv" id="0x7f8443b170d0" label="N"/>
- <node x="2" y="183" type="invgammav" id="0x7f8443a7e720" label="1/Γ">
+ <node type="cnormalv" id="0x7fc608ef43c0" x="205" label="compNorm" y="170"/>
+ <node type="invgammav" id="0x7fc608ef2e90" x="2" label="1/Γ" y="183">
   <parameter type="float" name="alpha">1</parameter>
   <parameter type="float" name="beta">1</parameter>
  </node>
- <node x="123" y="152" type="const" id="0x7f8443a7f580" label="C">
+ <node type="const" id="0x7fc60b206880" x="123" label="C" y="152">
   <parameter type="float" name="value">0</parameter>
  </node>
- <node x="84" y="183" type="affine" id="0x7f8443b3b360" label="a X + b">
-  <parameter type="float" name="shift">95</parameter>
+ <node type="affine" id="0x7fc60b1be770" x="84" label="a X + b" y="183">
   <parameter type="float" name="scale">1</parameter>
+  <parameter type="float" name="shift">95</parameter>
  </node>
- <node x="217" y="219" type="normv" id="0x7f8443b3bdc0" label="N">
-  <parameter type="float" name="sigma">100</parameter>
+ <node type="normv" id="0x7fc60b1bf490" x="242" label="Normal" y="222">
   <parameter type="float" name="mu">0</parameter>
+  <parameter type="float" name="sigma">100</parameter>
  </node>
- <node x="309" y="197" type="marginalplot" id="0x7f8443b3ffb0" label="Marginal Plot">
-  <parameter type="int" name="steps">200</parameter>
+ <node type="marginalplot" id="0x7fc60b1bfe60" x="357" label="Marginal Plot" y="196">
   <parameter type="float" name="min">-600</parameter>
   <parameter type="float" name="max">600</parameter>
   <parameter type="int" name="graphs">2</parameter>
+  <parameter type="int" name="steps">200</parameter>
  </node>
- <edge destNode="0x7f8443b170d0" destSocket="mu" srcNode="0x7f8443a7f580" srcSocket="out"/>
- <edge destNode="0x7f8443b3b360" destSocket="in" srcNode="0x7f8443a7e720" srcSocket="out"/>
- <edge destNode="0x7f8443b170d0" destSocket="sigma" srcNode="0x7f8443b3b360" srcSocket="out"/>
- <edge destNode="0x7f8443b3ffb0" destSocket="1" srcNode="0x7f8443b170d0" srcSocket="out"/>
- <edge destNode="0x7f8443b3ffb0" destSocket="2" srcNode="0x7f8443b3bdc0" srcSocket="out"/>
+ <edge srcSocket="out" srcNode="0x7fc60b206880" destNode="0x7fc608ef43c0" destSocket="mu"/>
+ <edge srcSocket="out" srcNode="0x7fc608ef2e90" destNode="0x7fc60b1be770" destSocket="in"/>
+ <edge srcSocket="out" srcNode="0x7fc60b1be770" destNode="0x7fc608ef43c0" destSocket="sigma"/>
+ <edge srcSocket="out" srcNode="0x7fc608ef43c0" destNode="0x7fc60b1bfe60" destSocket="1"/>
+ <edge srcSocket="out" srcNode="0x7fc60b1bf490" destNode="0x7fc60b1bfe60" destSocket="2"/>
 </net>
